@@ -128,4 +128,5 @@ async function appendToSheet(values) {
   }
 }
 
+// عند فشل الخطوة الأخيرة في الـworkflow (git push) لا نعيد تعيين البيانات
 scan().catch(e => { console.error('خطأ فادح:', e.message); process.exit(1); });
