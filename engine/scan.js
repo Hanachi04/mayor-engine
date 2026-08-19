@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
-const CHAT = process.env.TELEGRAM_CHAT || '@Paracaudina';
+const CHAT = process.env.TELEGRAM_CHAT || '-1004335182090';
 const SHEET_CSV_URL = process.env.SHEET_CSV_URL || ''; // رابط CSV المنشور لشيت السجل
 const MAX_SIGNALS_PER_DAY = 6;
 // نظام النوافذ الزمنية: اليوم مقسم إلى 6 نوافذ × 4 ساعات (00–04، 04–08، …، 20–24).
