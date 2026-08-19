@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "dir": "LONG",
+    "price": 77.38,
+    "votes": 4,
+    "votesByTf": [
+      "5m→LONG",
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 72.6392251815979,
+    "rsi15": 69.3069306930687,
+    "sl": 77.145357142857,
+    "tp1": 77.536428571429,
+    "tp2": 77.692857142857,
+    "tp3": 77.849285714286,
+    "atr15": 0.15642857142857025,
+    "tf": "MTF 5m+15m+1h+4h",
+    "symbol": "SOLUSDT",
+    "priceDecimals": 8,
+    "orderBookImbalance": 20.23,
+    "tapeBuyPct": 100,
+    "tapeSamples": 500,
+    "date": "2026-08-19",
+    "ts": 1787137177553,
+    "slot": 2,
+    "closed": false
+  }
+]
