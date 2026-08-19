@@ -25,6 +25,50 @@
     "date": "2026-08-19",
     "ts": 1787137177553,
     "slot": 2,
+    "closed": true,
+    "closePrice": 81.52,
+    "closeResult": "TP3",
+    "closePct": 0.606,
+    "closeAt": "2026-08-19T18:06:18.747Z"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "dir": "LONG",
+    "price": 0.18,
+    "atr": 0.001921428571428574,
+    "atrPct": 0.010674603174603189,
+    "adx": 41.63795654888037,
+    "pdi": 35.31598513011151,
+    "mdi": 19.330855018587375,
+    "pct": 29.87012987012987,
+    "filters": [
+      "ADX 41.6",
+      "DI +DI",
+      "TREND",
+      "SMC_FVG",
+      "SUPERTREND"
+    ],
+    "closedCandle": 1787162400000,
+    "index": 499,
+    "sl": 0.17711785714285713,
+    "tp1": 0.18288214285714285,
+    "tp2": 0.18576428571428572,
+    "tp3": 0.18864642857142858,
+    "rr": 3,
+    "votes": 3,
+    "totalFrames": 3,
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "adx4h": 31.534415835765284,
+    "rsi4h": 65.99999999999994,
+    "tf": "15m (MTF 15m+1h+4h)",
+    "priceDecimals": 5,
+    "date": "2026-08-19",
+    "ts": 1787162780921,
+    "slot": 4,
     "closed": false
   }
 ]
