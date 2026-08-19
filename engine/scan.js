@@ -81,6 +81,69 @@ async function send(msg) {
   console.log(ok ? `✓ أُرسلت رسالة لتليجرام` : `✗ فشل إرسال لتليجرام (HTTP ${res.status})`);
 }
 
+// ===== نظام الإغلاق الذاتي: متابعة الصفقات المفتوحة في كل دورة وإغلاقها عند بلوغ هدف أو ضرب SL =====
+// مدة حياة الإشارة الافتراضية: 48 ساعة من إرسالها؛ بعدها تُغلق تلقائيًا إذا لم تُحسم.
+const TRADE_MAX_AGE_MS = 48 * 3600 * 1000;
+
+async function getTicker(symbol) {
+  const url = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!res.ok || !data?.price) throw new Error(`ticker HTTP ${res.status}`);
+  return +data.price;
+}
+
+async function checkOpenTrades() {
+  const today = fmtDate();
+  const tracked = loadTracked();
+  const open = tracked.filter(t => !t.closed);
+  if (open.length === 0) { console.log(`لا صفقات مفتوحة للمتابعة (${tracked.length} في السجل)`); return; }
+  const prices = {};
+  for (const t of open) {
+    try {
+      prices[t.symbol] = await getTicker(t.symbol);
+    } catch (e) {
+      console.log(`تعذر جلب سعر ${t.symbol} — تُتخطى في هذه الدورة`);
+    }
+  }
+  let closedCount = 0;
+  for (const t of open) {
+    const price = prices[t.symbol];
+    if (!Number.isFinite(price)) continue;
+    let result = null, pct = 0;
+    const k = t.dir === 'LONG' ? 1 : -1;
+    const slHit = k === 1 ? price <= t.sl : price >= t.sl;
+    const tp1Hit = k === 1 ? price >= t.tp1 : price <= t.tp1;
+    const tp2Hit = k === 1 ? price >= t.tp2 : price <= t.tp2;
+    const tp3Hit = k === 1 ? price >= t.tp3 : price <= t.tp3;
+    const expired = (Date.now() - t.ts) > TRADE_MAX_AGE_MS;
+    if (slHit) { result = 'SL'; pct = k * (t.sl - t.price) / t.price * 100; }
+    else if (tp3Hit) { result = 'TP3'; pct = k * (t.tp3 - t.price) / t.price * 100; }
+    else if (tp2Hit) { result = 'TP2'; pct = k * (t.tp2 - t.price) / t.price * 100; }
+    else if (tp1Hit) { result = 'TP1'; pct = k * (t.tp1 - t.price) / t.price * 100; }
+    else if (expired) { result = 'انتهت المدة'; pct = k * (price - t.price) / t.price * 100; }
+    if (!result) continue;
+    t.closed = true;
+    t.closePrice = price;
+    t.closeResult = result;
+    t.closePct = Number(pct.toFixed(3));
+    t.closeAt = new Date().toISOString();
+    closedCount++;
+    const emoji = result === 'SL' ? '🔴' : result.startsWith('TP') ? '🎯' : '⏱️';
+    const msg = `${emoji} <b>إغلاق MaYor — ${t.symbol}</b>
+${result === 'SL' ? '⛔ ضرب وقف الخسارة' : result.startsWith('TP') ? '✅ أصابت ' + result : '⏱️ انتهت مدة الإشارة (48 ساعة)'}
+📍 الدخول: <code>${formatPrice(t.price, t.symbol)}</code> | الإغلاق: <code>${formatPrice(price, t.symbol)}</code>
+📈 النتيجة: <b>${t.closePct > 0 ? '+' : ''}${t.closePct}%</b>
+🎯 الأهداف: TP1 <code>${formatPrice(t.tp1, t.symbol)}</code> | TP2 <code>${formatPrice(t.tp2, t.symbol)}</code> | TP3 <code>${formatPrice(t.tp3, t.symbol)}</code>
+⏰ ${fmtTime()}`;
+    await send(msg);
+    console.log(`✗ أُغلقت ${t.symbol}: ${result} (${t.closePct}%)`);
+  }
+  if (closedCount > 0) saveTracked(tracked);
+  const stillOpen = tracked.filter(t => !t.closed).length;
+  console.log(`متابعة الصفقات: أُغلق ${closedCount} | مفتوحة: ${stillOpen}`);
+}
+
 async function getKlines(symbol, interval = '4h', limit = 250) {
   // الأطر الصغيرة لا تحتاج 200 شمعة؛ يكفي الحد الأدنى لحساب المؤشرات بدقة معقولة.
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
@@ -217,18 +280,23 @@ const fmtTime = () => new Date().toLocaleTimeString('en-GB', { hour12: false, ti
 
 async function scan() {
   const today = fmtDate();
-  const tracked = loadTracked();
+  let tracked = loadTracked();
   const todayCount = tracked.filter(t => t.date === today).length;
   let emittedToday = todayCount;
   console.log(`بدء الفحص — ${new Date().toISOString()} — إشارات اليوم: ${todayCount}/${MAX_SIGNALS_PER_DAY}`);
 
   // نافذة اليوم الحالية: إن كانت نافذة اليوم قد استُهلكت إشارة فيها، يُكتفى بذلك ويُنتظر الفحص القادم.
-  const todaySlotSignals = tracked.filter(t => t.date === today && t.slot === currentSlot()).length;
+  const todaySlotSignals = tracked.filter(t => t.date === today && t.slot === currentSlot() && !t.closed).length;
   if (todaySlotSignals > 0) {
     console.log(`نافذة اليوم (${currentSlot()}) استُهلكت بالفعل — ننتظر النافذة التالية`);
     return;
   }
   if (todayCount >= MAX_SIGNALS_PER_DAY) { console.log('حد إشارات اليوم وصل'); return; }
+
+  // الإغلاق الذاتي أولًا: متابعة الصفقات المفتوحة وتسجيل نتائجها.
+  // ملاحظة: checkOpenTrades يعيد تحميل السجل ويحفظه، فيجب إعادة تحميله هنا (let tracked بعد الإغلاق).
+  await checkOpenTrades();
+  tracked = loadTracked();
 
   const res = await Promise.all(SYMS.map(evaluate));
   // اختيار إشارة واحدة للنافذة الحالية: الأفضل جودة (أكثر أصواتًا) وغير مكررة في اليوم.
@@ -240,6 +308,7 @@ async function scan() {
     candidates.push({ ...s, symbol: SYMS[i] });
   }
   candidates.sort((a, b) => (b.votes || 0) - (a.votes || 0) || (b.rsi4h || 0) - (a.rsi4h || 0));
+  // السجل المحدّث بعد الإغلاق الذاتي هو الأساس (ملاحظة: tracked أعيد تحميله أعلاه).
   const loopSignals = candidates.slice(0, 1);
   for (let i = 0; i < loopSignals.length; i++) {
     const s = loopSignals[i];
