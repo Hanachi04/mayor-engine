@@ -115,7 +115,7 @@ function main() {
 
   const emoji = summary.winCount >= summary.losses ? '📈' : '📉';
   const lines = [
-    `${emoji} <b>تقرير MaYor الأسبوعي</b>`,
+    `🚨 <b>تقرير MaYor الأسبوعي</b> 🚨`,
     `📅 من ${startLabel} إلى ${fmtDate()}`,
     ``,
     `📊 <b>ملخص الأسبوع</b>`,
