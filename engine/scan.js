@@ -129,13 +129,16 @@ async function checkOpenTrades() {
     t.closePct = Number(pct.toFixed(3));
     t.closeAt = new Date().toISOString();
     closedCount++;
-    const emoji = result === 'SL' ? '🔴' : result.startsWith('TP') ? '🎯' : '⏱️';
-    const msg = `${emoji} <b>إغلاق MaYor — ${t.symbol}</b>
-${result === 'SL' ? '⛔ ضرب وقف الخسارة' : result.startsWith('TP') ? '✅ أصابت ' + result : '⏱️ انتهت مدة الإشارة (48 ساعة)'}
-📍 الدخول: <code>${formatPrice(t.price, t.symbol)}</code> | الإغلاق: <code>${formatPrice(price, t.symbol)}</code>
-📈 النتيجة: <b>${t.closePct > 0 ? '+' : ''}${t.closePct}%</b>
-🎯 الأهداف: TP1 <code>${formatPrice(t.tp1, t.symbol)}</code> | TP2 <code>${formatPrice(t.tp2, t.symbol)}</code> | TP3 <code>${formatPrice(t.tp3, t.symbol)}</code>
-⏰ ${fmtTime()}`;
+    const resText = result === 'SL' ? '⛔ ضرب وقف الخسارة' : result.startsWith('TP') ? '✅ أصابت ' + result : '⏱️ انتهت مدة الإشارة (48 ساعة)';
+    const dirText = t.dir === 'LONG' ? 'شراء 🟢' : 'بيع 🔴';
+    const msg = `🚨 <b>إغلاق صفقة — ${t.symbol}</b> 🚨\n\n` +
+      `📈 الاتجاه: ${dirText} (${t.dir})\n` +
+      `${resText}\n\n` +
+      `💰 سعر الدخول: <code>${formatPrice(t.price, t.symbol)}</code>\n` +
+      `🏁 سعر الإغلاق: <code>${formatPrice(price, t.symbol)}</code>\n\n` +
+      `📈 النتيجة: <b>${t.closePct > 0 ? '+' : ''}${t.closePct}%</b>\n` +
+      `🎯 الأهداف: TP1 <code>${formatPrice(t.tp1, t.symbol)}</code> | TP2 <code>${formatPrice(t.tp2, t.symbol)}</code> | TP3 <code>${formatPrice(t.tp3, t.symbol)}</code>\n` +
+      `⏰ ${fmtTime()}`;
     await send(msg);
     console.log(`✗ أُغلقت ${t.symbol}: ${result} (${t.closePct}%)`);
   }
@@ -326,10 +329,37 @@ async function scan() {
     tracked.push(s);
     saveTracked(tracked);
     emittedToday++;
-    const microLine = micro ? `\n📚 Order Book: ${formatMicro(micro.orderBookImbalance)}% | Tape شراء: ${formatMicro(micro.tapeBuyPct)}%` : '\n📚 Order Book/Tape: غير متاح مؤقتًا';
-    const tfLine = Array.isArray(s.votesByTf) && s.votesByTf.length ? `\n🗓️ أطر مؤيدة: ${s.votesByTf.join(' | ')}` : '';
-    const rsiLine = `RSI 4H: ${s.rsi4h ?? '—'} | RSI 15د: ${s.rsi15 ?? '—'}`;
-    const msg = `<b>📡 MaYor Signal (MTF)</b>\n\n${s.dir === 'LONG' ? '🟢' : '🔴'} <b>${s.dir} ${s.symbol}</b>\n📍 Entry: <code>${formatPrice(s.price, s.symbol)}</code>\n🛑 SL: <code>${formatPrice(s.sl, s.symbol)}</code>\n🎯 TP1: <code>${formatPrice(s.tp1, s.symbol)}</code>\n🎯 TP2: <code>${formatPrice(s.tp2, s.symbol)}</code>\n🎯 TP3: <code>${formatPrice(s.tp3, s.symbol)}</code>\n📊 ${rsiLine} | أصوات: ${s.votes}/4${tfLine}${microLine}\n⏰ ${fmtTime()}`;
+    // ===== صيغة الرسالة الجديدة (نموذج المستخدم الموحد) =====
+    const directionText = s.dir === 'LONG' ? 'شراء 🟢' : 'بيع 🔴';
+    const entryLabel = s.dir === 'LONG' ? 'شراء 📈' : 'بيع 🔴';
+    // نسبة المخاطرة/العائد: المسافة نحو TP3 ÷ المسافة نحو SL (نسبة 1:R)
+    const rr = (() => {
+      const slDist = Math.abs(s.price - s.sl);
+      const tpDist = Math.abs(s.tp3 - s.price);
+      if (!Number.isFinite(slDist) || slDist <= 0) return null;
+      return Number((tpDist / slDist).toFixed(1));
+    })();
+    // قوة التوافق: نسبة الأصوات المؤيدة × RSI 4H (نموذج تقريبي للتوافق)
+    const strength = Number.isFinite(s.rsi4h) && Number.isFinite(s.votes)
+      ? Number((Math.min(s.votes, 4) / 4 * 100).toFixed(1)) : null;
+    const microLine = micro
+      ? `\n📚 Order Book: ${formatMicro(micro.orderBookImbalance)}% | Tape شراء: ${formatMicro(micro.tapeBuyPct)}%`
+      : '';
+    const tfLine = Array.isArray(s.votesByTf) && s.votesByTf.length
+      ? `\n🗓️ أطر مؤيدة: ${s.votesByTf.join(' | ')}` : '';
+    const msg = `🚨 <b>إشارة ${s.dir === 'LONG' ? 'Long' : 'Short'}</b> 🚨\n\n` +
+      ` الزوج: <b>${s.symbol}</b>\n` +
+      `🏷️ النوع: كريبتو 🪙\n` +
+      `📈 الاتجاه: ${directionText}\n` +
+      `💰 سعر الدخول: <code>${formatPrice(s.price, s.symbol)}</code>\n\n` +
+      `🛑 وقف الخسارة (SL): <code>${formatPrice(s.sl, s.symbol)}</code>\n` +
+      `🎯 الهدف الأول (TP1): <code>${formatPrice(s.tp1, s.symbol)}</code>\n` +
+      `🎯 الهدف الثاني (TP2): <code>${formatPrice(s.tp2, s.symbol)}</code>\n` +
+      `🎯 الهدف الثالث (TP3): <code>${formatPrice(s.tp3, s.symbol)}</code>\n` +
+      (rr ? `⚖️ المخاطرة/العائد: <b>1 : ${rr}</b>\n` : '') +
+      (strength ? `🔥 قوة التوافق: <b>${strength}%</b> (أصوات: ${s.votes}/4)\n` : '') +
+      `📌 الإطار الزمني: 15 دقيقة | RSI 4H: ${Number.isFinite(s.rsi4h) ? s.rsi4h.toFixed(1) : '—'}${tfLine}${microLine}\n` +
+      `⏰ ${fmtTime()}`;
     await send(msg);
     await appendToSheet([
       tracked.filter(t => t.date === today).length,
