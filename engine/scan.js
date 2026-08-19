@@ -19,6 +19,8 @@ const MAX_SIGNALS_PER_DAY = 6;
 const SLOT_HOURS = 4;
 function currentSlot() { return Math.floor(new Date().getUTCHours() / SLOT_HOURS); }
 const SYMS = (process.env.SYMBOLS || 'BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT,ADAUSDT,AVAXUSDT,LINKUSDT,DOTUSDT').split(',');
+// Binance API endpoints (fallback chain for GitHub Actions rate limiting / geo-blocking)
+const BINANCE_ENDPOINTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const pricePrecisionCache = new Map();
 
@@ -107,11 +109,18 @@ async function send(msg) {
 const TRADE_MAX_AGE_MS = 48 * 3600 * 1000;
 
 async function getTicker(symbol) {
-  const url = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (!res.ok || !data?.price) throw new Error(`ticker HTTP ${res.status}`);
-  return +data.price;
+  let lastErr = null;
+  for (const base of BINANCE_ENDPOINTS) {
+    try {
+      const url = `${base}/api/v3/ticker/price?symbol=${symbol}`;
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`ticker HTTP ${res.status} from ${base}`); continue; }
+      const data = await res.json();
+      if (!data?.price) { lastErr = new Error(`ticker invalid response from ${base}`); continue; }
+      return +data.price;
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('ticker: all endpoints failed');
 }
 
 async function checkOpenTrades() {
@@ -170,14 +179,21 @@ async function checkOpenTrades() {
 
 // ===== جلب بيانات الشموع =====
 async function getKlines(symbol, interval = '15m', limit = 500) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (!res.ok || !Array.isArray(data)) throw new Error(`klines HTTP ${res.status}`);
-  return data.map(k => ({
-    openTime: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4],
-    volume: +k[5], closeTime: k[6], takerBuyVolume: +k[9]
-  }));
+  let lastErr = null;
+  for (const base of BINANCE_ENDPOINTS) {
+    try {
+      const url = `${base}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`klines HTTP ${res.status} from ${base}`); continue; }
+      const data = await res.json();
+      if (!Array.isArray(data)) { lastErr = new Error(`klines invalid response from ${base}`); continue; }
+      return data.map(k => ({
+        openTime: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4],
+        volume: +k[5], closeTime: k[6], takerBuyVolume: Number.isFinite(+k[9]) ? +k[9] : NaN
+      }));
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('klines: all endpoints failed');
 }
 
 // ===== Normalization =====
