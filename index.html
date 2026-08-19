@@ -70,7 +70,7 @@
       <tr>
         <th>#</th><th>التاريخ</th><th>الوقت</th><th>الزوج</th><th>الاتجاه</th>
         <th>الدخول</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
-        <th>النتيجة</th><th>الحالة</th>
+        <th>النتيجة</th><th>الحالة</th><th>Order Book</th><th>Tape شراء</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -121,7 +121,7 @@ function render(list) {
   document.getElementById('st-short').textContent = short;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><div class="big">📡</div>الإشارات ستظهر هنا فور بدء المحرك بإنتاج أول صفقة<br>المحرك يفحص السوق كل 30 دقيقة حتى 6 إشارات يوميًا</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty"><div class="big">📡</div>الإشارات ستظهر هنا فور بدء المحرك بإنتاج أول صفقة<br>المحرك يفحص السوق كل 30 دقيقة حتى 6 إشارات يوميًا</div></td></tr>`;
     return;
   }
   tbody.innerHTML = list.map((t, i) => {
@@ -132,15 +132,17 @@ function render(list) {
     if (resCls === 'open' && t.closed === true) resCls = 'closed';
     if (rl.includes('win') || rl.includes('tp1') || rl.includes('ربح')) resCls = 'win';
     else if (rl.includes('loss') || rl.includes('sl') || rl.includes('خسارة')) resCls = 'loss';
-    const f = n => (n == null || n === '') ? '—' : Number(n).toFixed(2);
+    const f = (n, decimals) => (n == null || n === '') ? '—' : Number(n).toFixed(Number.isFinite(Number(decimals)) ? Math.max(0, Math.min(12, Number(decimals))) : (Math.abs(Number(n)) >= 1000 ? 2 : Math.abs(Number(n)) >= 100 ? 3 : Math.abs(Number(n)) >= 1 ? 4 : Math.abs(Number(n)) >= 0.1 ? 5 : Math.abs(Number(n)) >= 0.01 ? 6 : 8));
     return `<tr>
       <td>${i+1}</td>
       <td>${t.date||'—'}</td><td>${t.time||t.fmtTime||'—'}</td>
       <td><b>${t.symbol||'—'}</b></td>
       <td class="${dirCls}">${t.dir}</td>
-      <td>${f(t.price)}</td><td>${f(t.sl)}</td><td>${f(t.tp1)}</td><td>${f(t.tp2)}</td><td>${f(t.tp3)}</td>
+      <td>${f(t.price,t.priceDecimals)}</td><td>${f(t.sl,t.priceDecimals)}</td><td>${f(t.tp1,t.priceDecimals)}</td><td>${f(t.tp2,t.priceDecimals)}</td><td>${f(t.tp3,t.priceDecimals)}</td>
       <td><span class="${resCls}">${res}</span></td>
       <td>${t.closed ? 'مغلقة' : 'مفتوحة'}</td>
+      <td>${t.orderBookImbalance == null ? '—' : Number(t.orderBookImbalance).toFixed(1) + '%'}</td>
+      <td>${t.tapeBuyPct == null ? '—' : Number(t.tapeBuyPct).toFixed(1) + '%'}</td>
     </tr>`;
   }).reverse().join('');
 }
