@@ -9,6 +9,10 @@ const TOKEN = process.env.TELEGRAM_TOKEN;
 const CHAT = process.env.TELEGRAM_CHAT || '@Paracaudina';
 const SHEET_CSV_URL = process.env.SHEET_CSV_URL || ''; // رابط CSV المنشور لشيت السجل
 const MAX_SIGNALS_PER_DAY = 6;
+// نظام النوافذ الزمنية: اليوم مقسم إلى 6 نوافذ × 4 ساعات (00–04، 04–08، …، 20–24).
+// يُسمح بإشارة واحدة كحد أقصى في كل نافذة، فتتوزع الإشارات الست على اليوم بدل إرسالها دفعة واحدة.
+const SLOT_HOURS = 4;
+function currentSlot() { return Math.floor(new Date().getUTCHours() / SLOT_HOURS); }
 const SYMS = (process.env.SYMBOLS || 'BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT,ADAUSDT,AVAXUSDT,LINKUSDT,DOTUSDT').split(',');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const pricePrecisionCache = new Map();
@@ -218,16 +222,29 @@ async function scan() {
   let emittedToday = todayCount;
   console.log(`بدء الفحص — ${new Date().toISOString()} — إشارات اليوم: ${todayCount}/${MAX_SIGNALS_PER_DAY}`);
 
+  // نافذة اليوم الحالية: إن كانت نافذة اليوم قد استُهلكت إشارة فيها، يُكتفى بذلك ويُنتظر الفحص القادم.
+  const todaySlotSignals = tracked.filter(t => t.date === today && t.slot === currentSlot()).length;
+  if (todaySlotSignals > 0) {
+    console.log(`نافذة اليوم (${currentSlot()}) استُهلكت بالفعل — ننتظر النافذة التالية`);
+    return;
+  }
   if (todayCount >= MAX_SIGNALS_PER_DAY) { console.log('حد إشارات اليوم وصل'); return; }
 
   const res = await Promise.all(SYMS.map(evaluate));
+  // اختيار إشارة واحدة للنافذة الحالية: الأفضل جودة (أكثر أصواتًا) وغير مكررة في اليوم.
+  const candidates = [];
   for (let i = 0; i < res.length; i++) {
     const s = res[i];
     if (!s) continue;
+    if (tracked.some(t => t.date === today && t.symbol === SYMS[i])) continue;
+    candidates.push({ ...s, symbol: SYMS[i] });
+  }
+  candidates.sort((a, b) => (b.votes || 0) - (a.votes || 0) || (b.rsi4h || 0) - (a.rsi4h || 0));
+  const loopSignals = candidates.slice(0, 1);
+  for (let i = 0; i < loopSignals.length; i++) {
+    const s = loopSignals[i];
+    if (!s) continue;
     if (emittedToday >= MAX_SIGNALS_PER_DAY) break;
-    s.symbol = SYMS[i];
-    // منع تكرار نفس الزوج في اليوم نفسه عند تشغيل الفحص كل 30 دقيقة.
-    if (tracked.some(t => t.date === today && t.symbol === s.symbol)) continue;
     await loadPricePrecision(s.symbol);
     s.priceDecimals = pricePrecisionCache.get(s.symbol) ?? fallbackPriceDecimals(s.price);
     const micro = await getMarketMicrostructure(s.symbol);
@@ -236,7 +253,7 @@ async function scan() {
       s.tapeBuyPct = Number.isFinite(micro.tapeBuyPct) ? Number(micro.tapeBuyPct.toFixed(2)) : null;
       s.tapeSamples = micro.samples;
     }
-    s.date = today; s.ts = Date.now(); s.closed = false;
+    s.date = today; s.ts = Date.now(); s.slot = currentSlot(); s.closed = false;
     tracked.push(s);
     saveTracked(tracked);
     emittedToday++;
