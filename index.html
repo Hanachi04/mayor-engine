@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaYor Signals — السجل العام لصفقات الإشارات</title>
+<meta name="description" content="السجل العام الموثق لإشارات MaYor — كل صفقة تُوثق تلقائيًا من Binance مع نقاط الدخول والأهداف والنتائج.">
+<style>
+  :root{
+    --bg:#0a0e17; --card:#111827; --line:#1e293b;
+    --gold:#f0b429; --green:#22c55e; --red:#ef4444; --txt:#e5e7eb; --mute:#94a3b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI','Tajawal',sans-serif;padding:16px}
+  .wrap{max-width:1100px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#f0b429,#b45309);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0e17}
+  h1{font-size:22px}
+  .brand p{color:var(--mute);font-size:12.5px;margin-top:2px}
+  .live{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px}
+  .live::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .stat .v{font-size:24px;font-weight:800;color:var(--gold)}
+  .stat .l{color:var(--mute);font-size:12.5px;margin-top:4px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
+  th{background:#0f1522;color:var(--gold);padding:12px 10px;text-align:right;font-weight:600;white-space:nowrap;position:sticky;top:0}
+  td{padding:11px 10px;border-top:1px solid var(--line);white-space:nowrap}
+  tr:hover td{background:#16202f}
+  .long{color:var(--green);font-weight:700}
+  .short{color:var(--red);font-weight:700}
+  .open{background:#22c55e22;color:var(--green);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .closed{background:#ef444422;color:var(--red);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .win{background:#22c55e22;color:var(--green);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .loss{background:#ef444422;color:var(--red);padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .empty{text-align:center;padding:40px 20px;color:var(--mute);border-top:1px solid var(--line)}
+  .empty .big{font-size:34px;margin-bottom:8px}
+  footer{margin-top:22px;text-align:center;color:var(--mute);font-size:12px;line-height:1.8}
+  footer a{color:var(--gold);text-decoration:none}
+  @media(max-width:760px){
+    table{display:block;overflow-x:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h1>MaYor Signals</h1>
+        <p>السجل العام الموثق لإشارات التداول — Binance 4H · تحديث تلقائي</p>
+      </div>
+    </div>
+    <div class="live">النظام يعمل · كل 30 دقيقة</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="v" id="st-total">0</div><div class="l">إجمالي الإشارات</div></div>
+    <div class="stat"><div class="v" id="st-wins">0</div><div class="l">وصلت الهدف</div></div>
+    <div class="stat"><div class="v" id="st-winrate">—</div><div class="l">نسبة النجاح</div></div>
+    <div class="stat"><div class="v" id="st-open">0</div><div class="l">صفقات مفتوحة</div></div>
+    <div class="stat"><div class="v" id="st-long">0 / <span id="st-short">0</span></div><div class="l">Long / Short</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>التاريخ</th><th>الوقت</th><th>الزوج</th><th>الاتجاه</th>
+        <th>الدخول</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
+        <th>النتيجة</th><th>الحالة</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <footer>
+    كل الصفقات تُوثق تلقائيًا من محرك MaYor وتُخزن في مستودع عام.<br>
+    هذا السجل للعرض والتوثيق فقط ولا يشكل نصيحة استثمارية.<br>
+    المحرك: <a href="https://github.com/lo77667/mayor-engine" target="_blank">lo77667/mayor-engine</a> · القناة: <a href="https://t.me/Paracaudina" target="_blank">@Paracaudina</a>
+  </footer>
+</div>
+
+<script>
+const REPO = 'lo77667/mayor-engine';
+const FILE = 'data/tracked.json';
+
+async function loadTracked() {
+  // يحاول GitHub API أولًا (يعطي آخر تعديل)، ثم fallback مباشر
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}?ref=main`, {cache:'no-store'});
+    const j = await r.json();
+    if (j.content) {
+      // API يعطي JSON مع حقول إضافية؟ الملف يُقرأ من content base64
+      const txt = atob(j.content.replace(/\n/g,''));
+      return { data: JSON.parse(txt), updated: j.commit?.sha ? j.sha : j.commit?.committer?.date || '' };
+    }
+  } catch(e) {}
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${FILE}?cb=${Date.now()}`);
+    const txt = await r.text();
+    return { data: JSON.parse(txt), updated: Date.now() };
+  } catch(e) {
+    return { data: [], updated: null };
+  }
+}
+
+function render(list) {
+  const tbody = document.getElementById('tbody');
+  const long = list.filter(t => t.dir === 'LONG').length;
+  const short = list.length - long;
+  const closed = list.filter(t => t.closed === true || t.result);
+  const open = list.filter(t => !t.closed);
+  const wins = closed.filter(t => (t.result||'').toLowerCase().includes('tp1') || (t.result||'').toLowerCase().includes('ربح') || (t.result||'').toLowerCase().includes('win')).length;
+  document.getElementById('st-total').textContent = list.length;
+  document.getElementById('st-wins').textContent = wins;
+  document.getElementById('st-winrate').textContent = closed.length ? Math.round(wins/closed.length*100) + '%' : '—';
+  document.getElementById('st-open').textContent = open.length;
+  document.getElementById('st-long').textContent = long;
+  document.getElementById('st-short').textContent = short;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><div class="big">📡</div>الإشارات ستظهر هنا فور بدء المحرك بإنتاج أول صفقة<br>المحرك يفحص السوق كل 30 دقيقة حتى 6 إشارات يوميًا</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((t, i) => {
+    const dirCls = t.dir === 'LONG' ? 'long' : 'short';
+    const res = (t.result || 'مفتوحة');
+    let resCls = 'open';
+    const rl = res.toLowerCase();
+    if (resCls === 'open' && t.closed === true) resCls = 'closed';
+    if (rl.includes('win') || rl.includes('tp1') || rl.includes('ربح')) resCls = 'win';
+    else if (rl.includes('loss') || rl.includes('sl') || rl.includes('خسارة')) resCls = 'loss';
+    const f = n => (n == null || n === '') ? '—' : Number(n).toFixed(2);
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${t.date||'—'}</td><td>${t.time||t.fmtTime||'—'}</td>
+      <td><b>${t.symbol||'—'}</b></td>
+      <td class="${dirCls}">${t.dir}</td>
+      <td>${f(t.price)}</td><td>${f(t.sl)}</td><td>${f(t.tp1)}</td><td>${f(t.tp2)}</td><td>${f(t.tp3)}</td>
+      <td><span class="${resCls}">${res}</span></td>
+      <td>${t.closed ? 'مغلقة' : 'مفتوحة'}</td>
+    </tr>`;
+  }).reverse().join('');
+}
+
+render([]);
+loadTracked().then(({data, updated}) => {
+  render(data);
+  const el = document.querySelector('.live');
+  if (updated && el) el.textContent = 'آخر تحديث: ' + new Date(updated).toLocaleString('ar', {hour12:false});
+});
+// تحديث تلقائي كل دقيقتين
+setInterval(async () => {
+  const {data, updated} = await loadTracked();
+  render(data);
+  const el = document.querySelector('.live');
+  if (updated && el) el.textContent = 'آخر تحديث: ' + new Date(updated).toLocaleString('ar', {hour12:false});
+}, 120000);
+</script>
+</body>
+</html>
