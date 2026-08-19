@@ -77,13 +77,57 @@ async function send(msg) {
   console.log(ok ? `✓ أُرسلت رسالة لتليجرام` : `✗ فشل إرسال لتليجرام (HTTP ${res.status})`);
 }
 
-async function getKlines(symbol) {
-  // نحتاج 200 شمعة فعلية حتى لا يُحسب SMA200 على عينة ناقصة.
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=250`;
+async function getKlines(symbol, interval = '4h', limit = 250) {
+  // الأطر الصغيرة لا تحتاج 200 شمعة؛ يكفي الحد الأدنى لحساب المؤشرات بدقة معقولة.
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
   const res = await fetch(url);
   const data = await res.json();
   if (!res.ok || !Array.isArray(data)) throw new Error(`klines HTTP ${res.status}`);
   return data.map(k => ({ open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5], ts: k[0] }));
+}
+
+// ===== نظام التحليل متعدد الأطر الزمنية (MTF) =====
+// 4 أطر: 5د / 15د / 1س / 4س. لكل إطار حساب RSI + علاقتا السعر بالمؤشرات المتحركة.
+// الاتفاق المطلوب: 3 أطر على الأقل تؤيد الاتجاه نفسه. الاتجاه الرئيسي من 4H ملزم.
+// الأهداف تُحسب من ATR على الإطار 15د (أضيق من 4H → أهداف أقرب وأسهل بلوغًا).
+const MTF_TIMEFRAMES = ['5m', '15m', '1h', '4h'];
+const MTF_MIN_CANDLES = { '5m': 120, '15m': 120, '1h': 200, '4h': 200 };
+
+function evaluateTimeframe(kl) {
+  const closes = kl.map(k => k.close);
+  const r = rsi(closes), ema50 = sma(closes, 50), ema200 = sma(closes, 200);
+  if (r === null || kl.length < 60) return null;
+  const last = kl[kl.length - 1];
+  const longScore = (ema50 > ema200 ? 1 : 0) + (last.close > ema50 ? 1 : 0) + (r >= 35 && r <= 55 ? 1 : 0);
+  const shortScore = (ema50 < ema200 ? 1 : 0) + (last.close < ema50 ? 1 : 0) + (r >= 55 && r <= 75 ? 1 : 0);
+  return { longScore, shortScore, rsi: r };
+}
+
+function evaluateMTF(symbol) {
+  return Promise.all(MTF_TIMEFRAMES.map(tf =>
+    getKlines(symbol, tf, MTF_MIN_CANDLES[tf]).then(kl => ({ tf, kl })).catch(() => null)
+  )).then(frames => {
+    let longVotes = 0, shortVotes = 0, rsi4h = null, rsi15 = null, last4h = null, atr15 = null;
+    const votesByTf = [];
+    for (const f of frames) {
+      if (!f || f.kl.length < MTF_MIN_CANDLES[f.tf]) continue;
+      const ev = evaluateTimeframe(f.kl);
+      if (!ev) continue;
+      if (ev.longScore >= 2) { longVotes++; votesByTf.push(`${f.tf}→LONG`); }
+      if (ev.shortScore >= 2) { shortVotes++; votesByTf.push(`${f.tf}→SHORT`); }
+      if (f.tf === '4h') { rsi4h = ev.rsi; last4h = f.kl[f.kl.length - 1].close; }
+      if (f.tf === '15m') rsi15 = ev.rsi;
+    }
+    // الإطار 4H يوجه الاتجاه: إن كان راسخًا يعطى صوتًا إضافيًا، وإن عارض يُلغى القرار.
+    const frames4h = frames.find(f => f?.tf === '4h');
+    const ev4h = frames4h?.kl?.length >= MTF_MIN_CANDLES['4h'] ? evaluateTimeframe(frames4h.kl) : null;
+    // الإطار 4H حارس نهائي: يجب أن يدعم اتجاه الإشارة صراحة (Score≥2) ولا يكون مؤيدًا للاتجاه المعاكس.
+    let dir = null;
+    if (longVotes >= 3 && longVotes > shortVotes && ev4h && ev4h.longScore >= 2) dir = 'LONG';
+    else if (shortVotes >= 3 && shortVotes > longVotes && ev4h && ev4h.shortScore >= 2) dir = 'SHORT';
+    if (!dir || !last4h) return null;
+    return { dir, last4h, votes: dir === 'LONG' ? longVotes : shortVotes, votesByTf, rsi4h, rsi15, frames };
+  }).catch(() => null);
 }
 
 // طبقة مجانية خفيفة من Binance REST بدل WebSocket دائم داخل GitHub Actions.
@@ -143,19 +187,24 @@ function atr(klines, period = 14) {
 }
 
 function evaluate(symbol) {
-  return getKlines(symbol).then(kl => {
-    if (kl.length < 200) return null;
-    const closes = kl.map(k => k.close);
-    const r = rsi(closes), ema50 = sma(closes, 50), ema200 = sma(closes, 200);
-    const last = kl[kl.length - 1], a = atr(kl);
-    if (r === null) return null;
-    if (ema50 > ema200 && r >= 35 && r <= 55) {
-      return { dir: 'LONG', price: last.close, sl: last.close - 1.5 * a, tp1: last.close + 1.5 * a, tp2: last.close + 2.5 * a, tp3: last.close + 3.5 * a, rsi: r.toFixed(1) };
-    }
-    if (ema50 < ema200 && r >= 55 && r <= 75) {
-      return { dir: 'SHORT', price: last.close, sl: last.close + 1.5 * a, tp1: last.close - 1.5 * a, tp2: last.close - 2.5 * a, tp3: last.close - 3.5 * a, rsi: r.toFixed(1) };
-    }
-    return null;
+  // المرحلة 1: قرار الاتجاه من نظام الأطر المتعددة (4 أطر، اتفاق 3 على الأقل، واتجاه 4H راسخ).
+  return evaluateMTF(symbol).then(mtf => {
+    if (!mtf) return null;
+    // المرحلة 2: الأهداف من ATR على الإطار 15د — أهداف أقرب وأسهل بلوغًا من نموذج 4H القديم.
+    const frames15 = mtf.frames.find(f => f?.tf === '15m');
+    if (!frames15 || frames15.kl.length < MTF_MIN_CANDLES['15m']) return null;
+    const a = atr(frames15.kl);
+    const price = mtf.last4h;
+    const k = { LONG: 1, SHORT: -1 }[mtf.dir];
+    return {
+      dir: mtf.dir, price, votes: mtf.votes, votesByTf: mtf.votesByTf, rsi4h: mtf.rsi4h, rsi15: mtf.rsi15,
+      sl: +(price - k * 1.5 * a).toFixed(12),
+      tp1: +(price + k * 1.0 * a).toFixed(12),
+      tp2: +(price + k * 2.0 * a).toFixed(12),
+      tp3: +(price + k * 3.0 * a).toFixed(12),
+      atr15: a,
+      tf: 'MTF 5m+15m+1h+4h'
+    };
   }).catch(() => null);
 }
 
@@ -192,7 +241,9 @@ async function scan() {
     saveTracked(tracked);
     emittedToday++;
     const microLine = micro ? `\n📚 Order Book: ${formatMicro(micro.orderBookImbalance)}% | Tape شراء: ${formatMicro(micro.tapeBuyPct)}%` : '\n📚 Order Book/Tape: غير متاح مؤقتًا';
-    const msg = `<b>📡 MaYor Signal</b>\n\n${s.dir === 'LONG' ? '🟢' : '🔴'} <b>${s.dir} ${s.symbol}</b>\n📍 Entry: <code>${formatPrice(s.price, s.symbol)}</code>\n🛑 SL: <code>${formatPrice(s.sl, s.symbol)}</code>\n🎯 TP1: <code>${formatPrice(s.tp1, s.symbol)}</code>\n🎯 TP2: <code>${formatPrice(s.tp2, s.symbol)}</code>\n🎯 TP3: <code>${formatPrice(s.tp3, s.symbol)}</code>\n📊 RSI: ${s.rsi} | المصدر: Binance 4H${microLine}\n⏰ ${fmtTime()}`;
+    const tfLine = Array.isArray(s.votesByTf) && s.votesByTf.length ? `\n🗓️ أطر مؤيدة: ${s.votesByTf.join(' | ')}` : '';
+    const rsiLine = `RSI 4H: ${s.rsi4h ?? '—'} | RSI 15د: ${s.rsi15 ?? '—'}`;
+    const msg = `<b>📡 MaYor Signal (MTF)</b>\n\n${s.dir === 'LONG' ? '🟢' : '🔴'} <b>${s.dir} ${s.symbol}</b>\n📍 Entry: <code>${formatPrice(s.price, s.symbol)}</code>\n🛑 SL: <code>${formatPrice(s.sl, s.symbol)}</code>\n🎯 TP1: <code>${formatPrice(s.tp1, s.symbol)}</code>\n🎯 TP2: <code>${formatPrice(s.tp2, s.symbol)}</code>\n🎯 TP3: <code>${formatPrice(s.tp3, s.symbol)}</code>\n📊 ${rsiLine} | أصوات: ${s.votes}/4${tfLine}${microLine}\n⏰ ${fmtTime()}`;
     await send(msg);
     await appendToSheet([
       tracked.filter(t => t.date === today).length,
