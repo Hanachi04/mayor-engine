@@ -2,8 +2,12 @@ name: MaYor Signal Engine
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # كل 30 دقيقة
-  workflow_dispatch:         # + تشغيل يدوي عند الحاجة
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
   scan:
@@ -21,14 +25,13 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
-          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
-          SYMBOLS: ${{ vars.SYMBOLS }}
         run: node engine/scan.js
 
       - name: Commit updated tracking data back to repo
+        if: always()
         run: |
           git config user.name "mayor-bot"
           git config user.email "mayor-bot@users.noreply.github.com"
           git add data/tracked.json
           git commit -m "update tracked signals ($(date -u))" || echo "no changes"
-          git push
+          git push || echo "push skipped"
