@@ -1,0 +1,28 @@
+name: MaYor Weekly Report
+
+on:
+  schedule:
+    # كل يوم جمعة الساعة 15:00 UTC (18:00 بتوقيت الرياض)
+    - cron: '0 15 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate and send weekly report
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
+        run: node engine/weekly_report.js
