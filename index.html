@@ -88,23 +88,22 @@ const REPO = 'lo77667/mayor-engine';
 const FILE = 'data/tracked.json';
 
 async function loadTracked() {
-  // يحاول GitHub API أولًا (يعطي آخر تعديل)، ثم fallback مباشر
+  // يقرأ عبر jsDelivr CDN (يدعم CORS تمامًا) ويضيف cb لمنع الكاش
   try {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}?ref=main`, {cache:'no-store'});
-    const j = await r.json();
-    if (j.content) {
-      // API يعطي JSON مع حقول إضافية؟ الملف يُقرأ من content base64
-      const txt = atob(j.content.replace(/\n/g,''));
-      return { data: JSON.parse(txt), updated: j.commit?.sha ? j.sha : j.commit?.committer?.date || '' };
+    const r = await fetch(`https://cdn.jsdelivr.net/gh/${REPO}@main/${FILE}?cb=${Date.now()}`, {cache:'no-store'});
+    if (r.ok) {
+      const txt = await r.text();
+      return { data: JSON.parse(txt), updated: Date.now() };
     }
   } catch(e) {}
   try {
     const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${FILE}?cb=${Date.now()}`);
-    const txt = await r.text();
-    return { data: JSON.parse(txt), updated: Date.now() };
-  } catch(e) {
-    return { data: [], updated: null };
-  }
+    if (r.ok) {
+      const txt = await r.text();
+      return { data: JSON.parse(txt), updated: Date.now() };
+    }
+  } catch(e) {}
+  return { data: [], updated: null };
 }
 
 function render(list) {
