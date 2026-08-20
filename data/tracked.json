@@ -117,6 +117,52 @@
     "date": "2026-08-19",
     "ts": 1787173135392,
     "slot": 5,
+    "closed": true,
+    "closePrice": 1.0895,
+    "closeResult": "SL",
+    "closePct": -0.969,
+    "closeAt": "2026-08-20T03:13:22.475Z"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "dir": "SHORT",
+    "price": 69005.57,
+    "atr": 248.48714285714232,
+    "atrPct": 0.0036009722527781786,
+    "adx": 20.919937351846077,
+    "pdi": 26.24223156127695,
+    "mdi": 31.44916954599548,
+    "pct": 65.9090909090909,
+    "filters": [
+      "ADX 20.9",
+      "DI -DI",
+      "MACD",
+      "SMC_FVG",
+      "SUPERTREND",
+      "BOLLINGER",
+      "STRUCTURE"
+    ],
+    "closedCandle": 1787194800000,
+    "index": 499,
+    "sl": 69378.30071428572,
+    "tp1": 68632.83928571429,
+    "tp2": 68260.10857142857,
+    "tp3": 67887.37785714287,
+    "rr": 2.999999999999961,
+    "votes": 2,
+    "totalFrames": 3,
+    "votesByTf": [
+      "15m→SHORT",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "adx4h": 52.114834538412325,
+    "rsi4h": 40.91942262863291,
+    "tf": "15m (MTF 15m+1h+4h)",
+    "priceDecimals": 2,
+    "date": "2026-08-20",
+    "ts": 1787195604006,
+    "slot": 0,
     "closed": false
   }
 ]
