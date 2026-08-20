@@ -207,6 +207,50 @@
     "date": "2026-08-20",
     "ts": 1787202461610,
     "slot": 1,
+    "closed": true,
+    "closePrice": 643.37,
+    "closeResult": "TP3",
+    "closePct": 1.285,
+    "closeAt": "2026-08-20T09:53:07.154Z"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "dir": "LONG",
+    "price": 87.19,
+    "atr": 0.48499999999999943,
+    "atrPct": 0.005562564514279154,
+    "adx": 77.05118132236016,
+    "pdi": 39.17525773195876,
+    "mdi": 9.278350515463861,
+    "pct": 19.402985074626866,
+    "filters": [
+      "ADX 77.1",
+      "DI +DI",
+      "TREND",
+      "MACD",
+      "TAKER_FLOW"
+    ],
+    "closedCandle": 1787219100000,
+    "index": 499,
+    "sl": 86.4625,
+    "tp1": 87.91749999999999,
+    "tp2": 88.645,
+    "tp3": 89.3725,
+    "rr": 3.000000000000039,
+    "votes": 3,
+    "totalFrames": 3,
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "adx4h": 49.69821135259416,
+    "rsi4h": 72.96587926509184,
+    "tf": "15m (MTF 15m+1h+4h)",
+    "priceDecimals": 4,
+    "date": "2026-08-20",
+    "ts": 1787219588674,
+    "slot": 2,
     "closed": false
   }
 ]
