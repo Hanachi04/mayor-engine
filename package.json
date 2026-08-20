@@ -1,0 +1,18 @@
+{
+  "name": "mayor-cloud-pro-mtf",
+  "version": "2.0.0",
+  "private": true,
+  "description": "MaYor Cloud Pro MTF research-only signal engine",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test/unit.test.js",
+    "backtest": "node engine/backtest.js",
+    "verify": "node engine/backtest.js",
+    "report:daily": "node engine/performance_report.js daily",
+    "report:weekly": "node engine/performance_report.js weekly",
+    "report:monthly": "node engine/performance_report.js monthly"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
