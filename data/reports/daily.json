@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "engineVersion": "cloud-pro-mtf-3.0-unified",
+  "period": "daily",
+  "periodLabel": "اليومي",
+  "generatedAt": "2026-08-20T12:50:23.706Z",
+  "windowStart": "2026-08-19T12:50:23.706Z",
+  "windowEnd": "2026-08-20T12:50:23.706Z",
+  "accounting": {
+    "takerFeeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
+  },
+  "summary": {
+    "signals": 5,
+    "closed": 4,
+    "open": 1,
+    "wins": 2,
+    "losses": 2,
+    "neutral": 0,
+    "winRatePct": 50,
+    "grossPnlPct": 3.494100846690496,
+    "feesPct": 0.4,
+    "slippagePct": 0.16,
+    "netPnlPct": 3.0941008466904956,
+    "netPnlUsd": null,
+    "averageNetPnlPct": 0.7735252116726239,
+    "profitFactor": 2.4605147084465453,
+    "maxDrawdownPct": -2.118500299104478,
+    "bestSymbol": {
+      "symbol": "ADAUSDT",
+      "netPct": 2.8588082383523368
+    },
+    "worstSymbol": {
+      "symbol": "XRPUSDT",
+      "netPct": -1.1840792786038672
+    }
+  },
+  "byResult": {
+    "TP1": 1,
+    "SL": 2,
+    "TP3": 1,
+    "مفتوحة": 1
+  },
+  "bySymbol": {
+    "ADAUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 2.8588082383523368
+    },
+    "XRPUSDT": {
+      "count": 1,
+      "wins": 0,
+      "losses": 1,
+      "netPct": -1.1840792786038672
+    },
+    "BTCUSDT": {
+      "count": 1,
+      "wins": 0,
+      "losses": 1,
+      "netPct": -0.9344210205006107
+    },
+    "BNBUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 2.353792907442637
+    }
+  }
+}
