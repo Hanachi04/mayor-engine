@@ -251,7 +251,17 @@
     "date": "2026-08-20",
     "ts": 1787219588674,
     "slot": 2,
-    "closed": false
+    "closed": true,
+    "closePrice": 89.36,
+    "closeResult": "TP2",
+    "entryFillPrice": 87.207438,
+    "exitFillPrice": 89.342128,
+    "grossPnlPct": 2.4478,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": 2.3478,
+    "netPnlUsd": null,
+    "closeAt": "2026-08-21T03:31:39.465Z"
   },
   {
     "symbol": "LTCUSDT",
