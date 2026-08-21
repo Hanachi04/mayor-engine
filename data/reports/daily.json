@@ -3,56 +3,33 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-08-20T21:03:38.914Z",
-  "windowStart": "2026-08-19T21:03:38.914Z",
-  "windowEnd": "2026-08-20T21:03:38.914Z",
+  "generatedAt": "2026-08-21T20:56:22.973Z",
+  "windowStart": "2026-08-20T20:56:22.973Z",
+  "windowEnd": "2026-08-21T20:56:22.973Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 4,
-    "closed": 2,
-    "open": 2,
-    "wins": 1,
-    "losses": 1,
+    "signals": 0,
+    "closed": 0,
+    "open": 0,
+    "wins": 0,
+    "losses": 0,
     "neutral": 0,
-    "winRatePct": 50,
-    "grossPnlPct": 1.6193718869420262,
-    "feesPct": 0.2,
-    "slippagePct": 0.08,
-    "netPnlPct": 1.4193718869420262,
+    "winRatePct": 0,
+    "grossPnlPct": 0,
+    "feesPct": 0,
+    "slippagePct": 0,
+    "netPnlPct": 0,
     "netPnlUsd": null,
-    "averageNetPnlPct": 0.7096859434710131,
-    "profitFactor": 2.5189853993027747,
-    "maxDrawdownPct": -0.9344210205006107,
-    "bestSymbol": {
-      "symbol": "BNBUSDT",
-      "netPct": 2.353792907442637
-    },
-    "worstSymbol": {
-      "symbol": "BTCUSDT",
-      "netPct": -0.9344210205006107
-    }
+    "averageNetPnlPct": 0,
+    "profitFactor": 0,
+    "maxDrawdownPct": 0,
+    "bestSymbol": null,
+    "worstSymbol": null
   },
-  "byResult": {
-    "SL": 1,
-    "TP3": 1,
-    "مفتوحة": 2
-  },
-  "bySymbol": {
-    "BTCUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -0.9344210205006107
-    },
-    "BNBUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.353792907442637
-    }
-  }
+  "byResult": {},
+  "bySymbol": {}
 }
