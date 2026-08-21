@@ -3,33 +3,33 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "weekly",
   "periodLabel": "الأسبوعي",
-  "generatedAt": "2026-08-20T12:52:28.702Z",
-  "windowStart": "2026-08-13T12:52:28.702Z",
-  "windowEnd": "2026-08-20T12:52:28.702Z",
+  "generatedAt": "2026-08-21T16:03:51.320Z",
+  "windowStart": "2026-08-14T16:03:51.320Z",
+  "windowEnd": "2026-08-21T16:03:51.320Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 6,
-    "closed": 5,
-    "open": 1,
-    "wins": 3,
+    "signals": 7,
+    "closed": 7,
+    "open": 0,
+    "wins": 5,
     "losses": 2,
     "neutral": 0,
-    "winRatePct": 60,
-    "grossPnlPct": 8.802188880156436,
-    "feesPct": 0.5,
-    "slippagePct": 0.2,
-    "netPnlPct": 8.302188880156436,
-    "netPnlUsd": null,
-    "averageNetPnlPct": 1.6604377760312872,
-    "profitFactor": 4.9188990833118575,
+    "winRatePct": 71.42857142857143,
+    "grossPnlPct": 15.143488880156436,
+    "feesPct": 0.7,
+    "slippagePct": 0.28,
+    "netPnlPct": 14.443488880156435,
+    "netPnlUsd": 37.934,
+    "averageNetPnlPct": 2.063355554308062,
+    "profitFactor": 7.817789398595749,
     "maxDrawdownPct": -2.118500299104478,
     "bestSymbol": {
       "symbol": "SOLUSDT",
-      "netPct": 5.20808803346594
+      "netPct": 7.555888033465941
     },
     "worstSymbol": {
       "symbol": "XRPUSDT",
@@ -37,17 +37,17 @@
     }
   },
   "byResult": {
-    "TP3": 2,
+    "TP3": 3,
     "TP1": 1,
     "SL": 2,
-    "مفتوحة": 1
+    "TP2": 1
   },
   "bySymbol": {
     "SOLUSDT": {
-      "count": 1,
-      "wins": 1,
+      "count": 2,
+      "wins": 2,
       "losses": 0,
-      "netPct": 5.20808803346594
+      "netPct": 7.555888033465941
     },
     "ADAUSDT": {
       "count": 1,
@@ -72,6 +72,12 @@
       "wins": 1,
       "losses": 0,
       "netPct": 2.353792907442637
+    },
+    "LTCUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 3.7935
     }
   }
 }
