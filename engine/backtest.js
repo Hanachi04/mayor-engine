@@ -100,6 +100,8 @@ async function loadDataset(symbol) {
 }
 
 function sliceUntil(series, endTime) { let lo = 0, hi = series.length; while (lo < hi) { const m = Math.floor((lo + hi) / 2); if (series[m].closeTime < endTime) lo = m + 1; else hi = m; } return series.slice(0, lo); }
+const WARMUP_CANDLES = 1500;
+function sliceWindowUntil(series, endTime, warmup = WARMUP_CANDLES) { let lo = 0, hi = series.length; while (lo < hi) { const m = Math.floor((lo + hi) / 2); if (series[m].closeTime < endTime) lo = m + 1; else hi = m; } const start = Math.max(0, lo - warmup); return series.slice(start, lo); }
 function lastClosedIndex(series, endTime) { let i = -1; for (let n = 0; n < series.length; n++) { if (series[n].closeTime < endTime) i = n; else break; } return i; }
 
 function volume24h(series, endIndex) {
@@ -122,13 +124,20 @@ function extractFeatures(result) {
   };
 }
 
-function getMtfAt(dataset, evaluationTime) {
+function getMtfAt(dataset, evaluationTime, sentiment = null) {
+  const baseTf = CONFIG.baseInterval;
+  const baseRaw = sliceWindowUntil(dataset.data[baseTf] || [], evaluationTime, 1500);
+  const baseMin = CONFIG.minKlinesByFrame[baseTf] || CONFIG.minKlines;
+  if (baseRaw.length < baseMin) return { ok: false, reason: 'base-frame-insufficient-data', frames: {}, valid: [] };
+  const baseResult = analyzeLatest(dataset.symbol, baseRaw, { skipSanitize: true, minKlines: baseMin, obImbalance: null, sentiment });
+  if (!baseResult.signal) return { ok: false, reason: 'base-frame-no-signal', frames: { [baseTf]: baseResult }, valid: [] };
+
   const frames = {}, valid = [];
   for (const tf of INTERVALS) {
-    const raw = sliceUntil(dataset.data[tf] || [], evaluationTime);
+    const raw = tf === baseTf ? baseRaw : sliceWindowUntil(dataset.data[tf] || [], evaluationTime, 1500);
     const min = CONFIG.minKlinesByFrame[tf] || CONFIG.minKlines;
     if (raw.length < min) continue;
-    const result = analyzeLatest(dataset.symbol, raw, { skipSanitize: true, minKlines: min, obImbalance: null });
+    const result = tf === baseTf ? baseResult : analyzeLatest(dataset.symbol, raw, { skipSanitize: true, minKlines: min, obImbalance: null, sentiment });
     frames[tf] = result;
     if (result.signal) valid.push(tf);
   }
