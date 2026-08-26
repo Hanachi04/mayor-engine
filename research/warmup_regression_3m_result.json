@@ -1,0 +1,42 @@
+{
+  "purpose": "Literal three-month regression comparison after warmup-window optimization.",
+  "referenceFile": "/home/ubuntu/mayor_backtest_expanded_3m_baseline.json",
+  "regressionFile": "/home/ubuntu/mayor-history-1y-expansion/data/backtest_report_3m_regression_w1500.json",
+  "expectedReference": {
+    "inSampleTrades": 9,
+    "outOfSampleTrades": 39,
+    "outOfSampleNetPct": -15.19294
+  },
+  "baselineTotals": {
+    "inSample": {
+      "trades": 9,
+      "wins": 5,
+      "losses": 4,
+      "netPct": 2.51003
+    },
+    "outOfSample": {
+      "trades": 39,
+      "wins": 17,
+      "losses": 22,
+      "netPct": -15.19294
+    }
+  },
+  "regressionTotals": {
+    "inSample": {
+      "trades": 9,
+      "wins": 5,
+      "losses": 4,
+      "netPct": 2.51003
+    },
+    "outOfSample": {
+      "trades": 39,
+      "wins": 17,
+      "losses": 22,
+      "netPct": -15.19294
+    }
+  },
+  "expectedMatch": true,
+  "perSymbolTradeAndReturnMatch": true,
+  "symbolMismatches": [],
+  "generatedAt": "2026-08-25T08:45:48.063Z"
+}

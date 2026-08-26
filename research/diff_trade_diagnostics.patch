@@ -1,0 +1,449 @@
+[1mdiff --git a/engine/backtest.js b/engine/backtest.js[m
+[1mindex ceaadce..ae94e61 100644[m
+[1m--- a/engine/backtest.js[m
+[1m+++ b/engine/backtest.js[m
+[36m@@ -19,6 +19,7 @@[m
+ [m
+ const fs = require('fs');[m
+ const path = require('path');[m
+[32m+[m[32mconst crypto = require('crypto');[m
+ const {[m
+   CONFIG, Indicators, normalizeKlines, analyzeLatest, levelsFromSignal,[m
+   netPnl[m
+[36m@@ -26,9 +27,10 @@[m [mconst {[m
+ [m
+ const ROOT = path.join(__dirname, '..');[m
+ const DATA_DIR = path.join(ROOT, 'data');[m
+[31m-const HIST_DIR = path.join(DATA_DIR, 'historical');[m
+[31m-const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');[m
+[31m-const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');[m
+[32m+[m[32mconst HIST_DIR = process.env.BACKTEST_HIST_DIR || path.join(DATA_DIR, 'historical');[m
+[32m+[m[32m// المخرجات الافتراضية تبقى كما هي؛ المسارات البديلة تستخدم فقط في التشغيل البحثي المتوازي.[m
+[32m+[m[32mconst REPORT_FILE = process.env.BACKTEST_REPORT_FILE || path.join(DATA_DIR, 'backtest_report.json');[m
+[32m+[m[32mconst VERIFICATION_FILE = process.env.BACKTEST_VERIFICATION_FILE || path.join(DATA_DIR, 'verification.json');[m
+ const ENDPOINTS = ['https://api.binance.com', 'https://data-api.binance.vision'];[m
+ const INTERVALS = ['5m', '15m', '1h', '4h'];[m
+ const FRAME_WEIGHTS = CONFIG.frameWeights;[m
+[36m@@ -36,7 +38,28 @@[m [mconst MC_RUNS = Math.max(200, Number(process.env.MONTE_CARLO_RUNS || 1000));[m
+ const MIN_SAMPLE = Number(process.env.MIN_BACKTEST_TRADES || CONFIG.minBacktestTrades || 30);[m
+ const MIN_OOS = Number(process.env.MIN_OOS_TRADES || CONFIG.minOosTrades || 10);[m
+ const SYMBOLS = (process.env.BACKTEST_SYMBOLS || 'BTCUSDT').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);[m
+[31m-const FETCH_LIMIT = Math.min(1000, Math.max(200, Number(process.env.BACKTEST_LIMIT || 1000)));[m
+[32m+[m[32m// حد Binance هو 1000 شمعة للطلب الواحد فقط. BACKTEST_LIMIT يعني إجمالي الشموع المطلوبة،[m
+[32m+[m[32m// بينما كل صفحة تبقى ضمن الحد. لا يغيّر ذلك شروط الاستراتيجية أو بوابة التحقق.[m
+[32m+[m[32mconst BINANCE_PAGE_LIMIT = 1000;[m
+[32m+[m[32mconst FETCH_LIMIT = Math.max(200, Number(process.env.BACKTEST_LIMIT || 1000));[m
+[32m+[m[32mconst PAGE_DELAY_MS = Math.max(0, Number(process.env.BACKTEST_PAGE_DELAY_MS || 300));[m
+[32m+[m[32mconst MAX_FETCH_PAGES = Math.max(1, Number(process.env.BACKTEST_MAX_PAGES || 10000));[m
+[32m+[m[32mconst SAVE_FETCHED_HISTORY = /^(1|true|yes)$/i.test(process.env.BACKTEST_SAVE_HISTORY || '');[m
+[32m+[m[32mconst BACKTEST_END_MS = process.env.BACKTEST_END ? new Date(process.env.BACKTEST_END).getTime() : Date.now();[m
+[32m+[m[32m// بحثي فقط: لا يتصل بالشبكة ولا يغير scan.js. وضع off يحافظ على baseline الحالي حرفيًا.[m
+[32m+[m[32mconst SENTIMENT_MODE = String(process.env.BACKTEST_SENTIMENT_MODE || 'off').toLowerCase();[m
+[32m+[m[32mconst SENTIMENT_FILE = process.env.BACKTEST_SENTIMENT_FILE || '';[m
+[32m+[m[32mconst DAY_MS = 24 * 60 * 60 * 1000;[m
+[32m+[m[32mconst VERBOSE_FETCH_PAGES = /^(1|true|yes)$/i.test(process.env.BACKTEST_VERBOSE_PAGES || '');[m
+[32m+[m[32m// يظل 1500 هو الافتراضي؛ المتغير يسمح باختبار حساسية الإحماء على البيانات المجمّدة فقط.[m
+[32m+[m[32mconst WARMUP_CANDLES = Math.max(1, Number(process.env.BACKTEST_WARMUP_CANDLES || 1500));[m
+[32m+[m[32m// يُفعّل في اختبارات الحساسية فقط لتوثيق قرار كل شمعة دون تغيير مسار الإشارة أو التقرير الافتراضي.[m
+[32m+[m[32mconst DECISION_FINGERPRINT = /^(1|true|yes)$/i.test(process.env.BACKTEST_DECISION_FINGERPRINT || '');[m
+[32m+[m[32m// تصدير بحثي اختياري فقط لصفقات OOS؛ يبقى التقرير الافتراضي دون هذا الحقل.[m
+[32m+[m[32mconst EXPORT_TRADES = /^(1|true|yes)$/i.test(process.env.BACKTEST_EXPORT_TRADES || '');[m
+[32m+[m[32m// تصدير تشخيصي بحثي منفصل؛ لا يغير شروط الإشارة أو حساب الصفقة أو التقرير الافتراضي.[m
+[32m+[m[32mconst EXPORT_TRADE_DIAGNOSTICS = /^(1|true|yes)$/i.test(process.env.BACKTEST_EXPORT_TRADE_DIAGNOSTICS || '');[m
+[32m+[m[32mlet lastHistoricalRequestAt = 0;[m
+ [m
+ function finite(v, fallback = NaN) {[m
+   if (v === null || v === undefined || v === '') return fallback;[m
+[36m@@ -53,24 +76,126 @@[m [mfunction normalCdf(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }[m
+ function erf(x) { const sign = x < 0 ? -1 : 1; const ax = Math.abs(x), t = 1 / (1 + 0.3275911 * ax); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-ax * ax); return sign * y; }[m
+ function escapeCsv(v) { return String(v ?? '').replace(/,/g, ''); }[m
+ [m
+[31m-function loadSeriesFromFile(file) {[m
+[32m+[m[32mfunction parseHistoricalSentiment(raw) {[m
+[32m+[m[32m  const entries = Array.isArray(raw) ? raw : raw?.data;[m
+[32m+[m[32m  if (!Array.isArray(entries)) throw new Error('historical-sentiment-invalid-format');[m
+[32m+[m[32m  const unique = new Map();[m
+[32m+[m[32m  for (const row of entries) {[m
+[32m+[m[32m    const timestampMs = Number(row?.timestamp) * 1000, value = Number(row?.value);[m
+[32m+[m[32m    if (!Number.isFinite(timestampMs) || !Number.isFinite(value) || value < 0 || value > 100) continue;[m
+[32m+[m[32m    unique.set(timestampMs, { timestampMs, value, classification: String(row?.value_classification || '') || null });[m
+[32m+[m[32m  }[m
+[32m+[m[32m  const observations = [...unique.values()].sort((a, b) => a.timestampMs - b.timestampMs);[m
+[32m+[m[32m  if (!observations.length) throw new Error('historical-sentiment-no-valid-observations');[m
+[32m+[m[32m  return observations;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// سياسة محافظة: قراءة يوم UTC لا تُستخدم في يوم timestamp نفسه؛ تبدأ فقط في اليوم التالي.[m
+[32m+[m[32m// هذا يتجنب افتراض ساعة نشر Alternative.me، ولو كان أبطأ من توافر المصدر الحقيقي.[m
+[32m+[m[32mfunction createHistoricalSentimentProvider(observations, metadata = {}) {[m
+[32m+[m[32m  const sorted = [...observations].sort((a, b) => a.timestampMs - b.timestampMs);[m
+[32m+[m[32m  if (!sorted.length) throw new Error('historical-sentiment-no-observations');[m
+[32m+[m[32m  return {[m
+[32m+[m[32m    mode: 'historical_previous_utc_day',[m
+[32m+[m[32m    policy: 'Use the newest observation with timestamp strictly before the current UTC day; never use same-day data.',[m
+[32m+[m[32m    metadata,[m
+[32m+[m[32m    resolve(evaluationTime) {[m
+[32m+[m[32m      const dayStart = Math.floor(evaluationTime / DAY_MS) * DAY_MS;[m
+[32m+[m[32m      let lo = 0, hi = sorted.length, index = -1;[m
+[32m+[m[32m      while (lo < hi) {[m
+[32m+[m[32m        const mid = (lo + hi) >> 1;[m
+[32m+[m[32m        if (sorted[mid].timestampMs < dayStart) { index = mid; lo = mid + 1; } else hi = mid;[m
+[32m+[m[32m      }[m
+[32m+[m[32m      if (index < 0) return { value: null, sourceTimestampMs: null, ageMs: null };[m
+[32m+[m[32m      const item = sorted[index];[m
+[32m+[m[32m      return { value: item.value, sourceTimestampMs: item.timestampMs, ageMs: evaluationTime - item.timestampMs, classification: item.classification };[m
+[32m+[m[32m    },[m
+[32m+[m[32m    describe() {[m
+[32m+[m[32m      return {[m
+[32m+[m[32m        mode: this.mode, policy: this.policy, observations: sorted.length,[m
+[32m+[m[32m        firstTimestampMs: sorted[0].timestampMs, lastTimestampMs: sorted.at(-1).timestampMs,[m
+[32m+[m[32m        ...metadata[m
+[32m+[m[32m      };[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction loadHistoricalSentimentProvider() {[m
+[32m+[m[32m  if (SENTIMENT_MODE === 'off') return null;[m
+[32m+[m[32m  if (SENTIMENT_MODE !== 'historical_previous_utc_day') throw new Error(`unsupported-backtest-sentiment-mode:${SENTIMENT_MODE}`);[m
+[32m+[m[32m  if (!SENTIMENT_FILE) throw new Error('backtest-sentiment-file-required');[m
+[32m+[m[32m  const rawText = fs.readFileSync(SENTIMENT_FILE, 'utf8');[m
+[32m+[m[32m  const observations = parseHistoricalSentiment(JSON.parse(rawText));[m
+[32m+[m[32m  return createHistoricalSentimentProvider(observations, {[m
+[32m+[m[32m    sourceFile: path.resolve(SENTIMENT_FILE),[m
+[32m+[m[32m    sourceSha256: crypto.createHash('sha256').update(rawText).digest('hex')[m
+[32m+[m[32m  });[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction createSentimentAudit(provider) {[m
+[32m+[m[32m  return { mode: provider?.mode || 'off', policy: provider?.policy || null, evaluations: 0, unavailable: 0,[m
+[32m+[m[32m    longVoteEligible: 0, shortVoteEligible: 0, neutral: 0, minValue: null, maxValue: null, maxAgeMs: null, _sources: new Set() };[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction observeSentiment(audit, resolved) {[m
+[32m+[m[32m  audit.evaluations++;[m
+[32m+[m[32m  if (!Number.isFinite(resolved?.value)) { audit.unavailable++; return; }[m
+[32m+[m[32m  const value = resolved.value;[m
+[32m+[m[32m  audit.minValue = audit.minValue === null ? value : Math.min(audit.minValue, value);[m
+[32m+[m[32m  audit.maxValue = audit.maxValue === null ? value : Math.max(audit.maxValue, value);[m
+[32m+[m[32m  audit.maxAgeMs = audit.maxAgeMs === null ? resolved.ageMs : Math.max(audit.maxAgeMs, resolved.ageMs);[m
+[32m+[m[32m  if (Number.isFinite(resolved.sourceTimestampMs)) audit._sources.add(resolved.sourceTimestampMs);[m
+[32m+[m[32m  if (value <= CONFIG.sentimentExtremeLow) audit.longVoteEligible++;[m
+[32m+[m[32m  else if (value >= CONFIG.sentimentExtremeHigh) audit.shortVoteEligible++;[m
+[32m+[m[32m  else audit.neutral++;[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction finalizeSentimentAudit(audit) {[m
+[32m+[m[32m  return { ...audit, sourceObservationsUsed: audit._sources.size, _sources: undefined };[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction createDecisionAudit() {[m
+[32m+[m[32m  return { evaluations: 0, baseCoreSignals: 0, mtfPassed: 0, reasons: {}, _hash: DECISION_FINGERPRINT ? crypto.createHash('sha256') : null };[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction observeDecision(audit, mtf, evaluationTime) {[m
+[32m+[m[32m  audit.evaluations++;[m
+[32m+[m[32m  if (mtf?.frames?.[CONFIG.baseInterval]?.signal) audit.baseCoreSignals++;[m
+[32m+[m[32m  if (mtf?.ok && mtf?.signal) audit.mtfPassed++;[m
+[32m+[m[32m  const reason = mtf?.ok ? 'passed-mtf' : (mtf?.reason || 'unknown');[m
+[32m+[m[32m  audit.reasons[reason] = (audit.reasons[reason] || 0) + 1;[m
+[32m+[m[32m  if (audit._hash) {[m
+[32m+[m[32m    const frameSignals = Object.fromEntries(INTERVALS.map(tf => [tf, mtf?.frames?.[tf]?.signal || null]));[m
+[32m+[m[32m    audit._hash.update(JSON.stringify({ evaluationTime, ok: Boolean(mtf?.ok), reason, valid: mtf?.valid || [], mtfPct: mtf?.mtfPct ?? null, signal: mtf?.signal || null, frameSignals }) + '\n');[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction finalizeDecisionAudit(audit) {[m
+[32m+[m[32m  const result = { ...audit, _hash: undefined };[m
+[32m+[m[32m  if (audit._hash) result.fingerprintSha256 = audit._hash.digest('hex');[m
+[32m+[m[32m  return result;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction loadSeriesFromFile(file, interval) {[m
+   const raw = JSON.parse(fs.readFileSync(file, 'utf8'));[m
+   const arr = Array.isArray(raw) ? raw : raw.klines || raw.data || [];[m
+[31m-  return normalizeKlines(arr).filter(k => Number.isFinite(k.closeTime) && k.closeTime < Date.now());[m
+[32m+[m[32m  return validateHistoricalSeries(arr, interval, path.basename(file)).klines;[m
+ }[m
+ [m
+[31m-async function fetchJson(url, params) {[m
+[32m+[m[32masync function fetchJson(url, params, onDiagnostic = null) {[m
+   let last;[m
+   for (const base of ENDPOINTS) {[m
+     for (let attempt = 0; attempt < 4; attempt++) {[m
+       const controller = new AbortController();[m
+       const timer = setTimeout(() => controller.abort(), 15000);[m
+       try {[m
+[32m+[m[32m        const waitMs = PAGE_DELAY_MS - (Date.now() - lastHistoricalRequestAt);[m
+[32m+[m[32m        if (waitMs > 0) await sleep(waitMs);[m
+[32m+[m[32m        lastHistoricalRequestAt = Date.now();[m
+         const u = new URL(`${base}${url}`); Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));[m
+         const res = await fetch(u, { signal: controller.signal, headers: { 'user-agent': 'MaYor-Backtest/1.0' } });[m
+[32m+[m[32m        onDiagnostic?.({ event: 'http-response', attempt: attempt + 1, endpoint: base, httpStatus: res.status });[m
+         if (!res.ok) { const e = new Error(`HTTP ${res.status}`); e.status = res.status; throw e; }[m
+[31m-        return await res.json();[m
+[32m+[m[32m        const data = await res.json();[m
+[32m+[m[32m        onDiagnostic?.({ event: 'payload', attempt: attempt + 1, endpoint: base, httpStatus: res.status, receivedCandles: Array.isArray(data) ? data.length : null });[m
+[32m+[m[32m        return data;[m
+       } catch (e) {[m
+[32m+[m[32m        onDiagnostic?.({ event: 'exception', attempt: attempt + 1, endpoint: base, httpStatus: e.status || null, error: e.message || String(e) });[m
+         last = e; const delay = [418, 429].includes(e.status) ? 1500 * 2 ** attempt : 500 * 2 ** attempt;[m
+         if (attempt < 3) await sleep(Math.min(30000, delay));[m
+       } finally { clearTimeout(timer); }[m
+[36m@@ -79,11 +204,95 @@[m [masync function fetchJson(url, params) {[m
+   throw last || new Error('historical-data-fetch-failed');[m
+ }[m
+ [m
+[32m+[m[32mfunction atomicWriteJson(file, value) {[m
+[32m+[m[32m  fs.mkdirSync(path.dirname(file), { recursive: true });[m
+[32m+[m[32m  const temp = `${file}.${process.pid}.tmp`;[m
+[32m+[m[32m  fs.writeFileSync(temp, JSON.stringify(value));[m
+[32m+[m[32m  fs.renameSync(temp, file);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction validateHistoricalSeries(raw, interval, label = interval) {[m
+[32m+[m[32m  const cadence = intervalMs(interval);[m
+[32m+[m[32m  const unique = new Map();[m
+[32m+[m[32m  let duplicates = 0;[m
+[32m+[m[32m  for (const candle of normalizeKlines(raw)) {[m
+[32m+[m[32m    if (!Number.isFinite(candle.openTime) || !Number.isFinite(candle.closeTime) || candle.closeTime >= Date.now()) continue;[m
+[32m+[m[32m    if (unique.has(candle.openTime)) { duplicates++; continue; }[m
+[32m+[m[32m    unique.set(candle.openTime, candle);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  const klines = [...unique.values()].sort((a, b) => a.openTime - b.openTime);[m
+[32m+[m[32m  const gaps = [];[m
+[32m+[m[32m  for (let i = 1; i < klines.length; i++) {[m
+[32m+[m[32m    const actual = klines[i].openTime - klines[i - 1].openTime;[m
+[32m+[m[32m    if (actual !== cadence) gaps.push({ previousOpenTime: klines[i - 1].openTime, nextOpenTime: klines[i].openTime, expectedMs: cadence, actualMs: actual });[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (gaps.length) {[m
+[32m+[m[32m    const first = gaps[0];[m
+[32m+[m[32m    throw new Error(`historical-series-gap:${label}: count=${gaps.length}, expected=${first.expectedMs}, actual=${first.actualMs}, at=${new Date(first.previousOpenTime).toISOString()}`);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return { klines, duplicates, cadenceMs: cadence, gaps };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction validateHistoricalCoverage(klines, cadence, requestedStart, endTime, label) {[m
+[32m+[m[32m  const expectedFirstOpen = Math.ceil(requestedStart / cadence) * cadence;[m
+[32m+[m[32m  const firstOpen = klines[0]?.openTime;[m
+[32m+[m[32m  const lastClose = klines.at(-1)?.closeTime;[m
+[32m+[m[32m  if (firstOpen !== expectedFirstOpen || lastClose !== endTime) {[m
+[32m+[m[32m    throw new Error(`historical-coverage-incomplete:${label}: expected=${new Date(expectedFirstOpen).toISOString()}..${new Date(endTime).toISOString()}, actual=${firstOpen ? new Date(firstOpen).toISOString() : 'none'}..${lastClose ? new Date(lastClose).toISOString() : 'none'}`);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+ async function fetchHistorical(symbol, interval) {[m
+[31m-  const endTime = Date.now() - 60 * 1000;[m
+[31m-  const startTime = process.env.BACKTEST_START ? new Date(process.env.BACKTEST_START).getTime() : endTime - intervalMs(interval) * FETCH_LIMIT;[m
+[31m-  const raw = await fetchJson('/api/v3/klines', { symbol, interval, limit: FETCH_LIMIT, startTime, endTime });[m
+[31m-  return normalizeKlines(raw).filter(k => k.closeTime < Date.now());[m
+[32m+[m[32m  const cadence = intervalMs(interval);[m
+[32m+[m[32m  // نهاية النطاق هي آخر شمعة مكتملة وفق الإطار، لا وقتًا وسط الشمعة الحالية.[m
+[32m+[m[32m  const endTime = Math.floor(BACKTEST_END_MS / cadence) * cadence - 1;[m
+[32m+[m[32m  if (!Number.isFinite(endTime)) throw new Error(`invalid-backtest-end:${process.env.BACKTEST_END || BACKTEST_END_MS}`);[m
+[32m+[m[32m  const requestedStart = process.env.BACKTEST_START ? new Date(process.env.BACKTEST_START).getTime() : endTime - cadence * FETCH_LIMIT;[m
+[32m+[m[32m  if (!Number.isFinite(requestedStart) || requestedStart >= endTime) throw new Error(`invalid-backtest-start:${process.env.BACKTEST_START || requestedStart}`);[m
+[32m+[m[32m  const rawCandles = [];[m
+[32m+[m[32m  let cursor = requestedStart, page = 0;[m
+[32m+[m[32m  while (cursor < endTime && page < MAX_FETCH_PAGES) {[m
+[32m+[m[32m    const remaining = Math.max(1, Math.ceil((endTime - cursor) / cadence));[m
+[32m+[m[32m    const pageNumber = page + 1;[m
+[32m+[m[32m    const pageParams = { symbol, interval, limit: Math.min(BINANCE_PAGE_LIMIT, remaining), startTime: cursor, endTime: endTime - 1 };[m
+[32m+[m[32m    if (VERBOSE_FETCH_PAGES) console.error(JSON.stringify({ event: 'page-request', page: pageNumber, ...pageParams }));[m
+[32m+[m[32m    const raw = await fetchJson('/api/v3/klines', pageParams, detail => {[m
+[32m+[m[32m      if (VERBOSE_FETCH_PAGES) console.error(JSON.stringify({ page: pageNumber, startTime: cursor, ...detail }));[m
+[32m+[m[32m    });[m
+[32m+[m[32m    if (!Array.isArray(raw)) throw new Error(`historical-page-invalid:${symbol}:${interval}:page=${page + 1}`);[m
+[32m+[m[32m    if (!raw.length) {[m
+[32m+[m[32m      if (VERBOSE_FETCH_PAGES) console.error(JSON.stringify({ event: 'page-empty-stop', page: pageNumber, startTime: cursor }));[m
+[32m+[m[32m      break;[m
+[32m+[m[32m    }[m
+[32m+[m[32m    rawCandles.push(...raw);[m
+[32m+[m[32m    const lastOpenTime = Number(raw.at(-1)?.[0]);[m
+[32m+[m[32m    const nextCursor = lastOpenTime + cadence;[m
+[32m+[m[32m    if (VERBOSE_FETCH_PAGES) console.error(JSON.stringify({ event: 'page-accepted', page: pageNumber, startTime: cursor, receivedCandles: raw.length, nextCursor }));[m
+[32m+[m[32m    if (!Number.isFinite(lastOpenTime) || nextCursor <= cursor) throw new Error(`historical-pagination-stalled:${symbol}:${interval}:page=${page + 1}`);[m
+[32m+[m[32m    cursor = nextCursor;[m
+[32m+[m[32m    page++;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  if (page >= MAX_FETCH_PAGES && cursor < endTime) throw new Error(`historical-pagination-page-limit:${symbol}:${interval}:${MAX_FETCH_PAGES}`);[m
+[32m+[m[32m  if (!rawCandles.length) throw new Error(`historical-series-empty:${symbol}:${interval}`);[m
+[32m+[m[32m  const validated = validateHistoricalSeries(rawCandles, interval, `${symbol}_${interval}`);[m
+[32m+[m[32m  if (!validated.klines.length) throw new Error(`historical-series-empty-after-validation:${symbol}:${interval}`);[m
+[32m+[m[32m  validateHistoricalCoverage(validated.klines, cadence, requestedStart, endTime, `${symbol}:${interval}`);[m
+[32m+[m[32m  const rawByOpen = new Map();[m
+[32m+[m[32m  for (const candle of rawCandles) rawByOpen.set(Number(candle?.[0]), candle);[m
+[32m+[m[32m  const frozenRaw = validated.klines.map(candle => rawByOpen.get(candle.openTime));[m
+[32m+[m[32m  const metadata = {[m
+[32m+[m[32m    symbol, interval, requestedStart, requestedEnd: endTime, fetchedAt: new Date().toISOString(),[m
+[32m+[m[32m    pages: page, rawCandles: rawCandles.length, savedCandles: frozenRaw.length,[m
+[32m+[m[32m    duplicatesRemoved: validated.duplicates, cadenceMs: validated.cadenceMs,[m
+[32m+[m[32m    firstOpenTime: validated.klines[0]?.openTime || null, lastCloseTime: validated.klines.at(-1)?.closeTime || null[m
+[32m+[m[32m  };[m
+[32m+[m[32m  if (SAVE_FETCHED_HISTORY) {[m
+[32m+[m[32m    const file = path.join(HIST_DIR, `${symbol}_${interval}.json`);[m
+[32m+[m[32m    atomicWriteJson(file, frozenRaw);[m
+[32m+[m[32m    atomicWriteJson(path.join(HIST_DIR, `${symbol}_${interval}.meta.json`), metadata);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  console.log(`historical ${symbol} ${interval}: pages=${page}, candles=${frozenRaw.length}, duplicatesRemoved=${validated.duplicates}, saved=${SAVE_FETCHED_HISTORY ? 'yes' : 'no'}`);[m
+[32m+[m[32m  return { klines: validated.klines, metadata };[m
+ }[m
+ [m
+ function intervalMs(interval) { return ({ '5m': 5, '15m': 15, '1h': 60, '4h': 240 }[interval] || 15) * 60 * 1000; }[m
+[36m@@ -92,14 +301,23 @@[m [masync function loadDataset(symbol) {[m
+   const data = {};[m
+   for (const interval of INTERVALS) {[m
+     const file = path.join(HIST_DIR, `${symbol}_${interval}.json`);[m
+[31m-    if (fs.existsSync(file)) data[interval] = loadSeriesFromFile(file);[m
+[31m-    else if (/^(1|true|yes)$/i.test(process.env.BACKTEST_FETCH || '')) data[interval] = await fetchHistorical(symbol, interval);[m
+[32m+[m[32m    if (fs.existsSync(file)) data[interval] = loadSeriesFromFile(file, interval);[m
+[32m+[m[32m    else if (/^(1|true|yes)$/i.test(process.env.BACKTEST_FETCH || '')) data[interval] = (await fetchHistorical(symbol, interval)).klines;[m
+     else data[interval] = [];[m
+   }[m
+   return { symbol, data };[m
+ }[m
+ [m
+ function sliceUntil(series, endTime) { let lo = 0, hi = series.length; while (lo < hi) { const m = Math.floor((lo + hi) / 2); if (series[m].closeTime < endTime) lo = m + 1; else hi = m; } return series.slice(0, lo); }[m
+[32m+[m[32mfunction sliceWindowUntil(series, endTime, warmup = WARMUP_CANDLES) {[m
+[32m+[m[32m  let lo = 0, hi = series.length;[m
+[32m+[m[32m  while (lo < hi) {[m
+[32m+[m[32m    const m = Math.floor((lo + hi) / 2);[m
+[32m+[m[32m    if (series[m].closeTime < endTime) lo = m + 1;[m
+[32m+[m[32m    else hi = m;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return series.slice(Math.max(0, lo - warmup), lo);[m
+[32m+[m[32m}[m
+ function lastClosedIndex(series, endTime) { let i = -1; for (let n = 0; n < series.length; n++) { if (series[n].closeTime < endTime) i = n; else break; } return i; }[m
+ [m
+ function volume24h(series, endIndex) {[m
+[36m@@ -122,13 +340,41 @@[m [mfunction extractFeatures(result) {[m
+   };[m
+ }[m
+ [m
+[31m-function getMtfAt(dataset, evaluationTime) {[m
+[32m+[m[32mfunction exportTradeDiagnostics(trades) {[m
+[32m+[m[32m  return trades.map(t => ({[m
+[32m+[m[32m    symbol: t.symbol,[m
+[32m+[m[32m    dir: t.dir,[m
+[32m+[m[32m    signalTime: t.signalTime,[m
+[32m+[m[32m    entryTime: t.entryTime,[m
+[32m+[m[32m    exitTime: t.exitTime,[m
+[32m+[m[32m    netPct: t.netPct,[m
+[32m+[m[32m    result: t.result,[m
+[32m+[m[32m    holdingMs: t.exitTime - t.entryTime,[m
+[32m+[m[32m    rr: t.rr,[m
+[32m+[m[32m    mtfPct: t.mtfPct,[m
+[32m+[m[32m    corePct: t.corePct,[m
+[32m+[m[32m    sentiment: t.sentiment,[m
+[32m+[m[32m    entryFeatures: t.entryFeatures || null[m
+[32m+[m[32m  }));[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction getMtfAt(dataset, evaluationTime, sentiment = null) {[m
+[32m+[m[32m  // أي إشارة صالحة تتطلب تأكيد الإطار الأساسي؛ لذا نفحصه أولًا.[m
+[32m+[m[32m  // عند غياب إشارته لا يمكن للأطر الأخرى تغيير النتيجة، فتجنب حسابها يحافظ[m
+[32m+[m[32m  // على المنطق نفسه ويجعل نافذة الأشهر قابلة للتنفيذ.[m
+[32m+[m[32m  const baseTf = CONFIG.baseInterval;[m
+[32m+[m[32m  const baseRaw = sliceWindowUntil(dataset.data[baseTf] || [], evaluationTime);[m
+[32m+[m[32m  const baseMin = CONFIG.minKlinesByFrame[baseTf] || CONFIG.minKlines;[m
+[32m+[m[32m  if (baseRaw.length < baseMin) return { ok: false, reason: 'base-frame-insufficient-data', frames: {}, valid: [] };[m
+[32m+[m[32m  const baseResult = analyzeLatest(dataset.symbol, baseRaw, { skipSanitize: true, minKlines: baseMin, obImbalance: null, sentiment });[m
+[32m+[m[32m  if (!baseResult.signal) return { ok: false, reason: 'base-frame-no-signal', frames: { [baseTf]: baseResult }, valid: [] };[m
+[32m+[m
+   const frames = {}, valid = [];[m
+   for (const tf of INTERVALS) {[m
+[31m-    const raw = sliceUntil(dataset.data[tf] || [], evaluationTime);[m
+[32m+[m[32m    const raw = tf === baseTf ? baseRaw : sliceWindowUntil(dataset.data[tf] || [], evaluationTime);[m
+     const min = CONFIG.minKlinesByFrame[tf] || CONFIG.minKlines;[m
+     if (raw.length < min) continue;[m
+[31m-    const result = analyzeLatest(dataset.symbol, raw, { skipSanitize: true, minKlines: min, obImbalance: null });[m
+[32m+[m[32m    const result = tf === baseTf ? baseResult : analyzeLatest(dataset.symbol, raw, { skipSanitize: true, minKlines: min, obImbalance: null, sentiment });[m
+     frames[tf] = result;[m
+     if (result.signal) valid.push(tf);[m
+   }[m
+[36m@@ -145,7 +391,7 @@[m [mfunction getMtfAt(dataset, evaluationTime) {[m
+     adx4h: frames['4h'].signal.adx, liquidity24h: volume24h(dataset.data[CONFIG.baseInterval], lastClosedIndex(dataset.data[CONFIG.baseInterval], evaluationTime)),[m
+     votesByTf: valid.map(tf => `${tf}→${frames[tf].signal.dir}`)[m
+   });[m
+[31m-  return levels ? { ok: true, signal: levels, frames, valid, mtfPct, features: extractFeatures(base) } : { ok: false, reason: 'invalid-levels', frames, valid, mtfPct };[m
+[32m+[m[32m  return levels ? { ok: true, signal: levels, frames, valid, mtfPct, sentiment, features: extractFeatures(base) } : { ok: false, reason: 'invalid-levels', frames, valid, mtfPct, sentiment };[m
+ }[m
+ [m
+ function chooseExit(trade, candle) {[m
+[36m@@ -161,8 +407,10 @@[m [mfunction chooseExit(trade, candle) {[m
+   return null;[m
+ }[m
+ [m
+[31m-function runWindow(dataset, startTime, endTime) {[m
+[32m+[m[32mfunction runWindow(dataset, startTime, endTime, sentimentProvider = null) {[m
+   const base = dataset.data[CONFIG.baseInterval] || [], trades = [], features = [], open = [];[m
+[32m+[m[32m  const sentimentAudit = createSentimentAudit(sentimentProvider);[m
+[32m+[m[32m  const decisionAudit = createDecisionAudit();[m
+   let lastSignalAt = 0;[m
+   for (let i = 0; i < base.length - 1; i++) {[m
+     const signalClose = base[i].closeTime;[m
+[36m@@ -178,7 +426,10 @@[m [mfunction runWindow(dataset, startTime, endTime) {[m
+         open.splice(oi, 1);[m
+       }[m
+     }[m
+[31m-    const mtf = getMtfAt(dataset, signalClose + 1);[m
+[32m+[m[32m    const resolvedSentiment = sentimentProvider ? sentimentProvider.resolve(signalClose + 1) : null;[m
+[32m+[m[32m    if (sentimentProvider) observeSentiment(sentimentAudit, resolvedSentiment);[m
+[32m+[m[32m    const mtf = getMtfAt(dataset, signalClose + 1, resolvedSentiment?.value ?? null);[m
+[32m+[m[32m    observeDecision(decisionAudit, mtf, signalClose);[m
+     const feature = mtf.features; if (feature) features.push({ time: signalClose, ...feature });[m
+     if (!mtf.ok || !mtf.signal || open.length) continue;[m
+     if (signalClose - lastSignalAt < CONFIG.signalCooldownMs) continue;[m
+[36m@@ -186,14 +437,15 @@[m [mfunction runWindow(dataset, startTime, endTime) {[m
+     if (!entryCandle || entryCandle.openTime < signalClose) continue;[m
+     const trade = { symbol: dataset.symbol, dir: mtf.signal.dir, signalTime: signalClose, entryTime: entryCandle.openTime,[m
+       entryRaw: entryCandle.open, price: entryCandle.open, sl: mtf.signal.sl, tp1: mtf.signal.tp1, tp2: mtf.signal.tp2, tp3: mtf.signal.tp3,[m
+[31m-      rr: mtf.signal.rr, mtfPct: mtf.signal.mtfPct, corePct: mtf.signal.corePct };[m
+[32m+[m[32m      rr: mtf.signal.rr, mtfPct: mtf.signal.mtfPct, corePct: mtf.signal.corePct, sentiment: mtf.sentiment,[m
+[32m+[m[32m      ...(EXPORT_TRADE_DIAGNOSTICS ? { entryFeatures: mtf.features || null } : {}) };[m
+     open.push(trade); lastSignalAt = signalClose;[m
+   }[m
+   for (const trade of open) {[m
+     const last = base.filter(c => c.closeTime >= trade.entryTime && c.closeTime < endTime).at(-1);[m
+     if (last) { const pnl = netPnl(trade.entryRaw, last.close, trade.dir); trades.push({ ...trade, result: 'انتهت المدة', exitTime: last.closeTime, exitRaw: last.close, ...pnl, netPct: round(pnl.netPct, 5) }); }[m
+   }[m
+[31m-  return { trades: trades.filter(t => t.exitTime >= startTime && t.exitTime < endTime), features };[m
+[32m+[m[32m  return { trades: trades.filter(t => t.exitTime >= startTime && t.exitTime < endTime), features, sentimentAudit: finalizeSentimentAudit(sentimentAudit), decisionAudit: finalizeDecisionAudit(decisionAudit) };[m
+ }[m
+ [m
+ function metrics(trades) {[m
+[36m@@ -265,20 +517,27 @@[m [mfunction buildGate(is, oos, mc) {[m
+ [m
+ async function main() {[m
+   if (!fs.existsSync(HIST_DIR) && !/^(1|true|yes)$/i.test(process.env.BACKTEST_FETCH || '')) fs.mkdirSync(HIST_DIR, { recursive: true });[m
+[31m-  const datasets = []; for (const symbol of SYMBOLS) datasets.push(await loadDataset(symbol));[m
+[32m+[m[32m  const sentimentProvider = loadHistoricalSentimentProvider();[m
+   const symbolReports = [];[m
+[31m-  for (const dataset of datasets) {[m
+[32m+[m[32m  for (const symbol of SYMBOLS) {[m
+[32m+[m[32m    const dataset = await loadDataset(symbol);[m
+     const all = dataset.data[CONFIG.baseInterval] || [], start = all[0]?.openTime || 0, end = all.at(-1)?.closeTime || 0, split = start + (end - start) * 0.7;[m
+     if (!all.length) { symbolReports.push({ symbol: dataset.symbol, warning: 'No historical data' }); continue; }[m
+[31m-    const isRun = runWindow(dataset, start, split), oosRun = runWindow(dataset, split, end);[m
+[32m+[m[32m    const isRun = runWindow(dataset, start, split, sentimentProvider), oosRun = runWindow(dataset, split, end, sentimentProvider);[m
+     const is = metrics(isRun.trades), oos = metrics(oosRun.trades), mc = monteCarlo(oos.returns), correlation = correlationMatrix([...isRun.features, ...oosRun.features]);[m
+     const gate = buildGate(is, oos, mc);[m
+[31m-    symbolReports.push({ symbol: dataset.symbol, period: { start, split, end }, inSample: is, outOfSample: oos, monteCarlo: mc, correlation, gate, warnings: [...gate.warnings] });[m
+[32m+[m[32m    const outOfSample = (EXPORT_TRADES || EXPORT_TRADE_DIAGNOSTICS) ? {[m
+[32m+[m[32m      ...oos,[m
+[32m+[m[32m      ...(EXPORT_TRADES ? { tradesDetailed: oosRun.trades.map(t => ({ symbol: t.symbol, entryTime: t.entryTime, exitTime: t.exitTime, netPct: t.netPct })) } : {}),[m
+[32m+[m[32m      ...(EXPORT_TRADE_DIAGNOSTICS ? { tradeDiagnostics: exportTradeDiagnostics(oosRun.trades) } : {})[m
+[32m+[m[32m    } : oos;[m
+[32m+[m[32m    symbolReports.push({ symbol: dataset.symbol, period: { start, split, end }, inSample: is, outOfSample, monteCarlo: mc, correlation, sentimentAudit: { inSample: isRun.sentimentAudit, outOfSample: oosRun.sentimentAudit }, decisionAudit: { inSample: isRun.decisionAudit, outOfSample: oosRun.decisionAudit }, gate, warnings: [...gate.warnings] });[m
+[32m+[m[32m    if (/^(1|true|yes)$/i.test(process.env.BACKTEST_FORCE_GC || '') && typeof global.gc === 'function') global.gc();[m
+   }[m
+   const valid = symbolReports.filter(r => r.gate), passed = valid.length > 0 && valid.every(r => r.gate.passed);[m
+[31m-  const report = { generatedAt: new Date().toISOString(), strategy: 'MaYor Cloud Pro MTF', engineVersion: 'cloud-pro-mtf-2.0', assumptions: { entry: 'next base candle open', ambiguousCandle: 'SL first (conservative)', takerFeeRate: CONFIG.takerFeeRate, slippageRate: CONFIG.slippageRate, monteCarloRuns: MC_RUNS, sampleWarning: true }, symbols: symbolReports, gate: { gateVersion: 'cloud-pro-statistical-gate-1', status: passed ? 'PASS' : 'BLOCKED', passed, reason: passed ? 'all symbol gates passed' : 'one or more symbol gates blocked' } };[m
+[32m+[m[32m  const report = { generatedAt: new Date().toISOString(), strategy: 'MaYor Cloud Pro MTF', engineVersion: 'cloud-pro-mtf-2.0', assumptions: { entry: 'next base candle open', ambiguousCandle: 'SL first (conservative)', takerFeeRate: CONFIG.takerFeeRate, slippageRate: CONFIG.slippageRate, monteCarloRuns: MC_RUNS, sampleWarning: true, sentiment: sentimentProvider ? sentimentProvider.describe() : { mode: 'off', policy: 'No historical sentiment supplied; preserves the established baseline.' } }, symbols: symbolReports, gate: { gateVersion: 'cloud-pro-statistical-gate-1', status: passed ? 'PASS' : 'BLOCKED', passed, reason: passed ? 'all symbol gates passed' : 'one or more symbol gates blocked' } };[m
+   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));[m
+[31m-  const verification = { ...report.gate, generatedAt: report.generatedAt, engineVersion: report.engineVersion, monteCarlo: symbolReports.map(r => ({ symbol: r.symbol, ...(r.monteCarlo || {}) })), oos: symbolReports.map(r => ({ symbol: r.symbol, ...(r.outOfSample || {}) })), warnings: symbolReports.flatMap(r => r.warnings || []) };[m
+[32m+[m[32m  const verification = { ...report.gate, generatedAt: report.generatedAt, engineVersion: report.engineVersion, monteCarlo: symbolReports.map(r => ({ symbol: r.symbol, ...(r.monteCarlo || {}) })), oos: symbolReports.map(r => { const { tradesDetailed, tradeDiagnostics, ...oos } = r.outOfSample || {}; return { symbol: r.symbol, ...oos }; }), warnings: symbolReports.flatMap(r => r.warnings || []) };[m
+   fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));[m
+   console.log(JSON.stringify({ report: REPORT_FILE, verification: VERIFICATION_FILE, gate: report.gate, symbols: symbolReports.map(r => ({ symbol: r.symbol, isTrades: r.inSample?.trades || 0, oosTrades: r.outOfSample?.trades || 0, oosNetPct: r.outOfSample?.netPct || 0, zScore: r.monteCarlo?.zScore || 0 })) }, null, 2));[m
+   return report;[m
+[36m@@ -286,4 +545,4 @@[m [masync function main() {[m
+ [m
+ if (require.main === module) main().catch(e => { console.error(`Backtest failed: ${e.stack || e.message}`); process.exitCode = 1; });[m
+ [m
+[31m-if (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate };[m
+[32m+[m[32mif (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, fetchHistorical, validateHistoricalSeries, validateHistoricalCoverage, parseHistoricalSentiment, createHistoricalSentimentProvider, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate };[m

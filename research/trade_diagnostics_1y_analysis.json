@@ -1,0 +1,819 @@
+{
+  "generatedAt": "2026-08-25T21:23:36.515Z",
+  "researchOnly": true,
+  "source": "/home/ubuntu/mayor-history-1y-expansion/data/backtest_report_1y_is_oos_diagnostics.json",
+  "methodology": {
+    "causalClaim": "Observational descriptive analysis only; associations are not proof of causation.",
+    "selectionDiscipline": "The entry-filter candidate is selected from IS only. OOS is evaluated exactly once for the selected candidate.",
+    "candidateFeatures": [
+      "adx",
+      "atrPct",
+      "volumeRatio",
+      "takerFlow",
+      "alignedEmaSpreadPct",
+      "alignedMacdHistPct"
+    ],
+    "thresholdRule": "IS median per feature; retain either side only when it has >=20 IS trades, positive IS net result, and IS average return above the full IS baseline.",
+    "oosSuccessCriterion": "Selected rule must retain at least 10 OOS trades and improve OOS netPct versus the frozen baseline; no live or production use follows from this test alone."
+  },
+  "samples": {
+    "inSample": {
+      "trades": 87,
+      "wins": 46,
+      "losses": 41,
+      "winRatePct": 52.873563,
+      "netPct": 55.80931,
+      "avgNetPct": 0.641486,
+      "medianNetPct": 0.15382,
+      "profitFactor": 1.908761,
+      "maxDrawdownPct": 19.04743
+    },
+    "outOfSample": {
+      "trades": 73,
+      "wins": 37,
+      "losses": 36,
+      "winRatePct": 50.684932,
+      "netPct": -9.50841,
+      "avgNetPct": -0.130252,
+      "medianNetPct": 0.05054,
+      "profitFactor": 0.822382,
+      "maxDrawdownPct": 19.59656
+    }
+  },
+  "oosObservedPatterns": {
+    "byExitResult": [
+      {
+        "value": "TP1",
+        "trades": 33,
+        "wins": 33,
+        "losses": 0,
+        "winRatePct": 100,
+        "netPct": 37.26301,
+        "avgNetPct": 1.129182,
+        "medianNetPct": 0.99176,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "value": "TP2",
+        "trades": 3,
+        "wins": 3,
+        "losses": 0,
+        "winRatePct": 100,
+        "netPct": 4.23054,
+        "avgNetPct": 1.41018,
+        "medianNetPct": 0.62571,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "value": "TP3",
+        "trades": 1,
+        "wins": 1,
+        "losses": 0,
+        "winRatePct": 100,
+        "netPct": 2.531,
+        "avgNetPct": 2.531,
+        "medianNetPct": 2.531,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "value": "SL",
+        "trades": 36,
+        "wins": 0,
+        "losses": 36,
+        "winRatePct": 0,
+        "netPct": -53.53296,
+        "avgNetPct": -1.487027,
+        "medianNetPct": -1.47464,
+        "profitFactor": 0,
+        "maxDrawdownPct": 53.53296
+      }
+    ],
+    "byDirection": [
+      {
+        "value": "LONG",
+        "trades": 48,
+        "wins": 26,
+        "losses": 22,
+        "winRatePct": 54.166667,
+        "netPct": -0.42117,
+        "avgNetPct": -0.008774,
+        "medianNetPct": 0.243105,
+        "profitFactor": 0.988147,
+        "maxDrawdownPct": 10.72626
+      },
+      {
+        "value": "SHORT",
+        "trades": 25,
+        "wins": 11,
+        "losses": 14,
+        "winRatePct": 44,
+        "netPct": -9.08724,
+        "avgNetPct": -0.36349,
+        "medianNetPct": -0.82858,
+        "profitFactor": 0.495171,
+        "maxDrawdownPct": 12.41987
+      }
+    ],
+    "bySymbolAtLeastTwoTrades": [
+      {
+        "value": "ARBUSDT",
+        "trades": 3,
+        "wins": 3,
+        "losses": 0,
+        "winRatePct": 100,
+        "netPct": 6.72103,
+        "avgNetPct": 2.240343,
+        "medianNetPct": 1.81723,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "value": "BTCUSDT",
+        "trades": 4,
+        "wins": 4,
+        "losses": 0,
+        "winRatePct": 100,
+        "netPct": 4.90208,
+        "avgNetPct": 1.22552,
+        "medianNetPct": 0.872685,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "value": "BCHUSDT",
+        "trades": 4,
+        "wins": 3,
+        "losses": 1,
+        "winRatePct": 75,
+        "netPct": 2.90465,
+        "avgNetPct": 0.726163,
+        "medianNetPct": 1.63869,
+        "profitFactor": 2.134664,
+        "maxDrawdownPct": 2.55992
+      },
+      {
+        "value": "SUIUSDT",
+        "trades": 4,
+        "wins": 2,
+        "losses": 2,
+        "winRatePct": 50,
+        "netPct": 1.38414,
+        "avgNetPct": 0.346035,
+        "medianNetPct": 0.21093,
+        "profitFactor": 1.447917,
+        "maxDrawdownPct": 3.09017
+      },
+      {
+        "value": "OPUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": 0.19292,
+        "avgNetPct": 0.09646,
+        "medianNetPct": 0.09646,
+        "profitFactor": 1.157795,
+        "maxDrawdownPct": 1.2226
+      },
+      {
+        "value": "SEIUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": 0.06093,
+        "avgNetPct": 0.030465,
+        "medianNetPct": 0.030465,
+        "profitFactor": 1.057048,
+        "maxDrawdownPct": 1.06805
+      },
+      {
+        "value": "TRXUSDT",
+        "trades": 6,
+        "wins": 4,
+        "losses": 2,
+        "winRatePct": 66.666667,
+        "netPct": -0.19299,
+        "avgNetPct": -0.032165,
+        "medianNetPct": 0.056875,
+        "profitFactor": 0.756618,
+        "maxDrawdownPct": 0.47897
+      },
+      {
+        "value": "XRPUSDT",
+        "trades": 3,
+        "wins": 2,
+        "losses": 1,
+        "winRatePct": 66.666667,
+        "netPct": -0.23753,
+        "avgNetPct": -0.079177,
+        "medianNetPct": 0.60477,
+        "profitFactor": 0.911632,
+        "maxDrawdownPct": 2.68795
+      },
+      {
+        "value": "ETCUSDT",
+        "trades": 4,
+        "wins": 2,
+        "losses": 2,
+        "winRatePct": 50,
+        "netPct": -0.33458,
+        "avgNetPct": -0.083645,
+        "medianNetPct": -0.247965,
+        "profitFactor": 0.881073,
+        "maxDrawdownPct": 2.81332
+      },
+      {
+        "value": "ADAUSDT",
+        "trades": 5,
+        "wins": 3,
+        "losses": 2,
+        "winRatePct": 60,
+        "netPct": -0.39676,
+        "avgNetPct": -0.079352,
+        "medianNetPct": 0.51903,
+        "profitFactor": 0.886456,
+        "maxDrawdownPct": 2.47603
+      },
+      {
+        "value": "SHIBUSDT",
+        "trades": 3,
+        "wins": 1,
+        "losses": 2,
+        "winRatePct": 33.333333,
+        "netPct": -0.47563,
+        "avgNetPct": -0.158543,
+        "medianNetPct": -0.82858,
+        "profitFactor": 0.774206,
+        "maxDrawdownPct": 2.10648
+      },
+      {
+        "value": "LINKUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": -0.48211,
+        "avgNetPct": -0.241055,
+        "medianNetPct": -0.241055,
+        "profitFactor": 0.687613,
+        "maxDrawdownPct": 1.54331
+      },
+      {
+        "value": "BNBUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": -0.51702,
+        "avgNetPct": -0.25851,
+        "medianNetPct": -0.25851,
+        "profitFactor": 0.417265,
+        "maxDrawdownPct": 0.88723
+      },
+      {
+        "value": "LTCUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": -0.53119,
+        "avgNetPct": -0.265595,
+        "medianNetPct": -0.265595,
+        "profitFactor": 0.542925,
+        "maxDrawdownPct": 1.16215
+      },
+      {
+        "value": "DOTUSDT",
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "winRatePct": 50,
+        "netPct": -1.03762,
+        "avgNetPct": -0.51881,
+        "medianNetPct": -0.51881,
+        "profitFactor": 0.45368,
+        "maxDrawdownPct": 1.89929
+      },
+      {
+        "value": "SANDUSDT",
+        "trades": 3,
+        "wins": 1,
+        "losses": 2,
+        "winRatePct": 33.333333,
+        "netPct": -1.56682,
+        "avgNetPct": -0.522273,
+        "medianNetPct": -1.17994,
+        "profitFactor": 0.350115,
+        "maxDrawdownPct": 2.41092
+      },
+      {
+        "value": "ETHUSDT",
+        "trades": 2,
+        "wins": 0,
+        "losses": 2,
+        "winRatePct": 0,
+        "netPct": -1.98907,
+        "avgNetPct": -0.994535,
+        "medianNetPct": -0.994535,
+        "profitFactor": 0,
+        "maxDrawdownPct": 1.98907
+      },
+      {
+        "value": "UNIUSDT",
+        "trades": 4,
+        "wins": 1,
+        "losses": 3,
+        "winRatePct": 25,
+        "netPct": -2.34855,
+        "avgNetPct": -0.587138,
+        "medianNetPct": -1.485595,
+        "profitFactor": 0.488233,
+        "maxDrawdownPct": 4.5891
+      },
+      {
+        "value": "AXSUSDT",
+        "trades": 4,
+        "wins": 1,
+        "losses": 3,
+        "winRatePct": 25,
+        "netPct": -2.41147,
+        "avgNetPct": -0.602868,
+        "medianNetPct": -0.97476,
+        "profitFactor": 0.217934,
+        "maxDrawdownPct": 2.41147
+      },
+      {
+        "value": "SOLUSDT",
+        "trades": 5,
+        "wins": 2,
+        "losses": 3,
+        "winRatePct": 40,
+        "netPct": -3.88244,
+        "avgNetPct": -0.776488,
+        "medianNetPct": -1.51652,
+        "profitFactor": 0.268863,
+        "maxDrawdownPct": 4.55091
+      },
+      {
+        "value": "DOGEUSDT",
+        "trades": 2,
+        "wins": 0,
+        "losses": 2,
+        "winRatePct": 0,
+        "netPct": -4.05022,
+        "avgNetPct": -2.02511,
+        "medianNetPct": -2.02511,
+        "profitFactor": 0,
+        "maxDrawdownPct": 4.05022
+      }
+    ],
+    "byEntryMonth": [
+      {
+        "value": "2026-05",
+        "trades": 15,
+        "wins": 10,
+        "losses": 5,
+        "winRatePct": 66.666667,
+        "netPct": 5.42223,
+        "avgNetPct": 0.361482,
+        "medianNetPct": 0.60477,
+        "profitFactor": 1.661362,
+        "maxDrawdownPct": 3.94051
+      },
+      {
+        "value": "2026-06",
+        "trades": 16,
+        "wins": 9,
+        "losses": 7,
+        "winRatePct": 56.25,
+        "netPct": -0.09959,
+        "avgNetPct": -0.006224,
+        "medianNetPct": 0.338125,
+        "profitFactor": 0.988887,
+        "maxDrawdownPct": 7.04072
+      },
+      {
+        "value": "2026-07",
+        "trades": 5,
+        "wins": 2,
+        "losses": 3,
+        "winRatePct": 40,
+        "netPct": -0.11869,
+        "avgNetPct": -0.023738,
+        "medianNetPct": -0.31398,
+        "profitFactor": 0.956703,
+        "maxDrawdownPct": 1.78632
+      },
+      {
+        "value": "2026-08",
+        "trades": 37,
+        "wins": 16,
+        "losses": 21,
+        "winRatePct": 43.243243,
+        "netPct": -14.71236,
+        "avgNetPct": -0.397631,
+        "medianNetPct": -1.13394,
+        "profitFactor": 0.562547,
+        "maxDrawdownPct": 17.7921
+      }
+    ],
+    "featureContrastsWinVsLoss": [
+      {
+        "feature": "adx",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 48.028524,
+        "lossMean": 46.709139,
+        "winMedian": 49.014013,
+        "lossMedian": 48.234875,
+        "meanDifferenceWinMinusLoss": 1.319385
+      },
+      {
+        "feature": "atrPct",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 0.811496,
+        "lossMean": 0.885621,
+        "winMedian": 0.712493,
+        "lossMedian": 0.86146,
+        "meanDifferenceWinMinusLoss": -0.074126
+      },
+      {
+        "feature": "volumeRatio",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 2.761967,
+        "lossMean": 3.29877,
+        "winMedian": 2.48902,
+        "lossMedian": 2.743037,
+        "meanDifferenceWinMinusLoss": -0.536803
+      },
+      {
+        "feature": "takerFlow",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 0.508574,
+        "lossMean": 0.507905,
+        "winMedian": 0.526252,
+        "lossMedian": 0.526939,
+        "meanDifferenceWinMinusLoss": 0.000668
+      },
+      {
+        "feature": "alignedEmaSpreadPct",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 1.6631,
+        "lossMean": 1.770314,
+        "winMedian": 1.458149,
+        "lossMedian": 1.515289,
+        "meanDifferenceWinMinusLoss": -0.107214
+      },
+      {
+        "feature": "alignedMacdHistPct",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 0.276577,
+        "lossMean": 0.313686,
+        "winMedian": 0.190565,
+        "lossMedian": 0.258326,
+        "meanDifferenceWinMinusLoss": -0.037109
+      },
+      {
+        "feature": "rsi",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 63.758998,
+        "lossMean": 59.288248,
+        "winMedian": 78.332662,
+        "lossMedian": 73.802258,
+        "meanDifferenceWinMinusLoss": 4.47075
+      },
+      {
+        "feature": "stochRsi",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 64.653516,
+        "lossMean": 60.610476,
+        "winMedian": 78.077841,
+        "lossMedian": 77.610394,
+        "meanDifferenceWinMinusLoss": 4.04304
+      },
+      {
+        "feature": "structure",
+        "observations": 73,
+        "winningTrades": 37,
+        "losingTrades": 36,
+        "winMean": 0.432432,
+        "lossMean": 0.166667,
+        "winMedian": 1,
+        "lossMedian": 1,
+        "meanDifferenceWinMinusLoss": 0.265766
+      }
+    ]
+  },
+  "isOnlyCandidateSelection": {
+    "fullIsBaseline": {
+      "trades": 87,
+      "wins": 46,
+      "losses": 41,
+      "winRatePct": 52.873563,
+      "netPct": 55.80931,
+      "avgNetPct": 0.641486,
+      "medianNetPct": 0.15382,
+      "profitFactor": 1.908761,
+      "maxDrawdownPct": 19.04743
+    },
+    "rankedCandidates": [
+      {
+        "feature": "adx",
+        "operator": "gte",
+        "threshold": 47.309165,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 23,
+          "losses": 21,
+          "winRatePct": 52.272727,
+          "netPct": 58.01034,
+          "avgNetPct": 1.318417,
+          "medianNetPct": 0.54941,
+          "profitFactor": 2.508703,
+          "maxDrawdownPct": 19.23313
+        },
+        "eligible": true,
+        "isScore": 8.745389
+      },
+      {
+        "feature": "volumeRatio",
+        "operator": "gte",
+        "threshold": 2.172771,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 23,
+          "losses": 21,
+          "winRatePct": 52.272727,
+          "netPct": 56.76654,
+          "avgNetPct": 1.290149,
+          "medianNetPct": 0.203095,
+          "profitFactor": 2.564169,
+          "maxDrawdownPct": 14.41667
+        },
+        "eligible": true,
+        "isScore": 8.55788
+      },
+      {
+        "feature": "alignedEmaSpreadPct",
+        "operator": "gte",
+        "threshold": 1.533025,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 22,
+          "losses": 22,
+          "winRatePct": 50,
+          "netPct": 56.40969,
+          "avgNetPct": 1.282038,
+          "medianNetPct": -0.03779,
+          "profitFactor": 2.304154,
+          "maxDrawdownPct": 19.51114
+        },
+        "eligible": true,
+        "isScore": 8.504078
+      },
+      {
+        "feature": "takerFlow",
+        "operator": "lt",
+        "threshold": 0.474375,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 29,
+          "losses": 14,
+          "winRatePct": 67.44186,
+          "netPct": 55.39536,
+          "avgNetPct": 1.288264,
+          "medianNetPct": 0.44934,
+          "profitFactor": 4.20753,
+          "maxDrawdownPct": 4.04977
+        },
+        "eligible": true,
+        "isScore": 8.447712
+      },
+      {
+        "feature": "atrPct",
+        "operator": "gte",
+        "threshold": 0.76688,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 22,
+          "losses": 22,
+          "winRatePct": 50,
+          "netPct": 51.53132,
+          "avgNetPct": 1.171166,
+          "medianNetPct": -0.140145,
+          "profitFactor": 2.156242,
+          "maxDrawdownPct": 18.40805
+        },
+        "eligible": true,
+        "isScore": 7.768636
+      },
+      {
+        "feature": "alignedMacdHistPct",
+        "operator": "gte",
+        "threshold": 0.230475,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 21,
+          "losses": 23,
+          "winRatePct": 47.727273,
+          "netPct": 40.74732,
+          "avgNetPct": 0.926075,
+          "medianNetPct": -1.025485,
+          "profitFactor": 1.918846,
+          "maxDrawdownPct": 18.40805
+        },
+        "eligible": true,
+        "isScore": 6.142887
+      },
+      {
+        "feature": "alignedMacdHistPct",
+        "operator": "lt",
+        "threshold": 0.230475,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 25,
+          "losses": 18,
+          "winRatePct": 58.139535,
+          "netPct": 15.06199,
+          "avgNetPct": 0.350279,
+          "medianNetPct": 0.22322,
+          "profitFactor": 1.882555,
+          "maxDrawdownPct": 6.94331
+        },
+        "eligible": false,
+        "isScore": 2.296933
+      },
+      {
+        "feature": "atrPct",
+        "operator": "lt",
+        "threshold": 0.76688,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 24,
+          "losses": 19,
+          "winRatePct": 55.813953,
+          "netPct": 4.27799,
+          "avgNetPct": 0.099488,
+          "medianNetPct": 0.15382,
+          "profitFactor": 1.253968,
+          "maxDrawdownPct": 6.38749
+        },
+        "eligible": false,
+        "isScore": 0.652386
+      },
+      {
+        "feature": "takerFlow",
+        "operator": "gte",
+        "threshold": 0.474375,
+        "selectionSample": {
+          "trades": 44,
+          "wins": 17,
+          "losses": 27,
+          "winRatePct": 38.636364,
+          "netPct": 0.41395,
+          "avgNetPct": 0.009408,
+          "medianNetPct": -0.940265,
+          "profitFactor": 1.009378,
+          "maxDrawdownPct": 18.00605
+        },
+        "eligible": false,
+        "isScore": 0.062406
+      },
+      {
+        "feature": "alignedEmaSpreadPct",
+        "operator": "lt",
+        "threshold": 1.533025,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 24,
+          "losses": 19,
+          "winRatePct": 55.813953,
+          "netPct": -0.60038,
+          "avgNetPct": -0.013962,
+          "medianNetPct": 0.15382,
+          "profitFactor": 0.966937,
+          "maxDrawdownPct": 6.33706
+        },
+        "eligible": false,
+        "isScore": -0.091555
+      },
+      {
+        "feature": "volumeRatio",
+        "operator": "lt",
+        "threshold": 2.172771,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 23,
+          "losses": 20,
+          "winRatePct": 53.488372,
+          "netPct": -0.95723,
+          "avgNetPct": -0.022261,
+          "medianNetPct": 0.15382,
+          "profitFactor": 0.961895,
+          "maxDrawdownPct": 9.10636
+        },
+        "eligible": false,
+        "isScore": -0.145975
+      },
+      {
+        "feature": "adx",
+        "operator": "lt",
+        "threshold": 47.309165,
+        "selectionSample": {
+          "trades": 43,
+          "wins": 23,
+          "losses": 20,
+          "winRatePct": 53.488372,
+          "netPct": -2.20103,
+          "avgNetPct": -0.051187,
+          "medianNetPct": 0.09077,
+          "profitFactor": 0.904145,
+          "maxDrawdownPct": 11.08493
+        },
+        "eligible": false,
+        "isScore": -0.335656
+      }
+    ],
+    "selectedRule": {
+      "feature": "adx",
+      "operator": "gte",
+      "threshold": 47.309165,
+      "selectionSample": {
+        "trades": 44,
+        "wins": 23,
+        "losses": 21,
+        "winRatePct": 52.272727,
+        "netPct": 58.01034,
+        "avgNetPct": 1.318417,
+        "medianNetPct": 0.54941,
+        "profitFactor": 2.508703,
+        "maxDrawdownPct": 19.23313
+      },
+      "eligible": true,
+      "isScore": 8.745389
+    }
+  },
+  "selectedRuleSingleOosEvaluation": {
+    "rule": {
+      "feature": "adx",
+      "operator": "gte",
+      "threshold": 47.309165,
+      "selectionSample": {
+        "trades": 44,
+        "wins": 23,
+        "losses": 21,
+        "winRatePct": 52.272727,
+        "netPct": 58.01034,
+        "avgNetPct": 1.318417,
+        "medianNetPct": 0.54941,
+        "profitFactor": 2.508703,
+        "maxDrawdownPct": 19.23313
+      },
+      "eligible": true,
+      "isScore": 8.745389
+    },
+    "frozenOosBaseline": {
+      "trades": 73,
+      "wins": 37,
+      "losses": 36,
+      "winRatePct": 50.684932,
+      "netPct": -9.50841,
+      "avgNetPct": -0.130252,
+      "medianNetPct": 0.05054,
+      "profitFactor": 0.822382,
+      "maxDrawdownPct": 19.59656
+    },
+    "filteredOos": {
+      "trades": 42,
+      "wins": 22,
+      "losses": 20,
+      "winRatePct": 52.380952,
+      "netPct": -4.74355,
+      "avgNetPct": -0.112942,
+      "medianNetPct": 0.09158,
+      "profitFactor": 0.853211,
+      "maxDrawdownPct": 8.3117
+    },
+    "oosNetImprovementPct": 4.76486,
+    "oosCriteriaPassed": true
+  }
+}

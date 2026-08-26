@@ -1,0 +1,11 @@
+{
+  "inSampleTrades": 9,
+  "outOfSampleTrades": 39,
+  "outOfSampleNetPct": -15.19294,
+  "detailedTrades": 39,
+  "detailedNetPct": -15.19294,
+  "allRowsHaveExactKeysAndFiniteValues": true,
+  "perSymbolDetailedCountMatchesMetric": true,
+  "noInSampleDetailedField": true,
+  "verificationOmitsDetailedField": true
+}

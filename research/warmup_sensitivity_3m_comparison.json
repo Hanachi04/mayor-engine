@@ -1,0 +1,537 @@
+{
+  "purpose": "Descriptive warmup sensitivity comparison on frozen three-month data.",
+  "generatedAt": "2026-08-25T08:34:54.499Z",
+  "warmups": {
+    "500": {
+      "inSample": {
+        "trades": 9,
+        "wins": 5,
+        "losses": 4,
+        "netPct": 2.51003
+      },
+      "outOfSample": {
+        "trades": 38,
+        "wins": 16,
+        "losses": 22,
+        "netPct": -16.60846
+      },
+      "gate": {
+        "gateVersion": "cloud-pro-statistical-gate-1",
+        "status": "BLOCKED",
+        "passed": false,
+        "reason": "one or more symbol gates blocked"
+      }
+    },
+    "1000": {
+      "inSample": {
+        "trades": 9,
+        "wins": 5,
+        "losses": 4,
+        "netPct": 2.51003
+      },
+      "outOfSample": {
+        "trades": 39,
+        "wins": 17,
+        "losses": 22,
+        "netPct": -15.19294
+      },
+      "gate": {
+        "gateVersion": "cloud-pro-statistical-gate-1",
+        "status": "BLOCKED",
+        "passed": false,
+        "reason": "one or more symbol gates blocked"
+      }
+    },
+    "1500": {
+      "inSample": {
+        "trades": 9,
+        "wins": 5,
+        "losses": 4,
+        "netPct": 2.51003
+      },
+      "outOfSample": {
+        "trades": 39,
+        "wins": 17,
+        "losses": 22,
+        "netPct": -15.19294
+      },
+      "gate": {
+        "gateVersion": "cloud-pro-statistical-gate-1",
+        "status": "BLOCKED",
+        "passed": false,
+        "reason": "one or more symbol gates blocked"
+      }
+    }
+  },
+  "comparisons": {
+    "500_vs_1000": {
+      "comparedWarmups": [
+        500,
+        1000
+      ],
+      "fingerprintMismatches": [
+        {
+          "500": "5a74c039437b5056c91701e35623b6174a333b8a2fee317e53ccf88d913a25fe",
+          "1000": "b84699efa7ea8484074d4a101d4f260b623021aaf622228a66acaacaef53513a",
+          "symbol": "AAVEUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "11cd6e7a2b01f91392763ec5abe9c1daf13f0e6089f18da92de01b346327ac43",
+          "1000": "99cc4753e19be59fb20347dd7a365ba3183c78323a19bf2be36d499bfb47545e",
+          "symbol": "AAVEUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "0b820d02fd76c88ff9eac95d91dd9949652d9e6ced1139b522e1464645d86006",
+          "1000": "697fd308a636523299482c14328f6ae16b85f594a489e000267bdf8c69cb25f9",
+          "symbol": "ADAUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "7c70f7588aaae84b07f918e756c0ea188e497ebdb3d1db24273c0df4980c2196",
+          "1000": "839e88e120bc40e1e5dd3f9249e63a7cb0158ab519ae574328b70c515dc80082",
+          "symbol": "ADAUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "9a009f38c26e56f6e735e5848b0e89127c05654146d94cb6f56596e984d23f6b",
+          "1000": "9653c1b4f8e666d2304668beb895a8b58c94ac4f730260c3f6a7f03dd3e919e1",
+          "symbol": "APTUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "614d21a5f5518474b7d2eefb5a2ba0e6f1633c1acb38850d2f83151c73f2039f",
+          "1000": "3160c9223a8c54647e076c901cc4b63a37332d5ee893cedc2225c423c5fdd5b8",
+          "symbol": "APTUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "564f775ffb4944fef369b54e8bd404adb1467885ba8acf52d6f1a42d939b7325",
+          "1000": "d66d680eacea73fbde2d565bd84f8767d75324557facc4c2d4c24ce2bbcc6044",
+          "symbol": "ARBUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "4b3eb1eddc1d4a1a380e3b7a3303d15c10ef27233c691d061eaee2e0cfc7c395",
+          "1000": "899ef7c49a3aa69f9becfc181fd8632c16df62826b545f9978a6cabd0457cd20",
+          "symbol": "ARBUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "0f3f9768a92c37258c40867ecd6ae780c4876067086d0c05ce30b6fa5a4536da",
+          "1000": "d779f7b826e71ff92a61542d1d64d10c9b1799d4f4d295e88ac05ac71997d5e2",
+          "symbol": "ATOMUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "979cb05bada51b0363967887df9ec5921f11029058aed6f74c221c05bec96df2",
+          "1000": "7193a894cac4219b2c6bc17de087958608fb4ff84f7c441252174174bbb1096d",
+          "symbol": "ATOMUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "473c9ad352cb5785017e770b56e66d5d2d8dd4b018c0c5c3a21a129407bc020a",
+          "1000": "1f005a0a6bd4b032ca81c92ce72c960b1dcef7126c60fd540531d157e2045c76",
+          "symbol": "AVAXUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "36e3489fcb218ae402c369a8793a7f14eb411f017df0fbcf0853a79e65b95859",
+          "1000": "23dd1c53dfefa32284a19e7aabf698da6a94fba51a6f689b9b577a43cbfe58d8",
+          "symbol": "AVAXUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "0960fca7fd41b8a3fa3e4935a3b5154fc030d739e2788d4be4490c78e086adf8",
+          "1000": "1870eb4d18cd4fa04bedaf00b2263cf63d0dc6ed7907f288aed0f70e8c839274",
+          "symbol": "AXSUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "d07c2268e3dd8dd288b2c2ccf614591276766e72f074e32d6e651be0ed4cecd9",
+          "1000": "c1911648c883412e141f8784b57017417cc99199e593bb585acf4757d5264950",
+          "symbol": "AXSUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "017d7234ae6a3d92daee85e95aa2c811a385312832c3e62d26ed6e2bb829514a",
+          "1000": "36ae3a251d9bdbbd704df2b5eb2055131e7647b0909b24d8f327d245f24e08c7",
+          "symbol": "BCHUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "e79df7baf56ffe7df75731fe942c738853cd367d5265633dd7d19eba9dff53e4",
+          "1000": "6d4f1884b854b8cecabff7c92bb9a40a668eb3721e8b189f822b6ca907d2ab20",
+          "symbol": "BCHUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "95887f70330f2c15c4d86c83af857ca3043c5b4a665d932b914ac0a0a3fc8db1",
+          "1000": "8b1e5eba264a5bf7d07f6a64fc5bed205e57870857b5ee943f115aa4ce0dd28f",
+          "symbol": "BNBUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "4c50396195a0b8f154da6b8cdb3ca53a993ba2a4e92a1ca63b4892d3df643d5c",
+          "1000": "94ca0ea9735db6a790cd97fe8b913989c1febcae2575d555758edeec0d4e6cf2",
+          "symbol": "BNBUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "67d0c920bdda27299276334006454dcb6addc00ecf878f6da6a680494496c54c",
+          "1000": "febbbffabe505b86da10ff402b7534589eed68d88a0a3ce787bfcb6623991f5e",
+          "symbol": "BTCUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "1aa10137aabc1492e9ad31f413a440fe6b9e7677df6a541b8ec3db048ec1134d",
+          "1000": "23bccc20c3f5ca20808c3f40db6650fd9400a2b51ddea22031330dc7a4a28e98",
+          "symbol": "BTCUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "f3892e3088a4074e328463cb5fd8974fdf1eed7cca589f0ae36a016cbe47a100",
+          "1000": "0e64fee435cc11d2eb9e9436e6f095ae4f3598b388ab7958c5629dd55c391d1c",
+          "symbol": "DOGEUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "ad760ec76bed4dbb97d2732d3832e95dade7845570618a190d5d3e38b4d64616",
+          "1000": "db781e03f01344a0dc55881444ccfe16e0cee21a533f2f3509b80e6ff0898456",
+          "symbol": "DOGEUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "b78df61005e5f7f229ae1b41b802c34c61c1a2773fabc0f31caea25152d4a10f",
+          "1000": "533db8c34d67fc6953739d5a45713f340297797aa2aca3fc547815e70063bfac",
+          "symbol": "DOTUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "249dc736d404bbe802913f90dbecb571a0a85b620f7091fd6f0ed3c6a28b244b",
+          "1000": "b8c0dffe5ceb5009ef16fb41800cb32db54124fa437f4da60ca17e39dcf61f45",
+          "symbol": "DOTUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "1d99a1b5d7cfde64310ad1071d56e9c1aed80271435620c8b83a60bb0a8b1c49",
+          "1000": "0a19dfefe8239386d06862487f08c811c5ca196776e12e5c490cddb3469833c6",
+          "symbol": "ETCUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "5243a6e85c58a7ead0029d680c03df51826fe738441211e47389eb43479f6151",
+          "1000": "f3ea169b7905d0e9f9bca1a9fcb97341f5bce1ad1d511ec4eb6988ec00d3a305",
+          "symbol": "ETCUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "fa54844ae27e0c2b4247ecf28b2c4a4202c41c4be02a2b75a335ec061692814f",
+          "1000": "45b6fff5eab3ca9c69513dabdc25652d93dcdd7c0df5aac85f5c2903510fc025",
+          "symbol": "ETHUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "394c80d9a34fa614d039519d66a1d5fc4e2910e51faef59d2d451722ec076d35",
+          "1000": "cdb6a280f7581080e8dc6ff98ca595127b0066f4532f6a4fc064b2310c6a4b78",
+          "symbol": "ETHUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "4858bca9f82bd943be20578a348d7329ed81fd6d33dcd953ec629b2b01cef541",
+          "1000": "d4ea89bdb786feb5351f2d15316203f0808f2fb8428aae7aea0f34eae7583aea",
+          "symbol": "FILUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "415e20fe9daad1b3a97af4a7ca690820481fed5fa2c19fe4ec4116102918f74d",
+          "1000": "7f14fe1012c0af282a9b3a240c5a9b005ad1b05ad34bd52ffec48fff5786cb00",
+          "symbol": "FILUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "169ca4f57fdced789c9815371482181b5f055716ce617750f8a1ee1490f57e08",
+          "1000": "ab882340bf8bd5070081b87afb326219ddbb131e03c2230213d2febb083c2407",
+          "symbol": "GALAUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "5cb8abc0acddf6f3f61d9f730faefdcce1c49e9d994cfe0ec919f14d197ef28f",
+          "1000": "aa0ecfcc07733452659b08cee2da36551b25cbf2582b460b01b0cd63ebdb4418",
+          "symbol": "GALAUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "d97781418ef0a5e905f645c3ee23dcf1f8fdff66c11e9b04c9e8a64f39b331a1",
+          "1000": "47f629ef2e727b9b1cd91ad7d608282a3d92d6f01d429c72d673aba2260ce697",
+          "symbol": "ICPUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "45804bf1d18ac96090477cbae4096cae32cc93f1f78a7c173e7ee73f216c3457",
+          "1000": "07fd93d9957a76750ace84f5c13a0c7093a34d95da6b5a0a741d9af15ad4745e",
+          "symbol": "ICPUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "9c33464701584026600c3dd6648dc27da85f79631c2634dfe2860187c263a0c9",
+          "1000": "206bab01a90cce8a3a56b7e03ec864df64ff421b6b25929b78b24b80f36bcb3e",
+          "symbol": "IMXUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "721d0989ccd5449c615a9889083d655dd0f1726c10b86a018c4e5116f1b56a48",
+          "1000": "e2279b2e8e0f3788f4b556c7784ae17094b38c1712af203687d368c783602909",
+          "symbol": "IMXUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "df3d65e1c84379f8fee23b215e47da7bff524e792470d0830f859d647e57a0bd",
+          "1000": "3927fe2ec743ff86b06fa5f075fabb25705f1a1720e663d078578683b1b38351",
+          "symbol": "INJUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "2da6e7558335d1ab59f7d8a01ab1ebc909f9ce52b10f97406b22c7e5dd40838e",
+          "1000": "623656734e76118469aecdce60d21e50bce81e8e215f680f350106bc28087f90",
+          "symbol": "INJUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "71872a268cbd93d99e718119f0db2f98074205bccddc1b2ba1f5c5c798921349",
+          "1000": "eaa450ef62c132379203955d332a7b7791df07845faebabf8f3c2786980ca805",
+          "symbol": "LINKUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "ecdfd691cc30f3679311d194395b539ae9b367ac84289423ef9a0ca76eb9c8c6",
+          "1000": "1202b51a90338235ca3fa550f81fb7a7169999bc9f47aaeab43a599f4468f65b",
+          "symbol": "LINKUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "e1d982cd991d3f2cf31c5fc4a7bd6297d727823951ac4be3395f19af476b917b",
+          "1000": "a178f8a9a6ccf50421a581b78ab2f3be72644cfe3070a1ec1d7dd9a11f2ec3b4",
+          "symbol": "LTCUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "4b431e7bab04f0b8b214843d063fbbb57ffb3cd6a31ff8935e3e1c881f61bd6d",
+          "1000": "631640e1559109a4a85b47bf536e4577ec1c55d3da616989e7ee84a497db3846",
+          "symbol": "LTCUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "c4454ec3cb2506bddce5358dd85bc35aeb9f0e92bc526e4c7daf58f1769a1e35",
+          "1000": "1afc0f88e0fc8aa0cbab4b8480822f3d0633e6a2c1bc465fabcb7d4a4c0fb18c",
+          "symbol": "NEARUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "a00a104a12b7eb7a4eeea98df46a30249df98c53178a227fc68aee8f56831558",
+          "1000": "1aa32fc6bbcb2dd17002749804b6f74ce4b8ab6f4875e359ce7953922f8020ed",
+          "symbol": "NEARUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "40ed092e5044a01c5404eddfdf63fe76a3f1b972e3754655742e4d873c64b230",
+          "1000": "50dd01096e4c1ccd8a7afc778196a4371e4d973d3b9ea7655dd983019859dd0f",
+          "symbol": "OPUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "548f621ce37dd3be9ef2c2f4a05dff05d87212f3c3e0512587ffbe8362f55b05",
+          "1000": "ad3640d2976272dd3f4d0a11771a34755b0399e3803325fe0b88ce6eeb0f39f0",
+          "symbol": "OPUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "cdfb8da3cf9e6858f634f9146f426ef33fccd38d1f3ec63954f8ad9b4294d2bf",
+          "1000": "7a35ebcc7a1c9394c96b036574e4e78c3dcc25071fd6972eff1e523c8979ff01",
+          "symbol": "PEPEUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "64e59808254cbddbc896e9ac8cbd6a32249dcf6210c510b2d71e7b2b36b661c5",
+          "1000": "b384ef626290801ae953b752d695ef67017dfde5253e72358a15c23db2882030",
+          "symbol": "PEPEUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "a1d81c333c3aea75a285efd9112f7b3f228b57b23180c1535ce43ca7b59c08ff",
+          "1000": "75f8ad6886ba6867f3c11eb1af2124f5205f79b227b21c5bf281cf3bf2593b89",
+          "symbol": "RUNEUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "6f50b94cf5164a724e79b946f0080ea15986a32b9556264553907581f15e762c",
+          "1000": "4610c2781d37ae2e8333ceb9236b62348ef3cafdd530420f4b88863c073ad533",
+          "symbol": "RUNEUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "1da0c8899c80d8f1d87e45350f94b1c62ffe7f551c00d314ac7201a45e982cf5",
+          "1000": "347c8d7c0ada2eebb6973cb1d683dfb4278c5e366f6cb2fe3a6119c53cd89a09",
+          "symbol": "SANDUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "4a913c0de1c60a10bfe3a633244956dd7d587027ee8b8caab0110a2be65c9371",
+          "1000": "e9f6974ed7dbfcbf40785c34ef6bbfc6f0dfc1b92bdd585e8ad707e2ab1ba915",
+          "symbol": "SANDUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "256d13c787c48c49ea122180afb19efa9cae99fc558844e04fd8cee2658a10c9",
+          "1000": "b9309fa08cd1445c231f728f9187580f6c2fdbd36af3c8f7dad2483e935465f7",
+          "symbol": "SEIUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "0edf54cd182637efd6f5305a651af32e00ac8a43cdeeac3cc6ef9e8c95434974",
+          "1000": "75dad99ba045d5a7792ab181463e4c43baf393a0969de5ccc00759c320e4d0f6",
+          "symbol": "SEIUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "d2ecd9c73798d4916d1ccabc79aad0a19e93b65f2743b5bc2ed220c86494aff4",
+          "1000": "6e949cb85869591f5de35c433f523bcfc20fb4805c6ecf334412659dfb6582e6",
+          "symbol": "SHIBUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "9c9ba9c7c628a6a5191e816f9f8f3219abf2ee4291e22c0f2191003530712848",
+          "1000": "327ed70e5fc7b6f06c0f4c5ebf2d7470321b399aad3468ed022fffbd9458478d",
+          "symbol": "SHIBUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "1966c9959722f159dc8ccdf3439ace0a92bed7134b46d1491e40d690da309220",
+          "1000": "98fdb39c6bcbf81428ab318ad622a109b90e0b883f7f2260256744b4e96c83b6",
+          "symbol": "SOLUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "80606188bb6e32a6a5df797b48630de584c8476fe8ad7ede7bce2996f7317b8d",
+          "1000": "1780b0661ba5f87a2e47785de3910f47e0bff51e6d04d6f7a7d00c95346c58c9",
+          "symbol": "SOLUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "3db95c84706e61cf469a02da0a0af3c62ac53a0a51451480370353f0d4ac2b38",
+          "1000": "675440cd32ec7287d7b80364010fe5de96faaf87b612d04b722714b8534c179c",
+          "symbol": "SUIUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "d1d6f0d3b52dc3bd88b822bb501ca9a32fcea9c86737914d114a393ee3f4fa84",
+          "1000": "f5ae7c5ea4bf79d39c086f4aa8d76aecba0b05a9ecd82fc86892f584fe2345ee",
+          "symbol": "SUIUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "3cb8f8155c803b3bd4bf000977dea4c154476204fc8dab2ea602807af2694aee",
+          "1000": "de6a26b4763ac0ecb4f0c4733144bf5eabeaab869f1bbc5cf2c3f54b889f98f4",
+          "symbol": "TIAUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "5762e33760a9a852fc4dbcca006f91f16db603c8116f0960d3f92e4e559dcf8e",
+          "1000": "a22f98494ce8b517a9d8c9b209a5b9901f297bc2814675eb2831bb9ca6c1c072",
+          "symbol": "TIAUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "9a68fc1fb1684a17f184760424c48fef63de472f1f59b100bd7814af6694ecf2",
+          "1000": "55b9b8fd89214eac20588c8c57882a47aff3b91cfd564588e18ed9072f070d7b",
+          "symbol": "TRXUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "2c044006df7ad41208dc861cff9a675e7a6371880649ee44b6fa95619c285cf8",
+          "1000": "c4efa05c38f8db4f38693f2cc953e593ab527d0b803034b2ec9649970cca08e5",
+          "symbol": "TRXUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "e8754d2cb7424101d462a962bba06ded36233626e0286a7f841d47f93a548cfb",
+          "1000": "c503970ae7058fb6715251a8a1050157391fa1642cbe8891193611d00878c1a2",
+          "symbol": "UNIUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "bd459cefd315462612a66485ee347cb0c3c4831cc89db152dd7ecf5d3cc36635",
+          "1000": "eb8b54aaa16321f11f2fbe52c75dda66dad4eb459648047080286cdb7fa0a482",
+          "symbol": "UNIUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "c811992556bff148a4e7132e45d4af0df77125efd6d7d0eafd8c333b644b5744",
+          "1000": "2739f0e762bbd4f3c4cca612742abee24074e5872549e628ed607910c024a017",
+          "symbol": "WIFUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "5a20022699fe9dd753d5a157b5525dbf431048332e95482cfb69bf1d9c509a8c",
+          "1000": "175d5f63968b1a10284f66ab0cff5ab92e8945d1edc509452f7f1d7480ae4d74",
+          "symbol": "WIFUSDT",
+          "period": "outOfSample"
+        },
+        {
+          "500": "12bb6c548d183d1dcd803fb828b9c3bdc052d60b511c799645554496381b67ec",
+          "1000": "80a1a04c230f06104ab20492bf709479624c8dff410caea3539b0e845a9b0c60",
+          "symbol": "XRPUSDT",
+          "period": "inSample"
+        },
+        {
+          "500": "55d6881579191c6ca902d9240176d5ed07cc786c123fac01e2d455eaf357d022",
+          "1000": "b0bbac04d0d061799cd27c77196e9709043d5f6581c6d1b6a6b29602035ceceb",
+          "symbol": "XRPUSDT",
+          "period": "outOfSample"
+        }
+      ],
+      "tradeMismatches": [
+        {
+          "500": {
+            "trades": 1,
+            "wins": 0,
+            "losses": 1,
+            "netPct": -1.2226,
+            "returns": [
+              -1.2226
+            ]
+          },
+          "1000": {
+            "trades": 2,
+            "wins": 1,
+            "losses": 1,
+            "netPct": 0.19291999999999998,
+            "returns": [
+              -1.2226,
+              1.41552
+            ]
+          },
+          "symbol": "OPUSDT",
+          "period": "outOfSample"
+        }
+      ],
+      "gateMismatches": [],
+      "exactDecisionMatch": false,
+      "exactTradeMatch": false,
+      "exactGateMatch": true
+    },
+    "1000_vs_1500": {
+      "comparedWarmups": [
+        1000,
+        1500
+      ],
+      "fingerprintMismatches": [],
+      "tradeMismatches": [],
+      "gateMismatches": [],
+      "exactDecisionMatch": true,
+      "exactTradeMatch": true,
+      "exactGateMatch": true
+    }
+  }
+}

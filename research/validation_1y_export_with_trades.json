@@ -1,0 +1,17 @@
+{
+  "symbolCount": 35,
+  "inSampleTrades": 87,
+  "inSampleNetPct": 55.80931,
+  "outOfSampleTrades": 73,
+  "outOfSampleNetPct": -9.50841,
+  "detailedTrades": 73,
+  "detailedNetPct": -9.50841,
+  "allRowsHaveExactKeysAndFiniteValues": true,
+  "perSymbolDetailedCountMatchesMetric": true,
+  "noInSampleDetailedField": true,
+  "verificationOmitsDetailedField": true,
+  "strictWholeReportParityExcludingOnlyGeneratedAtAndTradesDetailed": false,
+  "strictWholeReportMismatch": "reference-only execution metadata block",
+  "strategyAndSymbolFieldsIdenticalAfterRemovingRunMetadata": true,
+  "verificationFieldsIdenticalAfterRemovingGeneratedAt": true
+}

@@ -1,0 +1,56 @@
+{
+  "inputPath": "/home/ubuntu/mayor-history-1y-expansion/research/portfolio_daily_returns_output_1y_calendar365.json",
+  "inputWindow": {
+    "startInclusiveMs": 1755907200000,
+    "endInclusiveMs": 1787443199999,
+    "startDate": "2025-08-23",
+    "endDate": "2026-08-22",
+    "calendarDays": 365
+  },
+  "methodology": {
+    "method": "moving-block-bootstrap",
+    "blockLengths": [
+      5,
+      14,
+      21
+    ],
+    "iterations": 5000,
+    "seed": 20260824,
+    "statistic": "arithmetic sum of daily netPct across a resampled 365-day calendar series"
+  },
+  "results": [
+    {
+      "blockLength": 5,
+      "availableBlockStartPositions": 361,
+      "iterations": 5000,
+      "seed": 20260824,
+      "distributionMean": -0.40643366,
+      "distributionStd": 12.476718382961,
+      "observedNetPct": -9.50841,
+      "zScore": -0.729516853761,
+      "observedAtOrAbovePct": 77.56
+    },
+    {
+      "blockLength": 14,
+      "availableBlockStartPositions": 352,
+      "iterations": 5000,
+      "seed": 20260824,
+      "distributionMean": 2.277271178,
+      "distributionStd": 11.337794957956,
+      "observedNetPct": -9.50841,
+      "zScore": -1.039503820779,
+      "observedAtOrAbovePct": 86.66
+    },
+    {
+      "blockLength": 21,
+      "availableBlockStartPositions": 345,
+      "iterations": 5000,
+      "seed": 20260824,
+      "distributionMean": 3.467542656,
+      "distributionStd": 9.820898118248,
+      "observedNetPct": -9.50841,
+      "zScore": -1.321259267713,
+      "observedAtOrAbovePct": 92.06
+    }
+  ]
+}

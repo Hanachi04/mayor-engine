@@ -1,0 +1,14 @@
+{
+  "reference": "data/backtest_report_1y_full_baseline_with_trades.json",
+  "metricsMatchAfterRemovingDiagnostics": true,
+  "isTrades": 87,
+  "isNetPct": 55.809309999999996,
+  "oosTrades": 73,
+  "oosNetPct": -9.508409999999998,
+  "detailedRows": 73,
+  "detailedNetPct": -9.508409999999998,
+  "diagnosticRows": 73,
+  "diagnosticNetPct": -9.508409999999998,
+  "diagnosticsValid": true,
+  "pass": true
+}

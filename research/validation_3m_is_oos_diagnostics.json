@@ -1,0 +1,11 @@
+{
+  "metricsMatchAfterRemovingDiagnostics": true,
+  "isTrades": 9,
+  "oosTrades": 39,
+  "oosNetPct": -15.192939999999998,
+  "isDiagnosticRows": 9,
+  "oosDiagnosticRows": 39,
+  "isDiagnosticNetPct": 2.51003,
+  "oosDiagnosticNetPct": -15.19294,
+  "pass": true
+}

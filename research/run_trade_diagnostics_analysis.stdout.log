@@ -1,0 +1,65 @@
+{
+  "output": "/home/ubuntu/mayor-history-1y-expansion/research/trade_diagnostics_1y_analysis.json",
+  "selectedRule": {
+    "feature": "adx",
+    "operator": "gte",
+    "threshold": 47.309165,
+    "selectionSample": {
+      "trades": 44,
+      "wins": 23,
+      "losses": 21,
+      "winRatePct": 52.272727,
+      "netPct": 58.01034,
+      "avgNetPct": 1.318417,
+      "medianNetPct": 0.54941,
+      "profitFactor": 2.508703,
+      "maxDrawdownPct": 19.23313
+    },
+    "eligible": true,
+    "isScore": 8.745389
+  },
+  "selectedRuleSingleOosEvaluation": {
+    "rule": {
+      "feature": "adx",
+      "operator": "gte",
+      "threshold": 47.309165,
+      "selectionSample": {
+        "trades": 44,
+        "wins": 23,
+        "losses": 21,
+        "winRatePct": 52.272727,
+        "netPct": 58.01034,
+        "avgNetPct": 1.318417,
+        "medianNetPct": 0.54941,
+        "profitFactor": 2.508703,
+        "maxDrawdownPct": 19.23313
+      },
+      "eligible": true,
+      "isScore": 8.745389
+    },
+    "frozenOosBaseline": {
+      "trades": 73,
+      "wins": 37,
+      "losses": 36,
+      "winRatePct": 50.684932,
+      "netPct": -9.50841,
+      "avgNetPct": -0.130252,
+      "medianNetPct": 0.05054,
+      "profitFactor": 0.822382,
+      "maxDrawdownPct": 19.59656
+    },
+    "filteredOos": {
+      "trades": 42,
+      "wins": 22,
+      "losses": 20,
+      "winRatePct": 52.380952,
+      "netPct": -4.74355,
+      "avgNetPct": -0.112942,
+      "medianNetPct": 0.09158,
+      "profitFactor": 0.853211,
+      "maxDrawdownPct": 8.3117
+    },
+    "oosNetImprovementPct": 4.76486,
+    "oosCriteriaPassed": true
+  }
+}

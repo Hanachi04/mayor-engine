@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "scope": {
+    "interval": "15m",
+    "targetStartUtc": "2025-08-23T00:00:00.000Z",
+    "targetEndUtc": "2026-08-22T23:59:59.999Z",
+    "expectedCandles": 35040
+  },
+  "excludedSymbols": [
+    {
+      "symbol": "MKRUSDT",
+      "status": "excluded",
+      "gapType": "permanent-within-assessed-window",
+      "lastContiguousValidCloseUtc": "2025-09-15T02:59:59.999Z",
+      "firstEmptyPageStartTime": 1757905200000,
+      "evidence": {
+        "annualVerboseLog": "/home/ubuntu/research/mkrusdt_verbose_pages_2026-08-24.log",
+        "fromDecemberVerboseLog": "/home/ubuntu/research/mkrusdt_from_2025-12-01_verbose_pages_2026-08-24.log",
+        "observedFailure": "historical-coverage-incomplete:MKRUSDT:15m",
+        "fromDecemberProbe": "historical-series-empty:MKRUSDT:15m"
+      }
+    },
+    {
+      "symbol": "TONUSDT",
+      "status": "excluded",
+      "gapType": "recent-ongoing-within-assessed-window",
+      "lastContiguousValidCloseUtc": "2026-06-30T02:59:59.999Z",
+      "firstEmptyPageStartTime": 1782788400000,
+      "evidence": {
+        "annualVerboseLog": "/home/ubuntu/research/tonusdt_annual_verbose_pages_2026-08-24.log",
+        "observedFailure": "historical-coverage-incomplete:TONUSDT:15m",
+        "primaryAndDataApiProbe": "/home/ubuntu/research/binance_ton_mkr_direct_query_2026-08-24.txt"
+      }
+    }
+  ]
+}

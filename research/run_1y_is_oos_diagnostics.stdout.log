@@ -1,0 +1,257 @@
+{
+  "report": "/home/ubuntu/mayor-history-1y-expansion/data/backtest_report_1y_is_oos_diagnostics.json",
+  "verification": "/home/ubuntu/mayor-history-1y-expansion/data/verification_1y_is_oos_diagnostics.json",
+  "gate": {
+    "gateVersion": "cloud-pro-statistical-gate-1",
+    "status": "BLOCKED",
+    "passed": false,
+    "reason": "one or more symbol gates blocked"
+  },
+  "symbols": [
+    {
+      "symbol": "AAVEUSDT",
+      "isTrades": 5,
+      "oosTrades": 1,
+      "oosNetPct": -1.67474,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "ADAUSDT",
+      "isTrades": 0,
+      "oosTrades": 5,
+      "oosNetPct": -0.39675999999999956,
+      "zScore": 1.6349
+    },
+    {
+      "symbol": "APTUSDT",
+      "isTrades": 2,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "ARBUSDT",
+      "isTrades": 2,
+      "oosTrades": 3,
+      "oosNetPct": 6.72103,
+      "zScore": 0.9957
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "isTrades": 3,
+      "oosTrades": 1,
+      "oosNetPct": 0.56038,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "isTrades": 4,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "AXSUSDT",
+      "isTrades": 0,
+      "oosTrades": 4,
+      "oosNetPct": -2.41147,
+      "zScore": 1.0015
+    },
+    {
+      "symbol": "BCHUSDT",
+      "isTrades": 1,
+      "oosTrades": 4,
+      "oosNetPct": 2.90465,
+      "zScore": -0.9928
+    },
+    {
+      "symbol": "BNBUSDT",
+      "isTrades": 7,
+      "oosTrades": 2,
+      "oosNetPct": -0.51702,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "BTCUSDT",
+      "isTrades": 4,
+      "oosTrades": 4,
+      "oosNetPct": 4.90208,
+      "zScore": 0.9958
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "isTrades": 4,
+      "oosTrades": 2,
+      "oosNetPct": -4.0502199999999995,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "DOTUSDT",
+      "isTrades": 2,
+      "oosTrades": 2,
+      "oosNetPct": -1.03762,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "ETCUSDT",
+      "isTrades": 2,
+      "oosTrades": 4,
+      "oosNetPct": -0.3345799999999999,
+      "zScore": -1.0055
+    },
+    {
+      "symbol": "ETHUSDT",
+      "isTrades": 2,
+      "oosTrades": 2,
+      "oosNetPct": -1.9890700000000001,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "FILUSDT",
+      "isTrades": 1,
+      "oosTrades": 1,
+      "oosNetPct": -2.96301,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "GALAUSDT",
+      "isTrades": 0,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "ICPUSDT",
+      "isTrades": 1,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "IMXUSDT",
+      "isTrades": 1,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "INJUSDT",
+      "isTrades": 7,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "LINKUSDT",
+      "isTrades": 0,
+      "oosTrades": 2,
+      "oosNetPct": -0.48211000000000004,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "LTCUSDT",
+      "isTrades": 1,
+      "oosTrades": 2,
+      "oosNetPct": -0.53119,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "NEARUSDT",
+      "isTrades": 3,
+      "oosTrades": 1,
+      "oosNetPct": 0.99176,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "OPUSDT",
+      "isTrades": 1,
+      "oosTrades": 2,
+      "oosNetPct": 0.19291999999999998,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "PEPEUSDT",
+      "isTrades": 1,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "RUNEUSDT",
+      "isTrades": 1,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "SANDUSDT",
+      "isTrades": 2,
+      "oosTrades": 3,
+      "oosNetPct": -1.5668199999999999,
+      "zScore": -0.7046
+    },
+    {
+      "symbol": "SEIUSDT",
+      "isTrades": 3,
+      "oosTrades": 2,
+      "oosNetPct": 0.06093000000000015,
+      "zScore": -0.9995
+    },
+    {
+      "symbol": "SHIBUSDT",
+      "isTrades": 1,
+      "oosTrades": 3,
+      "oosNetPct": -0.47563,
+      "zScore": -0.7046
+    },
+    {
+      "symbol": "SOLUSDT",
+      "isTrades": 3,
+      "oosTrades": 5,
+      "oosNetPct": -3.88244,
+      "zScore": 1.4647
+    },
+    {
+      "symbol": "SUIUSDT",
+      "isTrades": 1,
+      "oosTrades": 4,
+      "oosNetPct": 1.3841400000000001,
+      "zScore": -0.7078
+    },
+    {
+      "symbol": "TIAUSDT",
+      "isTrades": 1,
+      "oosTrades": 0,
+      "oosNetPct": 0,
+      "zScore": 0
+    },
+    {
+      "symbol": "TRXUSDT",
+      "isTrades": 15,
+      "oosTrades": 6,
+      "oosNetPct": -0.19299,
+      "zScore": 1.2743
+    },
+    {
+      "symbol": "UNIUSDT",
+      "isTrades": 3,
+      "oosTrades": 4,
+      "oosNetPct": -2.3485500000000004,
+      "zScore": -0.8461
+    },
+    {
+      "symbol": "WIFUSDT",
+      "isTrades": 0,
+      "oosTrades": 1,
+      "oosNetPct": -2.13455,
+      "zScore": 0.9995
+    },
+    {
+      "symbol": "XRPUSDT",
+      "isTrades": 3,
+      "oosTrades": 3,
+      "oosNetPct": -0.23752999999999957,
+      "zScore": -0.9995
+    }
+  ]
+}

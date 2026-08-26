@@ -1,0 +1,11 @@
+{
+  "reference": "data/backtest_report_3m_regression_w1500.json",
+  "metricsMatchAfterRemovingDiagnostics": true,
+  "isTrades": 9,
+  "oosTrades": 39,
+  "oosNetPct": -15.192939999999998,
+  "diagnosticRows": 39,
+  "diagnosticNetPct": -15.19294,
+  "diagnosticsValid": true,
+  "pass": true
+}

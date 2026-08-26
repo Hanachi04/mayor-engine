@@ -1,0 +1,772 @@
+{
+  "execution": {
+    "startedAtUtc": "2026-08-25T10:48:24.786Z",
+    "finishedAtUtc": "2026-08-25T11:30:58.782Z",
+    "durationMs": 2553993.564,
+    "warmupCandles": 1500,
+    "symbolCount": 35,
+    "fetchEnabled": false
+  },
+  "aggregate": {
+    "inSample": {
+      "trades": 87,
+      "netPct": 55.809309999999996,
+      "wins": 46,
+      "losses": 41
+    },
+    "outOfSample": {
+      "trades": 73,
+      "netPct": -9.508409999999998,
+      "wins": 37,
+      "losses": 36
+    }
+  },
+  "portfolioGate": {
+    "gateVersion": "cloud-pro-statistical-gate-1",
+    "status": "BLOCKED",
+    "passed": false,
+    "reason": "one or more symbol gates blocked"
+  },
+  "gateStatusDistribution": {
+    "BLOCKED": 35
+  },
+  "blockReasonDistribution": {
+    "IS sample small: 5/30": 1,
+    "OOS sample small: 1/10": 5,
+    "Statistical gate not passed; live broadcast remains blocked": 35,
+    "IS sample small: 0/30": 5,
+    "OOS sample small: 5/10": 2,
+    "IS sample small: 2/30": 6,
+    "OOS sample small: 0/10": 9,
+    "OOS sample small: 3/10": 4,
+    "IS sample small: 3/30": 6,
+    "IS sample small: 4/30": 3,
+    "OOS sample small: 4/10": 6,
+    "IS sample small: 1/30": 11,
+    "IS sample small: 7/30": 2,
+    "OOS sample small: 2/10": 8,
+    "IS sample small: 15/30": 1,
+    "OOS sample small: 6/10": 1
+  },
+  "decisionReasonTotals": {
+    "inSample": {
+      "base-frame-insufficient-data": 1890,
+      "base-frame-no-signal": 830606,
+      "mtf-frames:1/3": 17369,
+      "mtf-frames:2/3": 7951,
+      "higher-timeframe-conflict": 536,
+      "passed-mtf": 127,
+      "mtf-threshold": 1
+    },
+    "outOfSample": {
+      "base-frame-no-signal": 356415,
+      "higher-timeframe-conflict": 323,
+      "mtf-frames:1/3": 7335,
+      "mtf-frames:2/3": 3706,
+      "passed-mtf": 105,
+      "mtf-threshold": 1
+    }
+  },
+  "symbols": [
+    {
+      "symbol": "AAVEUSDT",
+      "inSample": {
+        "trades": 5,
+        "netPct": 3.34968
+      },
+      "outOfSample": {
+        "trades": 1,
+        "netPct": -1.67474
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 5/30",
+          "OOS sample small: 1/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ADAUSDT",
+      "inSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "outOfSample": {
+        "trades": 5,
+        "netPct": -0.39675999999999956
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 0/30",
+          "OOS sample small: 5/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "APTUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": -2.62934
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ARBUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": 12.10735
+      },
+      "outOfSample": {
+        "trades": 3,
+        "netPct": 6.72103
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 3/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": -0.6757000000000002
+      },
+      "outOfSample": {
+        "trades": 1,
+        "netPct": 0.56038
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 1/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "inSample": {
+        "trades": 4,
+        "netPct": -3.8362100000000003
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 4/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "AXSUSDT",
+      "inSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": -2.41147
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 0/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "BCHUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -1.23308
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": 2.90465
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "inSample": {
+        "trades": 7,
+        "netPct": 1.32182
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -0.51702
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 7/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "inSample": {
+        "trades": 4,
+        "netPct": 2.42048
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": 4.90208
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 4/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "inSample": {
+        "trades": 4,
+        "netPct": 3.30237
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -4.0502199999999995
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 4/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "DOTUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": 0.5666800000000001
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -1.03762
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ETCUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": 8.237319999999999
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": -0.3345799999999999
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": 3.8383499999999993
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -1.9890700000000001
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "FILUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -1.36833
+      },
+      "outOfSample": {
+        "trades": 1,
+        "netPct": -2.96301
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 1/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "GALAUSDT",
+      "inSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 0/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "ICPUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": 1.96058
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "IMXUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": 1.44513
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "INJUSDT",
+      "inSample": {
+        "trades": 7,
+        "netPct": 4.146529999999999
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 7/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "LINKUSDT",
+      "inSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -0.48211000000000004
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 0/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "LTCUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": 0.70317
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": -0.53119
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "NEARUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": -4.45543
+      },
+      "outOfSample": {
+        "trades": 1,
+        "netPct": 0.99176
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 1/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "OPUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -2.47524
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": 0.19291999999999998
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "PEPEUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": 1.52887
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "RUNEUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -4.44396
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "SANDUSDT",
+      "inSample": {
+        "trades": 2,
+        "netPct": -5.553940000000001
+      },
+      "outOfSample": {
+        "trades": 3,
+        "netPct": -1.5668199999999999
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 2/30",
+          "OOS sample small: 3/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "SEIUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": 4.4366699999999994
+      },
+      "outOfSample": {
+        "trades": 2,
+        "netPct": 0.06093000000000015
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 2/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "SHIBUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -1.81825
+      },
+      "outOfSample": {
+        "trades": 3,
+        "netPct": -0.47563
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 3/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": 9.7318
+      },
+      "outOfSample": {
+        "trades": 5,
+        "netPct": -3.88244
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 5/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "SUIUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": -1.17802
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": 1.3841400000000001
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "TIAUSDT",
+      "inSample": {
+        "trades": 1,
+        "netPct": 1.64122
+      },
+      "outOfSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 1/30",
+          "OOS sample small: 0/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "TRXUSDT",
+      "inSample": {
+        "trades": 15,
+        "netPct": -0.08495999999999979
+      },
+      "outOfSample": {
+        "trades": 6,
+        "netPct": -0.19299
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 15/30",
+          "OOS sample small: 6/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "UNIUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": 12.03398
+      },
+      "outOfSample": {
+        "trades": 4,
+        "netPct": -2.3485500000000004
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 4/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "WIFUSDT",
+      "inSample": {
+        "trades": 0,
+        "netPct": 0
+      },
+      "outOfSample": {
+        "trades": 1,
+        "netPct": -2.13455
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 0/30",
+          "OOS sample small: 1/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "inSample": {
+        "trades": 3,
+        "netPct": 12.78977
+      },
+      "outOfSample": {
+        "trades": 3,
+        "netPct": -0.23752999999999957
+      },
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "IS sample small: 3/30",
+          "OOS sample small: 3/10",
+          "Statistical gate not passed; live broadcast remains blocked"
+        ]
+      }
+    }
+  ]
+}

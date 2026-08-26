@@ -1,0 +1,14 @@
+{
+  "calendarDays": 110,
+  "startDate": "2026-05-05",
+  "endDate": "2026-08-22",
+  "totalTradeCount": 73,
+  "sumNetPct": -9.50841,
+  "metricTrades": 73,
+  "metricNetPct": -9.508409999999998,
+  "sumCheckPasses": true,
+  "datesUnique": true,
+  "everyRowValid": true,
+  "zeroTradeDays": 83,
+  "nonZeroTradeDays": 27
+}
