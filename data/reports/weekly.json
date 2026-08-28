@@ -3,81 +3,48 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "weekly",
   "periodLabel": "الأسبوعي",
-  "generatedAt": "2026-08-21T16:03:51.320Z",
-  "windowStart": "2026-08-14T16:03:51.320Z",
-  "windowEnd": "2026-08-21T16:03:51.320Z",
+  "generatedAt": "2026-08-28T21:59:02.325Z",
+  "windowStart": "2026-08-21T21:59:02.325Z",
+  "windowEnd": "2026-08-28T21:59:02.325Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 7,
-    "closed": 7,
+    "signals": 1,
+    "closed": 1,
     "open": 0,
-    "wins": 5,
-    "losses": 2,
+    "wins": 0,
+    "losses": 1,
     "neutral": 0,
-    "winRatePct": 71.42857142857143,
-    "grossPnlPct": 15.143488880156436,
-    "feesPct": 0.7,
-    "slippagePct": 0.28,
-    "netPnlPct": 14.443488880156435,
-    "netPnlUsd": 37.934,
-    "averageNetPnlPct": 2.063355554308062,
-    "profitFactor": 7.817789398595749,
-    "maxDrawdownPct": -2.118500299104478,
+    "winRatePct": 0,
+    "grossPnlPct": -0.6186,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "netPnlPct": -0.7186,
+    "netPnlUsd": -7.1862,
+    "averageNetPnlPct": -0.7186,
+    "profitFactor": 0,
+    "maxDrawdownPct": -0.7186,
     "bestSymbol": {
-      "symbol": "SOLUSDT",
-      "netPct": 7.555888033465941
+      "symbol": "TRXUSDT",
+      "netPct": -0.7186
     },
     "worstSymbol": {
-      "symbol": "XRPUSDT",
-      "netPct": -1.1840792786038672
+      "symbol": "TRXUSDT",
+      "netPct": -0.7186
     }
   },
   "byResult": {
-    "TP3": 3,
-    "TP1": 1,
-    "SL": 2,
-    "TP2": 1
+    "SL": 1
   },
   "bySymbol": {
-    "SOLUSDT": {
-      "count": 2,
-      "wins": 2,
-      "losses": 0,
-      "netPct": 7.555888033465941
-    },
-    "ADAUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.8588082383523368
-    },
-    "XRPUSDT": {
+    "TRXUSDT": {
       "count": 1,
       "wins": 0,
       "losses": 1,
-      "netPct": -1.1840792786038672
-    },
-    "BTCUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -0.9344210205006107
-    },
-    "BNBUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.353792907442637
-    },
-    "LTCUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 3.7935
+      "netPct": -0.7186
     }
   }
 }
