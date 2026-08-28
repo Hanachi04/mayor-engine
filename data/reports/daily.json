@@ -3,48 +3,33 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-08-22T20:55:09.216Z",
-  "windowStart": "2026-08-21T20:55:09.216Z",
-  "windowEnd": "2026-08-22T20:55:09.216Z",
+  "generatedAt": "2026-08-28T21:51:26.108Z",
+  "windowStart": "2026-08-27T21:51:26.108Z",
+  "windowEnd": "2026-08-28T21:51:26.108Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 1,
-    "closed": 1,
+    "signals": 0,
+    "closed": 0,
     "open": 0,
     "wins": 0,
-    "losses": 1,
+    "losses": 0,
     "neutral": 0,
     "winRatePct": 0,
-    "grossPnlPct": -0.6186,
-    "feesPct": 0.1,
-    "slippagePct": 0.04,
-    "netPnlPct": -0.7186,
-    "netPnlUsd": -7.1862,
-    "averageNetPnlPct": -0.7186,
+    "grossPnlPct": 0,
+    "feesPct": 0,
+    "slippagePct": 0,
+    "netPnlPct": 0,
+    "netPnlUsd": null,
+    "averageNetPnlPct": 0,
     "profitFactor": 0,
-    "maxDrawdownPct": -0.7186,
-    "bestSymbol": {
-      "symbol": "TRXUSDT",
-      "netPct": -0.7186
-    },
-    "worstSymbol": {
-      "symbol": "TRXUSDT",
-      "netPct": -0.7186
-    }
+    "maxDrawdownPct": 0,
+    "bestSymbol": null,
+    "worstSymbol": null
   },
-  "byResult": {
-    "SL": 1
-  },
-  "bySymbol": {
-    "TRXUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -0.7186
-    }
-  }
+  "byResult": {},
+  "bySymbol": {}
 }
