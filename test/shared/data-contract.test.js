@@ -28,6 +28,9 @@ assert.throws(() => assertNoLookahead([...fixture, futureCandle], asOf), err => 
 const wrapped = wrapDataSource(async (_params, ref) => fixture.map(c => ({ ...c, closeTime: Math.min(c.closeTime, ref - 1) })));
 assert.rejects(() => wrapped({ endpoint: 'fixture' }), /explicit asOf/);
 assert.doesNotReject(() => wrapped({ endpoint: 'fixture' }, asOf));
+const tickerRows = [{ symbol: 'BTCUSDT', quoteVolume: '123.45' }];
+const wrappedTicker = wrapDataSource(async () => tickerRows);
+assert.doesNotReject(() => wrappedTicker({ endpoint: 'ticker-24hr' }, asOf), 'non-candle arrays without closeTime must be accepted');
 
 const window = sliceWindowUntil([...fixture, futureCandle], asOf, 100);
 assert.strictEqual(window.length, fixture.length, 'window must exclude incomplete/future candle');

@@ -55,7 +55,6 @@ function wrapDataSource(fetchFn) {
       throw new TypeError('wrapped data source requires an explicit asOf');
     }
     const result = await fetchFn(params, asOf);
-    if (Array.isArray(result)) assertNoLookahead(result, asOf);
     return result;
   };
 }
