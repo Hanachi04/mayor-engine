@@ -19,7 +19,8 @@ DB_PATH = DATA_DIR / "aegis.sqlite3"
 CANDLES_PATH = DATA_DIR / "BTCUSDT_1h.json"
 REPORT_PATH = DATA_DIR / "pipeline_report.json"
 BINANCE_URL = "https://fapi.binance.com/fapi/v1/klines"
-LLM_MODEL = os.getenv("AEGIS_LLM_MODEL", "gpt-5-nano")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models"
 INTERVAL = "1h"
 MONTH_MS = 31 * 24 * 60 * 60 * 1000
 
@@ -98,21 +99,24 @@ def rsi(values: list[float], period: int = 14) -> float:
 
 
 def sentiment_agent(feature: dict[str, float]) -> dict[str, Any]:
-    base = os.getenv("OPENAI_API_BASE")
-    key = os.getenv("OPENAI_API_KEY")
+    key = os.getenv("GEMINI_API_KEY")
     prompt = {k: round(float(feature[k]), 8) for k in ("close", "rsi", "macd", "macd_signal", "bb_mid", "bb_upper", "bb_lower", "volatility", "return_1h")}
-    if not base or not key:
-        return {"label": "neutral", "score": 0.0, "reason": "language backend unavailable"}
-    payload = {"model": LLM_MODEL, "messages": [{"role": "system", "content": "You are a conservative crypto market sentiment classifier. Output JSON only."}, {"role": "user", "content": "Classify sentiment from this market snapshot. Do not give financial advice. Return label bullish, bearish, or neutral; score from -1 to 1; brief reason. Snapshot: " + json.dumps(prompt)}], "response_format": {"type": "json_schema", "json_schema": {"name": "sentiment", "strict": True, "schema": {"type": "object", "properties": {"label": {"type": "string", "enum": ["bullish", "bearish", "neutral"]}, "score": {"type": "number"}, "reason": {"type": "string"}}, "required": ["label", "score", "reason"], "additionalProperties": False}}}}
+    if not key:
+        return {"label": "neutral", "score": 0.0, "reason": "GEMINI_API_KEY unavailable"}
+    instruction = "You are a conservative crypto market sentiment classifier. Return JSON only with label bullish, bearish, or neutral; score from -1 to 1; and a brief reason. Do not give financial advice. Snapshot: " + json.dumps(prompt)
+    payload = {"system_instruction": {"parts": [{"text": "Classify market sentiment conservatively."}]}, "contents": [{"role": "user", "parts": [{"text": instruction}]}], "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json", "responseSchema": {"type": "OBJECT", "properties": {"label": {"type": "STRING", "enum": ["bullish", "bearish", "neutral"]}, "score": {"type": "NUMBER"}, "reason": {"type": "STRING"}}, "required": ["label", "score", "reason"]}}}
     try:
-        r = requests.post(base.rstrip("/") + "/chat/completions", headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"}, json=payload, timeout=60)
+        url = f"{GEMINI_ENDPOINT}/{GEMINI_MODEL}:generateContent"
+        r = requests.post(url, params={"key": key}, headers={"Content-Type": "application/json"}, json=payload, timeout=60)
         r.raise_for_status()
-        content = r.json()["choices"][0]["message"]["content"]
+        content = r.json()["candidates"][0]["content"]["parts"][0]["text"]
         result = json.loads(content)
-        result["score"] = max(-1.0, min(1.0, float(result["score"])) )
+        result["score"] = max(-1.0, min(1.0, float(result["score"])))
+        if result["label"] not in {"bullish", "bearish", "neutral"}:
+            raise ValueError("invalid sentiment label")
         return result
     except Exception as exc:
-        return {"label": "neutral", "score": 0.0, "reason": f"agent fallback: {type(exc).__name__}"}
+        return {"label": "neutral", "score": 0.0, "reason": f"Gemini fallback: {type(exc).__name__}"}
 
 
 def decision(feature: dict[str, float], sentiment: dict[str, Any]) -> str | None:
@@ -146,7 +150,7 @@ def run() -> dict[str, Any]:
     count = conn.execute("SELECT COUNT(*) FROM decisions").fetchone()[0]
     signals = conn.execute("SELECT COUNT(*) FROM decisions WHERE decision IS NOT NULL").fetchone()[0]
     conn.close()
-    report = {"symbol": "BTCUSDT", "interval": INTERVAL, "candles": len(candles), "feature_rows": len(feats), "sqlite_rows": count, "trade_decisions": signals, "model": LLM_MODEL, "local_only": True, "profitability_evaluated": False, "first_decision": next((x for x in decisions if x["signal"]), None)}
+    report = {"symbol": "BTCUSDT", "interval": INTERVAL, "candles": len(candles), "feature_rows": len(feats), "sqlite_rows": count, "trade_decisions": signals, "model": GEMINI_MODEL, "local_only": True, "profitability_evaluated": False, "first_decision": next((x for x in decisions if x["signal"]), None)}
     REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))
     return report

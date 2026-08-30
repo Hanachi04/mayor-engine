@@ -12,4 +12,6 @@
 
 ## Decision
 
-Ollama was not installed or started. The first slice uses the available hosted OpenAI-compatible language proxy with `gpt-5-nano` for the single sentiment-agent role. Market data, feature engineering, technical decision logic, and SQLite persistence remain local. No GitHub Actions workflow or live order execution is included.
+Ollama was not installed or started. The first slice uses the Google Gemini API through Google AI Studio, configured with `GEMINI_API_KEY`, for the single sentiment-agent role. The default model is `gemini-2.5-flash` and can be overridden with `GEMINI_MODEL`. Market data, feature engineering, technical decision logic, and SQLite persistence remain local. No GitHub Actions workflow or live order execution is included.
+
+**Privacy note:** Google AI Studio's free tier may use submitted content to improve Google products, and quotas or terms may change. Do not send confidential data through the sentiment prompt.
