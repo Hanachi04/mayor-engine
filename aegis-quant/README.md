@@ -15,4 +15,4 @@ python3 aegis-quant/pipeline.py
 python3 aegis-quant/test/test_pipeline.py
 ```
 
-يحتاج وكيل المعنويات إلى `GEMINI_API_KEY` من Google AI Studio، ويمكن اختيار النموذج عبر `GEMINI_MODEL` (الافتراضي `gemini-2.5-flash`). يستخدم البرنامج واجهة Gemini `generateContent` مع إخراج JSON منظم. قد تستخدم الطبقة المجانية البيانات لتحسين منتجات Google، لذلك لا ترسل بيانات سرية. البيانات والنتائج تحفظ في `aegis-quant/data/`، ولا تحفظ الأسرار في المستودع.
+يحتاج وكيل المعنويات إلى `GEMINI_API_KEY` من Google AI Studio، ويمكن اختيار النموذج عبر `GEMINI_MODEL` (الافتراضي `gemini-3.6-flash`). يستخدم البرنامج واجهة Gemini `generateContent` مع إخراج JSON منظم. قد تستخدم الطبقة المجانية البيانات لتحسين منتجات Google، لذلك لا ترسل بيانات سرية. البيانات والنتائج تحفظ في `aegis-quant/data/`، ولا تحفظ الأسرار في المستودع.

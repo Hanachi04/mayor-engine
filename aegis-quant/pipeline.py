@@ -19,7 +19,7 @@ DB_PATH = DATA_DIR / "aegis.sqlite3"
 CANDLES_PATH = DATA_DIR / "BTCUSDT_1h.json"
 REPORT_PATH = DATA_DIR / "pipeline_report.json"
 BINANCE_URL = "https://fapi.binance.com/fapi/v1/klines"
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models"
 INTERVAL = "1h"
 MONTH_MS = 31 * 24 * 60 * 60 * 1000
@@ -115,6 +115,9 @@ def sentiment_agent(feature: dict[str, float]) -> dict[str, Any]:
         if result["label"] not in {"bullish", "bearish", "neutral"}:
             raise ValueError("invalid sentiment label")
         return result
+    except requests.HTTPError as exc:
+        detail = exc.response.text[:240] if exc.response is not None else ""
+        return {"label": "neutral", "score": 0.0, "reason": f"Gemini fallback HTTP {exc.response.status_code if exc.response is not None else 'unknown'}: {detail}"}
     except Exception as exc:
         return {"label": "neutral", "score": 0.0, "reason": f"Gemini fallback: {type(exc).__name__}"}
 
