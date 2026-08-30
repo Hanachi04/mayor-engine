@@ -3,33 +3,48 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-08-29T20:12:08.032Z",
-  "windowStart": "2026-08-28T20:12:08.032Z",
-  "windowEnd": "2026-08-29T20:12:08.032Z",
+  "generatedAt": "2026-08-30T20:12:21.981Z",
+  "windowStart": "2026-08-29T20:12:21.981Z",
+  "windowEnd": "2026-08-30T20:12:21.981Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 0,
-    "closed": 0,
+    "signals": 1,
+    "closed": 1,
     "open": 0,
-    "wins": 0,
+    "wins": 1,
     "losses": 0,
     "neutral": 0,
-    "winRatePct": 0,
-    "grossPnlPct": 0,
-    "feesPct": 0,
-    "slippagePct": 0,
-    "netPnlPct": 0,
-    "netPnlUsd": null,
-    "averageNetPnlPct": 0,
-    "profitFactor": 0,
+    "winRatePct": 100,
+    "grossPnlPct": 6.0265,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "netPnlPct": 5.9265,
+    "netPnlUsd": 36.669,
+    "averageNetPnlPct": 5.9265,
+    "profitFactor": null,
     "maxDrawdownPct": 0,
-    "bestSymbol": null,
-    "worstSymbol": null
+    "bestSymbol": {
+      "symbol": "UNIUSDT",
+      "netPct": 5.9265
+    },
+    "worstSymbol": {
+      "symbol": "UNIUSDT",
+      "netPct": 5.9265
+    }
   },
-  "byResult": {},
-  "bySymbol": {}
+  "byResult": {
+    "TP3": 1
+  },
+  "bySymbol": {
+    "UNIUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 5.9265
+    }
+  }
 }
