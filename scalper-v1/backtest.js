@@ -18,15 +18,21 @@ function load(symbol) {
   const end = normalized.at(-1)?.closeTime || 0;
   return prepareKlines(normalized, end + 1);
 }
-function simulateSymbol(symbol, candles, startTime, endTime) {
+function simulateSymbol(symbol, candles, startTime, endTime, portfolioSignals) {
   const trades = []; let lastSignal = -Infinity;
+  if (!Array.isArray(portfolioSignals)) throw new TypeError('portfolioSignals must be a shared array');
   for (let i = 50; i < candles.length - 1; i++) {
     const signalCandle = candles[i];
     if (signalCandle.closeTime < startTime || signalCandle.closeTime >= endTime) continue;
     const window = candles.slice(Math.max(0, i - 1499), i + 1);
     const signal = analyze1m(window, symbol);
     if (!signal || signal.signalTime >= endTime || signal.signalTime - lastSignal < CONFIG.cooldownMs) continue;
+    const dayUtc = new Date(signal.signalTime).toISOString().slice(0, 10);
+    const dailyCount = portfolioSignals.filter(item => item.dayUtc === dayUtc).length;
+    // الحد محفظي مشترك عبر كل الرموز، وليس حدًا مستقلًا لكل رمز.
+    if (dailyCount >= CONFIG.maxSignalsPerDay) continue;
     const entry = candles[i + 1]; if (!entry || entry.openTime < signalCandle.closeTime) continue;
+    portfolioSignals.push({ symbol, signalTime: signal.signalTime, dayUtc });
     let exit = null, result = 'TIMEOUT', exitIndex = i + 1;
     const lastExitIndex = Math.min(candles.length - 1, i + Math.ceil(CONFIG.maxTradeAgeMs / 60000));
     for (let j = i + 1; j <= lastExitIndex; j++) {
@@ -62,8 +68,9 @@ function run() {
   const available = Object.values(datasets).filter(a => a.length).map(a => a.at(-1).closeTime);
   if (!available.length) throw new Error('No local 1m fixtures found. Populate scalper-v1/fixtures first.');
   const end = Math.min(...available), start = end - MONTH_MS, split = start + MONTH_MS / 2;
-  const isTrades = SYMBOLS.flatMap(s => simulateSymbol(s, datasets[s], start, split));
-  const oosTrades = SYMBOLS.flatMap(s => simulateSymbol(s, datasets[s], split, end));
+  const portfolioSignals = [];
+  const isTrades = SYMBOLS.flatMap(s => simulateSymbol(s, datasets[s], start, split, portfolioSignals));
+  const oosTrades = SYMBOLS.flatMap(s => simulateSymbol(s, datasets[s], split, end, portfolioSignals));
   const report = { generatedAt: new Date().toISOString(), mode: 'local-only', symbols: SYMBOLS, timeframe: '1m', periodDays: 31, split: { isEnd: new Date(split).toISOString(), oosStart: new Date(split).toISOString() }, is: summarize(isTrades), oos: summarize(oosTrades), concentrationGate: { maxPct: CONFIG.maxConcentrationPct, passed: summarize(isTrades).concentration.passed && summarize(oosTrades).concentration.passed } };
   fs.mkdirSync(path.dirname(REPORT_FILE), { recursive: true }); fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
