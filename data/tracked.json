@@ -417,5 +417,72 @@
     "closePct": -0.7186,
     "netPnlUsd": -7.1862,
     "closeAt": "2026-08-22T09:54:24.181Z"
+  },
+  {
+    "symbol": "UNIUSDT",
+    "dir": "LONG",
+    "price": 5.108,
+    "atr": 0.0550352941700606,
+    "atrPct": 0.0107743332361121,
+    "adx": 34.675569025687786,
+    "pdi": 41.51443935335193,
+    "mdi": 10.204097708748227,
+    "corePct": 56.4,
+    "filters": [
+      "ADX 34.7",
+      "DI +DI",
+      "CORE 56.4%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "VOLUME",
+      "BOLLINGER",
+      "STRUCTURE",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1788090300000,
+    "liquidity24h": 42987721.71465,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 76.12682469574983,
+    "adx4h": 34.90729256068754,
+    "sentiment": 69,
+    "sl": 5.025447058744909,
+    "tp1": 5.19055294125509,
+    "tp2": 5.2731058825101815,
+    "tp3": 5.355658823765272,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 1.6161,
+      "notional": 618.73,
+      "margin": 618.73,
+      "quantity": 121.13,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-3.0-unified",
+    "strategyMode": "balanced",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-08-30",
+    "ts": 1788091679838,
+    "slot": 4,
+    "closed": false,
+    "entryFillPrice": 5.109021599999999
   }
 ]
