@@ -10,7 +10,10 @@
     "verify": "node engine/backtest.js",
     "report:daily": "node engine/performance_report.js daily",
     "report:weekly": "node engine/performance_report.js weekly",
-    "report:monthly": "node engine/performance_report.js monthly"
+    "report:monthly": "node engine/performance_report.js monthly",
+    "test:scalper": "node test/scalper/unit.test.js",
+    "scalper": "node engine/scalper/scan.js",
+    "scalper:backtest": "node engine/scalper/backtest.js"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,8 @@
+{
+  "gateVersion": "scalper-statistical-gate-1",
+  "status": "BLOCKED",
+  "passed": false,
+  "reason": "awaiting-first-local-backtest",
+  "generatedAt": "2026-08-30T00:00:00.000Z",
+  "engineVersion": "futures-scalper-v1.0"
+}
