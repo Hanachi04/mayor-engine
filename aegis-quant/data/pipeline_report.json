@@ -1,0 +1,20 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "candles": 744,
+  "feature_rows": 30,
+  "sqlite_rows": 30,
+  "trade_decisions": 16,
+  "model": "gpt-5-nano",
+  "local_only": true,
+  "profitability_evaluated": false,
+  "first_decision": {
+    "as_of": 1785531599999,
+    "signal": "SHORT",
+    "sentiment": {
+      "label": "bearish",
+      "score": -0.65,
+      "reason": "MACD is strongly negative (bearish momentum) and price is below the BB mid, near the lower band, with RSI near 27 (oversold). Overall momentum remains bearish despite oversold RSI."
+    }
+  }
+}
