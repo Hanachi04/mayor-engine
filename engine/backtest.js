@@ -23,6 +23,7 @@ const {
   CONFIG, Indicators, normalizeKlines, analyzeLatest, levelsFromSignal,
   netPnl
 } = require('./scan.js');
+const { assertNoLookahead, sliceWindowUntil } = require('./shared/data-contract');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
@@ -56,7 +57,11 @@ function escapeCsv(v) { return String(v ?? '').replace(/,/g, ''); }
 function loadSeriesFromFile(file) {
   const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
   const arr = Array.isArray(raw) ? raw : raw.klines || raw.data || [];
-  return normalizeKlines(arr).filter(k => Number.isFinite(k.closeTime) && k.closeTime < Date.now());
+  const normalized = normalizeKlines(arr);
+  const asOf = normalized.reduce((max, candle) => Math.max(max, candle.closeTime), 0) + 1;
+  const closed = normalized.filter(k => Number.isFinite(k.closeTime) && k.closeTime < asOf);
+  assertNoLookahead(closed, asOf);
+  return closed;
 }
 
 async function fetchJson(url, params) {
@@ -80,10 +85,12 @@ async function fetchJson(url, params) {
 }
 
 async function fetchHistorical(symbol, interval) {
-  const endTime = Date.now() - 60 * 1000;
-  const startTime = process.env.BACKTEST_START ? new Date(process.env.BACKTEST_START).getTime() : endTime - intervalMs(interval) * FETCH_LIMIT;
-  const raw = await fetchJson('/api/v3/klines', { symbol, interval, limit: FETCH_LIMIT, startTime, endTime });
-  return normalizeKlines(raw).filter(k => k.closeTime < Date.now());
+  const asOf = Date.now();
+  const startTime = process.env.BACKTEST_START ? new Date(process.env.BACKTEST_START).getTime() : asOf - intervalMs(interval) * FETCH_LIMIT;
+  const raw = await fetchJson('/api/v3/klines', { symbol, interval, limit: FETCH_LIMIT, startTime, endTime: asOf - 60 * 1000 });
+  const normalized = normalizeKlines(raw).filter(k => k.closeTime < asOf);
+  assertNoLookahead(normalized, asOf);
+  return normalized;
 }
 
 function intervalMs(interval) { return ({ '5m': 5, '15m': 15, '1h': 60, '4h': 240 }[interval] || 15) * 60 * 1000; }
@@ -99,9 +106,11 @@ async function loadDataset(symbol) {
   return { symbol, data };
 }
 
-function sliceUntil(series, endTime) { let lo = 0, hi = series.length; while (lo < hi) { const m = Math.floor((lo + hi) / 2); if (series[m].closeTime < endTime) lo = m + 1; else hi = m; } return series.slice(0, lo); }
+function sliceUntil(series, endTime) { return sliceWindowUntil(series, endTime, series.length); }
 const WARMUP_CANDLES = 1500;
-function sliceWindowUntil(series, endTime, warmup = WARMUP_CANDLES) { let lo = 0, hi = series.length; while (lo < hi) { const m = Math.floor((lo + hi) / 2); if (series[m].closeTime < endTime) lo = m + 1; else hi = m; } const start = Math.max(0, lo - warmup); return series.slice(start, lo); }
+function sliceWindowUntilContract(series, asOf, warmup = WARMUP_CANDLES) {
+  return sliceWindowUntil(series, asOf, warmup);
+}
 function lastClosedIndex(series, endTime) { let i = -1; for (let n = 0; n < series.length; n++) { if (series[n].closeTime < endTime) i = n; else break; } return i; }
 
 function volume24h(series, endIndex) {
@@ -126,7 +135,7 @@ function extractFeatures(result) {
 
 function getMtfAt(dataset, evaluationTime, sentiment = null) {
   const baseTf = CONFIG.baseInterval;
-  const baseRaw = sliceWindowUntil(dataset.data[baseTf] || [], evaluationTime, 1500);
+  const baseRaw = sliceWindowUntilContract(dataset.data[baseTf] || [], evaluationTime, 1500);
   const baseMin = CONFIG.minKlinesByFrame[baseTf] || CONFIG.minKlines;
   if (baseRaw.length < baseMin) return { ok: false, reason: 'base-frame-insufficient-data', frames: {}, valid: [] };
   const baseResult = analyzeLatest(dataset.symbol, baseRaw, { skipSanitize: true, minKlines: baseMin, obImbalance: null, sentiment });
@@ -134,7 +143,7 @@ function getMtfAt(dataset, evaluationTime, sentiment = null) {
 
   const frames = {}, valid = [];
   for (const tf of INTERVALS) {
-    const raw = tf === baseTf ? baseRaw : sliceWindowUntil(dataset.data[tf] || [], evaluationTime, 1500);
+    const raw = tf === baseTf ? baseRaw : sliceWindowUntilContract(dataset.data[tf] || [], evaluationTime, 1500);
     const min = CONFIG.minKlinesByFrame[tf] || CONFIG.minKlines;
     if (raw.length < min) continue;
     const result = tf === baseTf ? baseResult : analyzeLatest(dataset.symbol, raw, { skipSanitize: true, minKlines: min, obImbalance: null, sentiment });
@@ -187,7 +196,9 @@ function runWindow(dataset, startTime, endTime) {
         open.splice(oi, 1);
       }
     }
-    const mtf = getMtfAt(dataset, signalClose + 1);
+    const evaluationTime = signalClose + 1;
+    assertNoLookahead(sliceWindowUntilContract(base, evaluationTime, 1500), evaluationTime);
+    const mtf = getMtfAt(dataset, evaluationTime);
     const feature = mtf.features; if (feature) features.push({ time: signalClose, ...feature });
     if (!mtf.ok || !mtf.signal || open.length) continue;
     if (signalClose - lastSignalAt < CONFIG.signalCooldownMs) continue;

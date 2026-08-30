@@ -7,6 +7,7 @@ const {
   analyze1m, emaDirection, softTrend15m, levelsFromSignal,
   entryFillPrice, exitFillPrice, prepareKlines, Indicators
 } = require('./scan');
+const { assertNoLookahead, sliceWindowUntil } = require('../shared/data-contract');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
 const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');
@@ -29,15 +30,20 @@ function simulateSymbol(symbol, frames) {
   const fee = CONFIG.takerFeeRate;
 
   for (let i = 50; i < k1.length - 2; i++) {
-    const slice1 = k1.slice(0, i + 1);
     const t = k1[i].closeTime;
-    const slice3 = (frames['3m'] || []).filter(k => k.closeTime <= t);
-    const slice5 = (frames['5m'] || []).filter(k => k.closeTime <= t);
-    const slice15 = (frames['15m'] || []).filter(k => k.closeTime <= t);
+    const asOf = t + 1;
+    const slice1 = sliceWindowUntil(k1, asOf, 1500);
+    const slice3 = sliceWindowUntil(frames['3m'] || [], asOf, 1500);
+    const slice5 = sliceWindowUntil(frames['5m'] || [], asOf, 1500);
+    const slice15 = sliceWindowUntil(frames['15m'] || [], asOf, 1500);
+    assertNoLookahead(slice1, asOf);
+    assertNoLookahead(slice3, asOf);
+    assertNoLookahead(slice5, asOf);
+    assertNoLookahead(slice15, asOf);
 
     if (slice3.length < 25 || slice5.length < 25) continue;
 
-    const base = analyze1m(slice1, { symbol, skipSanitize: true, now: t + 1 });
+    const base = analyze1m(slice1, { symbol, skipSanitize: true, now: asOf });
     if (!base.signal) continue;
     const dir = base.signal.dir;
 

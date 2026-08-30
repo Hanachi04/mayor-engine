@@ -5,7 +5,7 @@
   "description": "MaYor Cloud Pro MTF research-only signal engine",
   "type": "commonjs",
   "scripts": {
-    "test": "node test/unit.test.js",
+    "test": "node test/unit.test.js && node test/shared/data-contract.test.js",
     "backtest": "node engine/backtest.js",
     "verify": "node engine/backtest.js",
     "report:daily": "node engine/performance_report.js daily",
@@ -13,7 +13,8 @@
     "report:monthly": "node engine/performance_report.js monthly",
     "test:scalper": "node test/scalper/unit.test.js",
     "scalper": "node engine/scalper/scan.js",
-    "scalper:backtest": "node engine/scalper/backtest.js"
+    "scalper:backtest": "node engine/scalper/backtest.js",
+    "lint": "node scripts/lint.js"
   },
   "engines": {
     "node": ">=20"

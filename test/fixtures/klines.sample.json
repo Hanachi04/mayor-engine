@@ -1,0 +1,7 @@
+[
+  {"openTime":1700000000000,"open":100,"high":101,"low":99,"close":100.5,"volume":1200,"closeTime":1700000299999},
+  {"openTime":1700000300000,"open":100.5,"high":102,"low":100,"close":101.5,"volume":1300,"closeTime":1700000599999},
+  {"openTime":1700000600000,"open":101.5,"high":103,"low":101,"close":102.5,"volume":1400,"closeTime":1700000899999},
+  {"openTime":1700000900000,"open":102.5,"high":104,"low":102,"close":103.5,"volume":1500,"closeTime":1700001199999},
+  {"openTime":1700001200000,"open":103.5,"high":105,"low":103,"close":104.5,"volume":1600,"closeTime":1700001499999}
+]

@@ -21,6 +21,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { assertNoLookahead, wrapDataSource, getSuccessfulCheckCount } = require('./shared/data-contract');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-3.0-unified';
 const TOKEN = process.env.TELEGRAM_TOKEN || '';
@@ -217,15 +218,20 @@ function prepareKlines(raw, min = CONFIG.minKlines, now = Date.now()) {
     reason: clean.length >= min ? '' : `insufficient-closed-candles:${clean.length}/${min}` };
 }
 
+const requestWithContract = wrapDataSource(({ pathname, params }) => requestJson(pathname, params));
+
 async function getKlines(symbol, interval, limit) {
-  const raw = await requestJson('/api/v3/klines', { symbol, interval, limit });
-  const prepared = prepareKlines(raw, CONFIG.minKlinesByFrame[interval] || CONFIG.minKlines);
+  const asOf = Date.now();
+  const raw = await requestWithContract({ pathname: '/api/v3/klines', params: { symbol, interval, limit } }, asOf);
+  const prepared = prepareKlines(raw, CONFIG.minKlinesByFrame[interval] || CONFIG.minKlines, asOf);
   if (!prepared.ok) throw new Error(`${symbol} ${interval} ${prepared.reason}`);
+  assertNoLookahead(prepared.klines, asOf);
+  console.log(`Data contract: Cloud Pro ${symbol} ${interval} checks=${getSuccessfulCheckCount()}`);
   return prepared.klines;
 }
 
 async function get24hVolumeMap(symbols) {
-  const data = await requestJson('/api/v3/ticker/24hr', { symbols: JSON.stringify(symbols) });
+  const data = await requestWithContract({ pathname: '/api/v3/ticker/24hr', params: { symbols: JSON.stringify(symbols) } }, Date.now());
   const map = new Map();
   for (const t of Array.isArray(data) ? data : []) {
     map.set(t.symbol, { quoteVolume: finite(t.quoteVolume, 0), price: finite(t.lastPrice), changePct: finite(t.priceChangePercent, 0) });
@@ -235,7 +241,7 @@ async function get24hVolumeMap(symbols) {
 
 async function getOrderBookImbalance(symbol, limit = 100) {
   try {
-    const data = await requestJson('/api/v3/depth', { symbol, limit });
+    const data = await requestWithContract({ pathname: '/api/v3/depth', params: { symbol, limit } }, Date.now());
     let bidNotional = 0, askNotional = 0;
     for (const [price, qty] of data.bids || []) bidNotional += finite(price, 0) * finite(qty, 0);
     for (const [price, qty] of data.asks || []) askNotional += finite(price, 0) * finite(qty, 0);
@@ -267,7 +273,7 @@ async function getMarketSentiment() {
 }
 
 async function getTicker(symbol) {
-  const data = await requestJson('/api/v3/ticker/price', { symbol });
+  const data = await requestWithContract({ pathname: '/api/v3/ticker/price', params: { symbol } }, Date.now());
   const price = finite(data?.price);
   if (!Number.isFinite(price)) throw new Error(`ticker-invalid:${symbol}`);
   return price;
@@ -770,7 +776,8 @@ if (process.env.CLOUD_PRO_TEST === '1' || require.main !== module) {
     CONFIG, WEIGHTS, WEIGHT_PROFILES, STRATEGY_MODE, TOTAL_VOTE_WEIGHT, Indicators, VOTE_PLUGINS, normalizeKlines, prepareKlines,
     getKlines, get24hVolumeMap, getOrderBookImbalance, getMarketSentiment, analyzeLatest, levelsFromSignal, calculatePositionSize,
     applyExchangeLotSizing, roundDownToStep, checkCircuitBreaker, entryFillPrice, exitFillPrice, netPnl,
-    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed
+    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed,
+    assertNoLookahead, wrapDataSource
   };
 } else {
   scan().catch(e => { console.error(`خطأ فادح: ${e.stack || e.message}`); process.exitCode = 1; });

@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { assertNoLookahead, wrapDataSource, getSuccessfulCheckCount } = require('../shared/data-contract');
 const { CONFIG, ENGINE_VERSION, GATE_VERSION } = require('./config');
 
 const parent = require('../scan.js');
@@ -122,16 +123,21 @@ async function requestJson(pathname, params = {}) {
   throw lastError || new Error('Futures request failed');
 }
 
+const requestWithContract = wrapDataSource(({ pathname, params }) => requestJson(pathname, params));
+
 async function getKlines(symbol, interval, limit) {
-  const raw = await requestJson('/fapi/v1/klines', { symbol, interval, limit });
+  const asOf = Date.now();
+  const raw = await requestWithContract({ pathname: '/fapi/v1/klines', params: { symbol, interval, limit } }, asOf);
   const min = CONFIG.minKlines[interval] || 30;
-  const prepared = prepareKlines(raw, min);
+  const prepared = prepareKlines(raw, min, asOf);
   if (!prepared.ok) throw new Error(`${symbol} ${interval} ${prepared.reason}`);
+  assertNoLookahead(prepared.klines, asOf);
+  console.log(`Data contract: Scalper ${symbol} ${interval} checks=${getSuccessfulCheckCount()}`);
   return prepared.klines;
 }
 
 async function get24hVolumeMap(symbols) {
-  const data = await requestJson('/fapi/v1/ticker/24hr');
+  const data = await requestWithContract({ pathname: '/fapi/v1/ticker/24hr', params: {} }, Date.now());
   const map = new Map();
   const set = new Set(symbols);
   for (const t of Array.isArray(data) ? data : []) {
@@ -148,7 +154,7 @@ async function get24hVolumeMap(symbols) {
 
 async function getOrderBookImbalance(symbol, limit = 50) {
   try {
-    const data = await requestJson('/fapi/v1/depth', { symbol, limit });
+    const data = await requestWithContract({ pathname: '/fapi/v1/depth', params: { symbol, limit } }, Date.now());
     let bid = 0, ask = 0;
     for (const [p, q] of data.bids || []) bid += finite(p, 0) * finite(q, 0);
     for (const [p, q] of data.asks || []) ask += finite(p, 0) * finite(q, 0);
@@ -161,7 +167,7 @@ async function getOrderBookImbalance(symbol, limit = 50) {
 }
 
 async function getTicker(symbol) {
-  const data = await requestJson('/fapi/v1/ticker/price', { symbol });
+  const data = await requestWithContract({ pathname: '/fapi/v1/ticker/price', params: { symbol } }, Date.now());
   const price = finite(data?.price);
   if (!Number.isFinite(price)) throw new Error(`ticker-invalid:${symbol}`);
   return price;
@@ -566,6 +572,7 @@ if (process.env.SCALPER_TEST === '1' || require.main !== module) {
     analyze1m, emaDirection, softTrend15m, levelsFromSignal,
     calculatePositionSize, canEmit, entryFillPrice, exitFillPrice,
     prepareKlines, Indicators, loadTracked, saveTracked,
+    assertNoLookahead, wrapDataSource,
     loadVerification, verificationPassed, getMTFScalper, netPnl
   };
 } else {
