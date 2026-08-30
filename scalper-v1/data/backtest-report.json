@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-08-30T14:58:50.848Z",
+  "mode": "local-only",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT"
+  ],
+  "timeframe": "1m",
+  "periodDays": 31,
+  "split": {
+    "isEnd": "2026-08-15T02:53:59.999Z",
+    "oosStart": "2026-08-15T02:53:59.999Z"
+  },
+  "is": {
+    "trades": 17781,
+    "wins": 1404,
+    "netPct": -1769.187093,
+    "concentration": {
+      "netPct": -1769.187093,
+      "top3ContributionPct": 61.0566,
+      "passed": false
+    }
+  },
+  "oos": {
+    "trades": 17217,
+    "wins": 3794,
+    "netPct": -1654.002713,
+    "concentration": {
+      "netPct": -1654.002713,
+      "top3ContributionPct": 60.8135,
+      "passed": false
+    }
+  },
+  "concentrationGate": {
+    "maxPct": 50,
+    "passed": false
+  }
+}
