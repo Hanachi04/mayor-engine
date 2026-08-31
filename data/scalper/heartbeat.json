@@ -1,7 +1,7 @@
 {
   "engineVersion": "futures-scalper-v1.0",
-  "at": "2026-08-31T19:43:11.455Z",
-  "ts": 1788205391455,
+  "at": "2026-08-31T19:58:21.196Z",
+  "ts": 1788206301196,
   "ok": false,
   "error": "HTTP 403 https://fstream.binance.com <html>\r\n<head><title>403 Forbidden</title></head>\r\n<body>\r\n<center><h1>403 Forbidden</h1></center>\r\n"
 }
