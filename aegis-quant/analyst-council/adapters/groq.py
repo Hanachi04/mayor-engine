@@ -1,1 +1,120 @@
-IiIiCkdyb3EgYWRhcHRlciBmb3IgdGhlIHNlbnRpbWVudCBhZ2VudC4KClJlcGxhY2VzIHRoZSBsb2NhbCBPbGxhbWEgYWRhcHRlciAoYWRhcHRlcnMvb2xsYW1hLnB5KSBhcyBvZiAxIFNlcHQgMjAyNjoKT2xsYW1hJ3Mgc21hbGxlc3Qgd29ya2FibGUgbG9jYWwgbW9kZWwgKHF3ZW4yLjU6M2IsIDIuMUdpQikgZG9lcyBub3QgZml0IGluClJlcGxpdCdzIGZyZWUtdGllciBSQU0gKDEuNUdpQiB0b3RhbCwgfjI5M01pQiBmcmVlIGF0IHRlc3QgdGltZSkuIFRoaXMgaXMgYW4KZXhwbGljaXQsIGRlbGliZXJhdGUgZGVwYXJ0dXJlIGZyb20gdGhlIG9yaWdpbmFsICJvZmZsaW5lLWZpcnN0LCBubyBleHRlcm5hbApBUEkiIGRlc2lnbiBwcmluY2lwbGUgKExheWVyIDUgb2YgdGhlIG9yaWdpbmFsIHBsYW4pIOKAlCBhIHJlc291cmNlLWRyaXZlbgp0cmFkZW9mZiwgbm90IGEgZGVzaWduIG92ZXJzaWdodC4gYWRhcHRlcnMvb2xsYW1hLnB5IGlzIGtlcHQgaW4gdGhlIHJlcG8gZm9yCnJlZmVyZW5jZSAvIGZ1dHVyZSBsb2NhbCByZS1lbmFibGVtZW50IG9uIGEgbWFjaGluZSB3aXRoIGVub3VnaCBSQU0uCgpTYW1lIGludGVyZmFjZSBhcyBvbGxhbWEuY2xhc3NpZnkoKTogc2FtZSB0ZWNobmljYWwtZmllbGRzLW9ubHkgcHJvbXB0CihubyBtYXJrZXRfY2FwL3ZvbHVtZSBsZWFrYWdlIOKAlCB2ZXJpZmllZCBieSB0aGUgc2FtZSB0ZXN0IHRoYXQgZ3VhcmRlZCB0aGUKT2xsYW1hIHZlcnNpb24pLCBzYW1lIEpTT04gb3V0cHV0IGNvbnRyYWN0LCBzbyBhZ2VudHMvc2VudGltZW50LnB5IG9ubHkKbmVlZHMgYSBvbmUtbGluZSBpbXBvcnQgY2hhbmdlIHRvIHN3aXRjaCBwcm92aWRlcnMuCgpNb2RlbDogb3BlbmFpL2dwdC1vc3MtMTIwYiAoR3JvcSdzIHJlcGxhY2VtZW50IGZvciB0aGUgZGVjb21taXNzaW9uZWQKbGxhbWEtMy4zLTcwYi12ZXJzYXRpbGUsIGNob3NlbiBlYXJsaWVyIGluIHRoaXMgcHJvamVjdCBmb3IgdGhlIHNhbWUgdGFzaykuClZlcmlmeSB0aGlzIG1vZGVsIGlkIGlzIHN0aWxsIHZhbGlkIGluIHRoZSBHcm9xIGNvbnNvbGUgYmVmb3JlIHJlbHlpbmcgb24gaXQg4oCUCkdyb3EncyBhdmFpbGFibGUtbW9kZWwgbGlzdCBoYXMgY2hhbmdlZCBhdCBsZWFzdCBvbmNlIGFscmVhZHkgaW4gdGhpcyBwcm9qZWN0LgoiIiIKaW1wb3J0IGpzb24KaW1wb3J0IG9zCmltcG9ydCB1cmxsaWIucmVxdWVzdAoKR1JPUV9FTkRQT0lOVCA9ICJodHRwczovL2FwaS5ncm9xLmNvbS9vcGVuYWkvdjEiCkdST1FfTU9ERUwgPSBvcy5lbnZpcm9uLmdldCgiR1JPUV9NT0RFTCIsICJvcGVuYWkvZ3B0LW9zcy0xMjBiIikKCl9TWVNURU1fUFJPTVBUID0gKAogICAgIllvdSBhcmUgYSB0ZWNobmljYWwgc2VudGltZW50IGNsYXNzaWZpZXIuIEJhc2UgeW91ciBqdWRnbWVudCBPTkxZIG9uICIKICAgICJwcmljZSBhY3Rpb24gYW5kIG1vbWVudHVtIGluZGljYXRvcnMgcHJvdmlkZWQgKFJTSSwgTUFDRCwgQm9sbGluZ2VyICIKICAgICJCYW5kcywgdm9sYXRpbGl0eSkuIERvIG5vdCByZWZlcmVuY2UgbWFya2V0IGNhcCwgZnVuZGFtZW50YWxzLCBvciBhbnkgIgogICAgImRhdGEgbm90IHByb3ZpZGVkLiBSZXR1cm4gSlNPTiBvbmx5IHdpdGggZXhhY3RseTogbGFiZWwgKGJ1bGxpc2gsICIKICAgICJiZWFyaXNoLCBvciBuZXV0cmFsKSwgc2NvcmUgKC0xIHRvIDEpLCBhbmQgcmVhc29uLiIKKQoKX1RFQ0hOSUNBTF9GSUVMRFMgPSAoCiAgICAic3ltYm9sIiwgImNsb3NlIiwgIm9wZW4iLCAiaGlnaCIsICJsb3ciLAogICAgInJzaSIsICJtYWNkIiwgIm1hY2Rfc2lnbmFsIiwgImJiX2xvd2VyIiwgImJiX21pZCIsICJiYl91cHBlciIsCiAgICAidm9sYXRpbGl0eSIsCikKCgpkZWYgX2J1aWxkX21lc3NhZ2VzKHNuYXBzaG90OiBkaWN0LCByZWZsZWN0aW9uX2NvbnRleHQ6IHN0ciB8IE5vbmUpIC0+IGxpc3RbZGljdF06CiAgICB0ZWNobmljYWxfc25hcHNob3QgPSB7azogc25hcHNob3Rba10gZm9yIGsgaW4gX1RFQ0hOSUNBTF9GSUVMRFMgaWYgayBpbiBzbmFwc2hvdH0KICAgIHVzZXJfcGFydHMgPSBbXQogICAgaWYgcmVmbGVjdGlvbl9jb250ZXh0OgogICAgICAgIHVzZXJfcGFydHMuYXBwZW5kKAogICAgICAgICAgICAiUHJpb3IgZXhlY3V0aW9uIHJlZmxlY3Rpb24gaXMgYWR2aXNvcnkgY29udGV4dCBvbmx5OyBkbyBub3QgIgogICAgICAgICAgICAib3ZlcnJpZGUgdGhlIGN1cnJlbnQgaW5kaWNhdG9yczpcbiIgKyByZWZsZWN0aW9uX2NvbnRleHQKICAgICAgICApCiAgICB1c2VyX3BhcnRzLmFwcGVuZCgiU25hcHNob3Q6ICIgKyBqc29uLmR1bXBzKHRlY2huaWNhbF9zbmFwc2hvdCwgc29ydF9rZXlzPVRydWUpKQogICAgcmV0dXJuIFsKICAgICAgICB7InJvbGUiOiAic3lzdGVtIiwgImNvbnRlbnQiOiBfU1lTVEVNX1BST01QVH0sCiAgICAgICAgeyJyb2xlIjogInVzZXIiLCAiY29udGVudCI6ICJcblxuIi5qb2luKHVzZXJfcGFydHMpfSwKICAgIF0KCgpkZWYgY2xhc3NpZnkoc25hcHNob3Q6IGRpY3QsIHJlZmxlY3Rpb25fY29udGV4dDogc3RyIHwgTm9uZSA9IE5vbmUsCiAgICAgICAgICAgICB0cmFuc3BvcnQ9Tm9uZSkgLT4gZGljdDoKICAgICIiIgogICAgdHJhbnNwb3J0OiBvcHRpb25hbCBjYWxsYWJsZShtZXNzYWdlczogbGlzdFtkaWN0XSkgLT4gc3RyLCB1c2VkIHRvIGluamVjdAogICAgYSBmYWtlIEhUVFAgbGF5ZXIgaW4gdGVzdHMgd2l0aG91dCBhIHJlYWwgR3JvcSBBUEkga2V5LiBQcm9kdWN0aW9uIGNvZGUKICAgIHBhdGggKHRyYW5zcG9ydD1Ob25lKSBjYWxscyB0aGUgcmVhbCBHcm9xIGNoYXQvY29tcGxldGlvbnMgZW5kcG9pbnQgYW5kCiAgICByZXF1aXJlcyBHUk9RX0FQSV9LRVkgdG8gYmUgc2V0IGluIHRoZSBlbnZpcm9ubWVudC4KICAgICIiIgogICAgbWVzc2FnZXMgPSBfYnVpbGRfbWVzc2FnZXMoc25hcHNob3QsIHJlZmxlY3Rpb25fY29udGV4dCkKCiAgICBpZiB0cmFuc3BvcnQgaXMgbm90IE5vbmU6CiAgICAgICAgcmF3X3RleHQgPSB0cmFuc3BvcnQobWVzc2FnZXMpCiAgICBlbHNlOgogICAgICAgIGFwaV9rZXkgPSBvcy5lbnZpcm9uLmdldCgiR1JPUV9BUElfS0VZIikKICAgICAgICBpZiBub3QgYXBpX2tleToKICAgICAgICAgICAgcmFpc2UgUnVudGltZUVycm9yKCJHUk9RX0FQSV9LRVkgZW52aXJvbm1lbnQgdmFyaWFibGUgaXMgbm90IHNldCIpCiAgICAgICAgcGF5bG9hZCA9IGpzb24uZHVtcHMoewogICAgICAgICAgICAibW9kZWwiOiBHUk9RX01PREVMLAogICAgICAgICAgICAibWVzc2FnZXMiOiBtZXNzYWdlcywKICAgICAgICAgICAgInRlbXBlcmF0dXJlIjogMC4wLAogICAgICAgICAgICAicmVzcG9uc2VfZm9ybWF0IjogewogICAgICAgICAgICAgICAgInR5cGUiOiAianNvbl9zY2hlbWEiLAogICAgICAgICAgICAgICAgImpzb25fc2NoZW1hIjogewogICAgICAgICAgICAgICAgICAgICJuYW1lIjogInNlbnRpbWVudCIsCiAgICAgICAgICAgICAgICAgICAgInN0cmljdCI6IFRydWUsCiAgICAgICAgICAgICAgICAgICAgInNjaGVtYSI6IHsKICAgICAgICAgICAgICAgICAgICAgICAgInR5cGUiOiAib2JqZWN0IiwKICAgICAgICAgICAgICAgICAgICAgICAgInByb3BlcnRpZXMiOiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAibGFiZWwiOiB7InR5cGUiOiAic3RyaW5nIiwgImVudW0iOiBbImJ1bGxpc2giLCAiYmVhcmlzaCIsICJuZXV0cmFsIl19LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgInNjb3JlIjogeyJ0eXBlIjogIm51bWJlciJ9LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgInJlYXNvbiI6IHsidHlwZSI6ICJzdHJpbmcifSwKICAgICAgICAgICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgICAgICAgICAgInJlcXVpcmVkIjogWyJsYWJlbCIsICJzY29yZSIsICJyZWFzb24iXSwKICAgICAgICAgICAgICAgICAgICAgICAgImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogRmFsc2UsCiAgICAgICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgIH0sCiAgICAgICAgfSkuZW5jb2RlKCJ1dGYtOCIpCiAgICAgICAgcmVxID0gdXJsbGliLnJlcXVlc3QuUmVxdWVzdCgKICAgICAgICAgICAgZiJ7R1JPUV9FTkRQT0lOVH0vY2hhdC9jb21wbGV0aW9ucyIsCiAgICAgICAgICAgIGRhdGE9cGF5bG9hZCwKICAgICAgICAgICAgaGVhZGVycz17CiAgICAgICAgICAgICAgICAiQ29udGVudC1UeXBlIjogImFwcGxpY2F0aW9uL2pzb24iLAogICAgICAgICAgICAgICAgIkF1dGhvcml6YXRpb24iOiBmIkJlYXJlciB7YXBpX2tleX0iLAogICAgICAgICAgICAgICAgIyBDbG91ZGZsYXJlIChpbiBmcm9udCBvZiBHcm9xJ3MgQVBJKSBibG9ja3MgdGhlIGRlZmF1bHQKICAgICAgICAgICAgICAgICMgUHl0aG9uIHVybGxpYiBVc2VyLUFnZW50ICgiUHl0aG9uLXVybGxpYi8zLngiKSBhcyBhIGJvdAogICAgICAgICAgICAgICAgIyBzaWduYXR1cmUgKGVycm9yIGNvZGUgMTAxMCkg4oCUIGNvbmZpcm1lZCAxIFNlcHQgMjAyNjogdGhlCiAgICAgICAgICAgICAgICAjIGV4YWN0IHNhbWUgcmVxdWVzdCBzdWNjZWVkZWQgdmlhIGN1cmwgKEhUVFAgMjAwKSBhbmQKICAgICAgICAgICAgICAgICMgZmFpbGVkIHZpYSBiYXJlIHVybGxpYiAoSFRUUCA0MDMpIHdpdGggbm8gb3RoZXIKICAgICAgICAgICAgICAgICMgZGlmZmVyZW5jZS4gVGhpcyBoZWFkZXIgaXMgdGhlIGZpeCwgbm90IGEgbG9naWMgY2hhbmdlLgogICAgICAgICAgICAgICAgIlVzZXItQWdlbnQiOiAiYWVnaXMtcXVhbnQtYW5hbHlzdC1jb3VuY2lsLzEuMCIsCiAgICAgICAgICAgIH0sCiAgICAgICAgKQogICAgICAgIHdpdGggdXJsbGliLnJlcXVlc3QudXJsb3BlbihyZXEsIHRpbWVvdXQ9NjApIGFzIHJlc3A6CiAgICAgICAgICAgIGJvZHkgPSBqc29uLmxvYWRzKHJlc3AucmVhZCgpLmRlY29kZSgidXRmLTgiKSkKICAgICAgICByYXdfdGV4dCA9IGJvZHlbImNob2ljZXMiXVswXVsibWVzc2FnZSJdWyJjb250ZW50Il0KCiAgICByZXN1bHQgPSBqc29uLmxvYWRzKHJhd190ZXh0KQogICAgcmVzdWx0WyJzY29yZSJdID0gbWF4KC0xLjAsIG1pbigxLjAsIGZsb2F0KHJlc3VsdFsic2NvcmUiXSkpKQogICAgaWYgcmVzdWx0WyJsYWJlbCJdIG5vdCBpbiB7ImJ1bGxpc2giLCAiYmVhcmlzaCIsICJuZXV0cmFsIn06CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmImludmFsaWQgc2VudGltZW50IGxhYmVsOiB7cmVzdWx0WydsYWJlbCddIXJ9IikKICAgIHJldHVybiByZXN1bHQK
+"""
+Groq adapter for the sentiment agent.
+
+Replaces the local Ollama adapter (adapters/ollama.py) as of 1 Sept 2026:
+Ollama's smallest workable local model (qwen2.5:3b, 2.1GiB) does not fit in
+Replit's free-tier RAM (1.5GiB total, ~293MiB free at test time). This is an
+explicit, deliberate departure from the original "offline-first, no external
+API" design principle (Layer 5 of the original plan) — a resource-driven
+tradeoff, not a design oversight. adapters/ollama.py is kept in the repo for
+reference / future local re-enablement on a machine with enough RAM.
+
+Same interface as ollama.classify(): same technical-fields-only prompt
+(no market_cap/volume leakage — verified by the same test that guarded the
+Ollama version), same JSON output contract, so agents/sentiment.py only
+needs a one-line import change to switch providers.
+
+Model: openai/gpt-oss-120b (Groq's replacement for the decommissioned
+llama-3.3-70b-versatile, chosen earlier in this project for the same task).
+Verify this model id is still valid in the Groq console before relying on it —
+Groq's available-model list has changed at least once already in this project.
+"""
+import json
+import os
+import urllib.request
+
+GROQ_ENDPOINT = "https://api.groq.com/openai/v1"
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
+
+_SYSTEM_PROMPT = (
+    "You are a technical sentiment classifier. Base your judgment ONLY on "
+    "price action and momentum indicators provided (RSI, MACD, Bollinger "
+    "Bands, volatility). Do not reference market cap, fundamentals, or any "
+    "data not provided. Return JSON only with exactly: label (bullish, "
+    "bearish, or neutral), score (-1 to 1), and reason."
+)
+
+_TECHNICAL_FIELDS = (
+    "symbol", "close", "open", "high", "low",
+    "rsi", "macd", "macd_signal", "bb_lower", "bb_mid", "bb_upper",
+    "volatility",
+)
+
+
+def _build_messages(snapshot: dict, reflection_context: str | None) -> list[dict]:
+    technical_snapshot = {k: snapshot[k] for k in _TECHNICAL_FIELDS if k in snapshot}
+    user_parts = []
+    if reflection_context:
+        user_parts.append(
+            "Prior execution reflection is advisory context only; do not "
+            "override the current indicators:\n" + reflection_context
+        )
+    user_parts.append("Snapshot: " + json.dumps(technical_snapshot, sort_keys=True))
+    return [
+        {"role": "system", "content": _SYSTEM_PROMPT},
+        {"role": "user", "content": "\n\n".join(user_parts)},
+    ]
+
+
+def classify(snapshot: dict, reflection_context: str | None = None,
+             transport=None) -> dict:
+    """
+    transport: optional callable(messages: list[dict]) -> str, used to inject
+    a fake HTTP layer in tests without a real Groq API key. Production code
+    path (transport=None) calls the real Groq chat/completions endpoint and
+    requires GROQ_API_KEY to be set in the environment.
+    """
+    messages = _build_messages(snapshot, reflection_context)
+
+    if transport is not None:
+        raw_text = transport(messages)
+    else:
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise RuntimeError("GROQ_API_KEY environment variable is not set")
+        payload = json.dumps({
+            "model": GROQ_MODEL,
+            "messages": messages,
+            "temperature": 0.0,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "sentiment",
+                    "strict": True,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "label": {"type": "string", "enum": ["bullish", "bearish", "neutral"]},
+                            "score": {"type": "number"},
+                            "reason": {"type": "string"},
+                        },
+                        "required": ["label", "score", "reason"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            f"{GROQ_ENDPOINT}/chat/completions",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                # Cloudflare (in front of Groq's API) blocks the default
+                # Python urllib User-Agent ("Python-urllib/3.x") as a bot
+                # signature (error code 1010) — confirmed 1 Sept 2026: the
+                # exact same request succeeded via curl (HTTP 200) and
+                # failed via bare urllib (HTTP 403) with no other
+                # difference. This header is the fix, not a logic change.
+                "User-Agent": "aegis-quant-analyst-council/1.0",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        raw_text = body["choices"][0]["message"]["content"]
+
+    result = json.loads(raw_text)
+    result["score"] = max(-1.0, min(1.0, float(result["score"])))
+    if result["label"] not in {"bullish", "bearish", "neutral"}:
+        raise ValueError(f"invalid sentiment label: {result['label']!r}")
+    return result

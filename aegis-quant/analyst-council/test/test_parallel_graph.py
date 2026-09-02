@@ -1,1 +1,68 @@
-aW1wb3J0IGpzb24KaW1wb3J0IG9zCmltcG9ydCBzeXMKaW1wb3J0IHVuaXR0ZXN0CgpzeXMucGF0aC5pbnNlcnQoMCwgb3MucGF0aC5qb2luKG9zLnBhdGguZGlybmFtZShfX2ZpbGVfXyksICIuLiIpKQoKZnJvbSBncmFwaCBpbXBvcnQgYnVpbGRfZ3JhcGggICMgbm9xYTogRTQwMgpmcm9tIGFkYXB0ZXJzIGltcG9ydCBtYXJrZXRfZGF0YSwgZ3JvcSBhcyBncm9xX2FkYXB0ZXIgICMgbm9xYTogRTQwMgppbXBvcnQgYWdlbnRzLnNlbnRpbWVudCBhcyBzZW50aW1lbnRfbW9kICAjIG5vcWE6IEU0MDIKCgpjbGFzcyBUZXN0UGFyYWxsZWxHcmFwaCh1bml0dGVzdC5UZXN0Q2FzZSk6CiAgICBkZWYgc2V0VXAoc2VsZik6CiAgICAgICAgc2VsZi5jYWxscyA9IFtdCgogICAgICAgIGRlZiBmYWtlX3RyYW5zcG9ydChtZXNzYWdlcyk6CiAgICAgICAgICAgIHNlbGYuY2FsbHMuYXBwZW5kKG1lc3NhZ2VzKQogICAgICAgICAgICByZXR1cm4ganNvbi5kdW1wcyh7ImxhYmVsIjogIm5ldXRyYWwiLCAic2NvcmUiOiAwLjAsICJyZWFzb24iOiAidGVzdCBzdHViIn0pCgogICAgICAgIHNlbGYuX29yaWdfY2xhc3NpZnkgPSBncm9xX2FkYXB0ZXIuY2xhc3NpZnkKICAgICAgICBzZWxmLl9vcmlnX3Byb3ZpZGVyID0gc2VudGltZW50X21vZC5zZW50aW1lbnRfcHJvdmlkZXIKCiAgICAgICAgZGVmIHBhdGNoZWRfY2xhc3NpZnkoc25hcHNob3QsIHJlZmxlY3Rpb25fY29udGV4dD1Ob25lLCB0cmFuc3BvcnQ9Tm9uZSk6CiAgICAgICAgICAgIHJldHVybiBzZWxmLl9vcmlnX2NsYXNzaWZ5KHNuYXBzaG90LCByZWZsZWN0aW9uX2NvbnRleHQ9cmVmbGVjdGlvbl9jb250ZXh0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHJhbnNwb3J0PWZha2VfdHJhbnNwb3J0KQoKICAgICAgICBncm9xX2FkYXB0ZXIuY2xhc3NpZnkgPSBwYXRjaGVkX2NsYXNzaWZ5CiAgICAgICAgc2VudGltZW50X21vZC5zZW50aW1lbnRfcHJvdmlkZXIgPSBncm9xX2FkYXB0ZXIKCiAgICBkZWYgdGVhckRvd24oc2VsZik6CiAgICAgICAgZ3JvcV9hZGFwdGVyLmNsYXNzaWZ5ID0gc2VsZi5fb3JpZ19jbGFzc2lmeQogICAgICAgIHNlbnRpbWVudF9tb2Quc2VudGltZW50X3Byb3ZpZGVyID0gc2VsZi5fb3JpZ19wcm92aWRlcgoKICAgIGRlZiB0ZXN0X2FsbF90aHJlZV9hZ2VudHNfcnVuX2FuZF9hZ2dyZWdhdGUoc2VsZik6CiAgICAgICAgc25hcHNob3QgPSBtYXJrZXRfZGF0YS5sb2FkX3NuYXBzaG90KHN5bWJvbD0iQlRDVVNEVCIsIGFzX29mPU5vbmUpCiAgICAgICAgZ3JhcGggPSBidWlsZF9ncmFwaCgpCiAgICAgICAgc3RhdGUgPSBncmFwaC5pbnZva2UoewogICAgICAgICAgICAic3ltYm9sIjogIkJUQ1VTRFQiLAogICAgICAgICAgICAiYXNfb2YiOiBzbmFwc2hvdFsiY2xvc2VfdGltZSJdLAogICAgICAgICAgICAic25hcHNob3QiOiBzbmFwc2hvdCwKICAgICAgICB9KQogICAgICAgIHNlbGYuYXNzZXJ0SW4oImZ1bmRhbWVudGFscyIsIHN0YXRlKQogICAgICAgIHNlbGYuYXNzZXJ0SW4oInNlbnRpbWVudCIsIHN0YXRlKQogICAgICAgIHNlbGYuYXNzZXJ0SW4oInRlY2huaWNhbHMiLCBzdGF0ZSkKICAgICAgICBzZWxmLmFzc2VydEluKCJjb3VuY2lsX2RlY2lzaW9uIiwgc3RhdGUpCiAgICAgICAgc2VsZi5hc3NlcnRJbihzdGF0ZVsiY291bmNpbF9kZWNpc2lvbiJdLCAoIkxPTkciLCAiU0hPUlQiLCBOb25lKSkKCiAgICBkZWYgdGVzdF9zZW50aW1lbnRfcHJvbXB0X2V4Y2x1ZGVzX2Z1bmRhbWVudGFsc19maWVsZHMoc2VsZik6CiAgICAgICAgc25hcHNob3QgPSBtYXJrZXRfZGF0YS5sb2FkX3NuYXBzaG90KHN5bWJvbD0iQlRDVVNEVCIsIGFzX29mPU5vbmUpCiAgICAgICAgZ3JhcGggPSBidWlsZF9ncmFwaCgpCiAgICAgICAgZ3JhcGguaW52b2tlKHsKICAgICAgICAgICAgInN5bWJvbCI6ICJCVENVU0RUIiwKICAgICAgICAgICAgImFzX29mIjogc25hcHNob3RbImNsb3NlX3RpbWUiXSwKICAgICAgICAgICAgInNuYXBzaG90Ijogc25hcHNob3QsCiAgICAgICAgfSkKICAgICAgICBzZWxmLmFzc2VydEVxdWFsKGxlbihzZWxmLmNhbGxzKSwgMSkKICAgICAgICBtZXNzYWdlcyA9IHNlbGYuY2FsbHNbMF0KICAgICAgICB1c2VyX2NvbnRlbnQgPSBtZXNzYWdlc1stMV1bImNvbnRlbnQiXQogICAgICAgIHNuYXBzaG90X3BhcnQgPSB1c2VyX2NvbnRlbnQuc3BsaXQoIlNuYXBzaG90OiIpWzFdCiAgICAgICAgc2VsZi5hc3NlcnROb3RJbigibWFya2V0X2NhcCIsIHNuYXBzaG90X3BhcnQpCiAgICAgICAgc2VsZi5hc3NlcnROb3RJbigidm9sdW1lIiwgc25hcHNob3RfcGFydCkKICAgICAgICBzZWxmLmFzc2VydEluKCJyc2kiLCBzbmFwc2hvdF9wYXJ0KQogICAgICAgIHNlbGYuYXNzZXJ0SW4oIm1hY2QiLCBzbmFwc2hvdF9wYXJ0KQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICB1bml0dGVzdC5tYWluKCkK
+import json
+import os
+import sys
+import unittest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from graph import build_graph  # noqa: E402
+from adapters import market_data, groq as groq_adapter  # noqa: E402
+import agents.sentiment as sentiment_mod  # noqa: E402
+
+
+class TestParallelGraph(unittest.TestCase):
+    def setUp(self):
+        self.calls = []
+
+        def fake_transport(messages):
+            self.calls.append(messages)
+            return json.dumps({"label": "neutral", "score": 0.0, "reason": "test stub"})
+
+        self._orig_classify = groq_adapter.classify
+        self._orig_provider = sentiment_mod.sentiment_provider
+
+        def patched_classify(snapshot, reflection_context=None, transport=None):
+            return self._orig_classify(snapshot, reflection_context=reflection_context,
+                                        transport=fake_transport)
+
+        groq_adapter.classify = patched_classify
+        sentiment_mod.sentiment_provider = groq_adapter
+
+    def tearDown(self):
+        groq_adapter.classify = self._orig_classify
+        sentiment_mod.sentiment_provider = self._orig_provider
+
+    def test_all_three_agents_run_and_aggregate(self):
+        snapshot = market_data.load_snapshot(symbol="BTCUSDT", as_of=None)
+        graph = build_graph()
+        state = graph.invoke({
+            "symbol": "BTCUSDT",
+            "as_of": snapshot["close_time"],
+            "snapshot": snapshot,
+        })
+        self.assertIn("fundamentals", state)
+        self.assertIn("sentiment", state)
+        self.assertIn("technicals", state)
+        self.assertIn("council_decision", state)
+        self.assertIn(state["council_decision"], ("LONG", "SHORT", None))
+
+    def test_sentiment_prompt_excludes_fundamentals_fields(self):
+        snapshot = market_data.load_snapshot(symbol="BTCUSDT", as_of=None)
+        graph = build_graph()
+        graph.invoke({
+            "symbol": "BTCUSDT",
+            "as_of": snapshot["close_time"],
+            "snapshot": snapshot,
+        })
+        self.assertEqual(len(self.calls), 1)
+        messages = self.calls[0]
+        user_content = messages[-1]["content"]
+        snapshot_part = user_content.split("Snapshot:")[1]
+        self.assertNotIn("market_cap", snapshot_part)
+        self.assertNotIn("volume", snapshot_part)
+        self.assertIn("rsi", snapshot_part)
+        self.assertIn("macd", snapshot_part)
+
+
+if __name__ == "__main__":
+    unittest.main()

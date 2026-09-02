@@ -1,1 +1,25 @@
-IyBOT1RFOiAiYW5hbHlzdC1jb3VuY2lsIiAodGhpcyBsYXllcidzIG93biBkaXJlY3RvcnkgbmFtZSkgY29udGFpbnMgYQojIGh5cGhlbiwgd2hpY2ggaXMgbm90IGEgdmFsaWQgUHl0aG9uIHBhY2thZ2UgaWRlbnRpZmllciDigJQgaXQgY2FuIG5ldmVyIGJlCiMgcGFydCBvZiBhIGRvdHRlZCBpbXBvcnQgcGF0aCAoYGZyb20gLi5hZGFwdGVycyBpbXBvcnQgeGAgaXMgaW1wb3NzaWJsZSkuCiMgRXZlcnkgbGF5ZXIgaXMgdGhlcmVmb3JlIHJ1biB3aXRoIGl0cyBPV04gZm9sZGVyIGFzIHRoZSBzeXMucGF0aCByb290CiMgKG1haW4ucHkgZG9lcyB0aGlzIG9uY2UsIGF0IHByb2Nlc3Mgc3RhcnQpLCBhbmQgaW50ZXJuYWwgbW9kdWxlcwojIChhZ2VudHMsIGFkYXB0ZXJzLCBwZXJzaXN0ZW5jZSDigJQgYWxsIHZhbGlkIGlkZW50aWZpZXJzKSBhcmUgaW1wb3J0ZWQgYXMKIyBwbGFpbiB0b3AtbGV2ZWwgYWJzb2x1dGUgaW1wb3J0cywgZXhhY3RseSBhcyBiZWxvdy4KIyBTd2l0Y2hlZCBmcm9tIE9sbGFtYSB0byBHcm9xIG9uIDEgU2VwdCAyMDI2IOKAlCBzZWUgYWRhcHRlcnMvZ3JvcS5weQojIGRvY3N0cmluZyBmb3Igd2h5IChSZXBsaXQgZnJlZS10aWVyIFJBTSB0b28gc21hbGwgZm9yIGFueSB3b3JrYWJsZSBsb2NhbAojIG1vZGVsKS4gYWRhcHRlcnMvb2xsYW1hLnB5IGlzIGtlcHQgZm9yIGZ1dHVyZSBsb2NhbCByZS1lbmFibGVtZW50Lgpmcm9tIGFkYXB0ZXJzIGltcG9ydCBncm9xIGFzIHNlbnRpbWVudF9wcm92aWRlcgoKCmRlZiBzZW50aW1lbnRfbm9kZShzdGF0ZTogZGljdCkgLT4gZGljdDoKICAgIHNuYXBzaG90ID0gc3RhdGVbInNuYXBzaG90Il0KICAgIHJlZmxlY3Rpb25fY29udGV4dCA9IHN0YXRlLmdldCgicmVmbGVjdGlvbl9jb250ZXh0IikKICAgIHRyeToKICAgICAgICByZXN1bHQgPSBzZW50aW1lbnRfcHJvdmlkZXIuY2xhc3NpZnkoc25hcHNob3QsIHJlZmxlY3Rpb25fY29udGV4dD1yZWZsZWN0aW9uX2NvbnRleHQpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGV4YzoKICAgICAgICByZXN1bHQgPSB7CiAgICAgICAgICAgICJsYWJlbCI6ICJuZXV0cmFsIiwKICAgICAgICAgICAgInNjb3JlIjogMC4wLAogICAgICAgICAgICAicmVhc29uIjogZiJzZW50aW1lbnQgdW5hdmFpbGFibGU6IHt0eXBlKGV4YykuX19uYW1lX199OiB7ZXhjfSIsCiAgICAgICAgfQogICAgcmV0dXJuIHsic2VudGltZW50IjogcmVzdWx0fQo=
+# NOTE: "analyst-council" (this layer's own directory name) contains a
+# hyphen, which is not a valid Python package identifier — it can never be
+# part of a dotted import path (`from ..adapters import x` is impossible).
+# Every layer is therefore run with its OWN folder as the sys.path root
+# (main.py does this once, at process start), and internal modules
+# (agents, adapters, persistence — all valid identifiers) are imported as
+# plain top-level absolute imports, exactly as below.
+# Switched from Ollama to Groq on 1 Sept 2026 — see adapters/groq.py
+# docstring for why (Replit free-tier RAM too small for any workable local
+# model). adapters/ollama.py is kept for future local re-enablement.
+from adapters import groq as sentiment_provider
+
+
+def sentiment_node(state: dict) -> dict:
+    snapshot = state["snapshot"]
+    reflection_context = state.get("reflection_context")
+    try:
+        result = sentiment_provider.classify(snapshot, reflection_context=reflection_context)
+    except Exception as exc:
+        result = {
+            "label": "neutral",
+            "score": 0.0,
+            "reason": f"sentiment unavailable: {type(exc).__name__}: {exc}",
+        }
+    return {"sentiment": result}
