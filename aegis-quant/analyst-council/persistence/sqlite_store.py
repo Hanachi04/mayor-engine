@@ -1,1 +1,102 @@
-aW1wb3J0IGpzb24KaW1wb3J0IHNxbGl0ZTMKZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUsIHRpbWV6b25lCgpTQ0hFTUEgPSAiIiIKQ1JFQVRFIFRBQkxFIElGIE5PVCBFWElTVFMgYW5hbHlzdF9jb3VuY2lsX2RlY2lzaW9ucyAoCiAgICBpZCBJTlRFR0VSIFBSSU1BUlkgS0VZLAogICAgc3ltYm9sIFRFWFQgTk9UIE5VTEwsCiAgICBhc19vZiBJTlRFR0VSIE5PVCBOVUxMLAogICAgZnVuZGFtZW50YWxzX2pzb24gVEVYVCBOT1QgTlVMTCwKICAgIHNlbnRpbWVudF9qc29uIFRFWFQgTk9UIE5VTEwsCiAgICB0ZWNobmljYWxzX2pzb24gVEVYVCBOT1QgTlVMTCwKICAgIGNvdW5jaWxfZGVjaXNpb24gVEVYVCwKICAgIHJpc2tfcGN0IFJFQUwsCiAgICBjcmVhdGVkX2F0IFRFWFQgTk9UIE5VTEwKKTsKIiIiCgoKZGVmIGVuc3VyZV9zY2hlbWEoY29ubjogc3FsaXRlMy5Db25uZWN0aW9uKSAtPiBOb25lOgogICAgY29ubi5leGVjdXRlKFNDSEVNQSkKICAgIGNvbm4uY29tbWl0KCkKCgpkZWYgbG9nX2RlY2lzaW9uKGNvbm46IHNxbGl0ZTMuQ29ubmVjdGlvbiwgc3RhdGU6IGRpY3QpIC0+IGludDoKICAgIGVuc3VyZV9zY2hlbWEoY29ubikKICAgIGN1ciA9IGNvbm4uZXhlY3V0ZSgKICAgICAgICAiIiIKICAgICAgICBJTlNFUlQgSU5UTyBhbmFseXN0X2NvdW5jaWxfZGVjaXNpb25zCiAgICAgICAgICAgIChzeW1ib2wsIGFzX29mLCBmdW5kYW1lbnRhbHNfanNvbiwgc2VudGltZW50X2pzb24sIHRlY2huaWNhbHNfanNvbiwKICAgICAgICAgICAgIGNvdW5jaWxfZGVjaXNpb24sIHJpc2tfcGN0LCBjcmVhdGVkX2F0KQogICAgICAgIFZBTFVFUyAoPywgPywgPywgPywgPywgPywgPywgPykKICAgICAgICAiIiIsCiAgICAgICAgKAogICAgICAgICAgICBzdGF0ZVsic3ltYm9sIl0sCiAgICAgICAgICAgIHN0YXRlWyJhc19vZiJdLAogICAgICAgICAgICBqc29uLmR1bXBzKHN0YXRlWyJmdW5kYW1lbnRhbHMiXSksCiAgICAgICAgICAgIGpzb24uZHVtcHMoc3RhdGVbInNlbnRpbWVudCJdKSwKICAgICAgICAgICAganNvbi5kdW1wcyhzdGF0ZVsidGVjaG5pY2FscyJdKSwKICAgICAgICAgICAgc3RhdGUuZ2V0KCJjb3VuY2lsX2RlY2lzaW9uIiksCiAgICAgICAgICAgIHN0YXRlLmdldCgicmlza19wY3QiKSwKICAgICAgICAgICAgZGF0ZXRpbWUubm93KHRpbWV6b25lLnV0YykuaXNvZm9ybWF0KCksCiAgICAgICAgKSwKICAgICkKICAgIGNvbm4uY29tbWl0KCkKICAgIHJldHVybiBjdXIubGFzdHJvd2lkCgoKZGVmIGxvYWRfbGF0ZXN0KGNvbm46IHNxbGl0ZTMuQ29ubmVjdGlvbiwgc3ltYm9sOiBzdHIpIC0+IGRpY3QgfCBOb25lOgogICAgZW5zdXJlX3NjaGVtYShjb25uKQogICAgcm93ID0gY29ubi5leGVjdXRlKAogICAgICAgICIiIgogICAgICAgIFNFTEVDVCBzeW1ib2wsIGFzX29mLCBmdW5kYW1lbnRhbHNfanNvbiwgc2VudGltZW50X2pzb24sIHRlY2huaWNhbHNfanNvbiwKICAgICAgICAgICAgICAgY291bmNpbF9kZWNpc2lvbiwgcmlza19wY3QKICAgICAgICBGUk9NIGFuYWx5c3RfY291bmNpbF9kZWNpc2lvbnMKICAgICAgICBXSEVSRSBzeW1ib2wgPSA/CiAgICAgICAgT1JERVIgQlkgaWQgREVTQyBMSU1JVCAxCiAgICAgICAgIiIiLAogICAgICAgIChzeW1ib2wsKSwKICAgICkuZmV0Y2hvbmUoKQogICAgaWYgcm93IGlzIE5vbmU6CiAgICAgICAgcmV0dXJuIE5vbmUKICAgIHJldHVybiBfcm93X3RvX2RpY3Qocm93KQoKCmRlZiBsb2FkX2J5X2FzX29mKGNvbm46IHNxbGl0ZTMuQ29ubmVjdGlvbiwgc3ltYm9sOiBzdHIsIGFzX29mOiBpbnQpIC0+IGRpY3QgfCBOb25lOgogICAgZW5zdXJlX3NjaGVtYShjb25uKQogICAgcm93ID0gY29ubi5leGVjdXRlKAogICAgICAgICIiIgogICAgICAgIFNFTEVDVCBzeW1ib2wsIGFzX29mLCBmdW5kYW1lbnRhbHNfanNvbiwgc2VudGltZW50X2pzb24sIHRlY2huaWNhbHNfanNvbiwKICAgICAgICAgICAgICAgY291bmNpbF9kZWNpc2lvbiwgcmlza19wY3QKICAgICAgICBGUk9NIGFuYWx5c3RfY291bmNpbF9kZWNpc2lvbnMKICAgICAgICBXSEVSRSBzeW1ib2wgPSA/IEFORCBhc19vZiA9ID8KICAgICAgICAiIiIsCiAgICAgICAgKHN5bWJvbCwgYXNfb2YpLAogICAgKS5mZXRjaG9uZSgpCiAgICBpZiByb3cgaXMgTm9uZToKICAgICAgICByZXR1cm4gTm9uZQogICAgcmV0dXJuIF9yb3dfdG9fZGljdChyb3cpCgoKZGVmIF9yb3dfdG9fZGljdChyb3cpIC0+IGRpY3Q6CiAgICBzeW1ib2wsIGFzX29mLCBmdW5kYW1lbnRhbHNfanNvbiwgc2VudGltZW50X2pzb24sIHRlY2huaWNhbHNfanNvbiwgZGVjaXNpb24sIHJpc2tfcGN0ID0gcm93CiAgICByZXR1cm4gewogICAgICAgICJzeW1ib2wiOiBzeW1ib2wsCiAgICAgICAgImFzX29mIjogYXNfb2YsCiAgICAgICAgImZ1bmRhbWVudGFscyI6IGpzb24ubG9hZHMoZnVuZGFtZW50YWxzX2pzb24pLAogICAgICAgICJzZW50aW1lbnQiOiBqc29uLmxvYWRzKHNlbnRpbWVudF9qc29uKSwKICAgICAgICAidGVjaG5pY2FscyI6IGpzb24ubG9hZHModGVjaG5pY2Fsc19qc29uKSwKICAgICAgICAiY291bmNpbF9kZWNpc2lvbiI6IGRlY2lzaW9uLAogICAgICAgICJyaXNrX3BjdCI6IHJpc2tfcGN0LAogICAgfQo=
+import json
+import sqlite3
+from datetime import datetime, timezone
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS analyst_council_decisions (
+    id INTEGER PRIMARY KEY,
+    symbol TEXT NOT NULL,
+    as_of INTEGER NOT NULL,
+    snapshot_json TEXT NOT NULL,
+    fundamentals_json TEXT NOT NULL,
+    sentiment_json TEXT NOT NULL,
+    technicals_json TEXT NOT NULL,
+    council_decision TEXT,
+    risk_pct REAL,
+    created_at TEXT NOT NULL
+);
+"""
+
+
+def ensure_schema(conn: sqlite3.Connection) -> None:
+    conn.execute(SCHEMA)
+    # Backward-compatible migration: earlier committed rows (this project's
+    # very first Layer-1 test rows) predate snapshot_json. Add the column if
+    # an older table already exists without it, instead of assuming a clean
+    # database.
+    existing_cols = {row[1] for row in conn.execute("PRAGMA table_info(analyst_council_decisions)")}
+    if "snapshot_json" not in existing_cols:
+        conn.execute("ALTER TABLE analyst_council_decisions ADD COLUMN snapshot_json TEXT")
+    conn.commit()
+
+
+def log_decision(conn: sqlite3.Connection, state: dict) -> int:
+    ensure_schema(conn)
+    cur = conn.execute(
+        """
+        INSERT INTO analyst_council_decisions
+            (symbol, as_of, snapshot_json, fundamentals_json, sentiment_json, technicals_json,
+             council_decision, risk_pct, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            state["symbol"],
+            state["as_of"],
+            json.dumps(state["snapshot"]),
+            json.dumps(state["fundamentals"]),
+            json.dumps(state["sentiment"]),
+            json.dumps(state["technicals"]),
+            state.get("council_decision"),
+            state.get("risk_pct"),
+            datetime.now(timezone.utc).isoformat(),
+        ),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def load_latest(conn: sqlite3.Connection, symbol: str) -> dict | None:
+    ensure_schema(conn)
+    row = conn.execute(
+        """
+        SELECT symbol, as_of, snapshot_json, fundamentals_json, sentiment_json, technicals_json,
+               council_decision, risk_pct
+        FROM analyst_council_decisions
+        WHERE symbol = ?
+        ORDER BY id DESC LIMIT 1
+        """,
+        (symbol,),
+    ).fetchone()
+    if row is None:
+        return None
+    return _row_to_dict(row)
+
+
+def load_by_as_of(conn: sqlite3.Connection, symbol: str, as_of: int) -> dict | None:
+    ensure_schema(conn)
+    row = conn.execute(
+        """
+        SELECT symbol, as_of, snapshot_json, fundamentals_json, sentiment_json, technicals_json,
+               council_decision, risk_pct
+        FROM analyst_council_decisions
+        WHERE symbol = ? AND as_of = ?
+        """,
+        (symbol, as_of),
+    ).fetchone()
+    if row is None:
+        return None
+    return _row_to_dict(row)
+
+
+def _row_to_dict(row) -> dict:
+    symbol, as_of, snapshot_json, fundamentals_json, sentiment_json, technicals_json, decision, risk_pct = row
+    return {
+        "symbol": symbol,
+        "as_of": as_of,
+        "snapshot": json.loads(snapshot_json) if snapshot_json else None,
+        "fundamentals": json.loads(fundamentals_json),
+        "sentiment": json.loads(sentiment_json),
+        "technicals": json.loads(technicals_json),
+        "council_decision": decision,
+        "risk_pct": risk_pct,
+    }
