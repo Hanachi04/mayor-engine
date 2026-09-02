@@ -1,1 +1,0 @@
-aegis-quant/analyst-council/adapters/__init__.py
