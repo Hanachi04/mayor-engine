@@ -1,0 +1,14 @@
+{
+  "provider": "Google Gemini API",
+  "model": "gemini-3.6-flash",
+  "symbol": "BTCUSDT",
+  "as_of": 1785531599999,
+  "sentiment": {
+    "label": "bearish",
+    "score": -0.45,
+    "reason": "Negative MACD momentum and price below the Bollinger middle band indicate a short-term bearish trend, despite an oversold RSI."
+  },
+  "decision": "SHORT",
+  "sqlite_row_id": 31,
+  "profitability_evaluated": false
+}

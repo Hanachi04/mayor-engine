@@ -1,0 +1,77 @@
+name: Verify Aegis Quant Layers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install langgraph
+
+      - name: Ensure test candle data exists
+        run: |
+          mkdir -p aegis-quant/data
+          if [ ! -f aegis-quant/data/BTCUSDT_1h.json ]; then
+            python3 -c "
+          import json, random
+          random.seed(42)
+          candles = []
+          price = 70000.0
+          t = 1700000000000
+          for i in range(60):
+              open_p = price
+              change = random.uniform(-0.01, 0.01)
+              close_p = open_p * (1 + change)
+              high_p = max(open_p, close_p) * (1 + random.uniform(0, 0.003))
+              low_p = min(open_p, close_p) * (1 - random.uniform(0, 0.003))
+              candles.append({
+                  'open_time': t, 'close_time': t + 3599999,
+                  'open': open_p, 'high': high_p, 'low': low_p, 'close': close_p,
+                  'volume': random.uniform(1000, 3000),
+              })
+              price = close_p
+              t += 3600000
+          with open('aegis-quant/data/BTCUSDT_1h.json', 'w') as f:
+              json.dump(candles, f)
+          print('Generated synthetic test candles (no real data file found in repo)')
+          "
+          else
+            echo "Using existing aegis-quant/data/BTCUSDT_1h.json"
+          fi
+
+      - name: Layer 1 - Analyst Council
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python3 aegis-quant/analyst-council/main.py
+
+      - name: Layer 2 - Debate Chamber
+        run: python3 aegis-quant/debate-chamber/main.py
+
+      - name: Layer 3 - DRL Sizing
+        run: python3 aegis-quant/drl-sizing/main.py
+
+      - name: Test - Analyst Council
+        run: python3 aegis-quant/analyst-council/test/test_parallel_graph.py -v
+
+      - name: Test - Debate Chamber
+        run: python3 aegis-quant/debate-chamber/test/test_debate_chamber.py -v
+
+      - name: Test - Direction Invariance
+        run: python3 aegis-quant/drl-sizing/test/test_direction_invariance.py -v
+
+      - name: Test - Reward
+        run: python3 aegis-quant/drl-sizing/test/test_reward.py -v
+
+      - name: Test - Sizing
+        run: python3 aegis-quant/drl-sizing/test/test_sizing.py -v
+
+      - name: Test - Execution Timing
+        run: python3 aegis-quant/drl-sizing/test/test_execution_timing.py -v
