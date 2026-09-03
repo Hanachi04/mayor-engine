@@ -1,1 +1,66 @@
-IiIiClRlY2huaWNhbHMgYWdlbnQuIEJ1aWxkcyBpdHMgdmlldyBkaXJlY3RseSBmcm9tIHRoZSByYXcgaW5kaWNhdG9ycwooUlNJLCBNQUNEIHZzIHNpZ25hbCwgY2xvc2UgdnMgQm9sbGluZ2VyIG1pZCkgcmF0aGVyIHRoYW4gYW55IHByZS1zdW1tYXJpemVkCmZpZWxkIOKAlCB0aGlzIG1pcnJvcnMgdGhlIGZpeCBsYXRlciByZXF1aXJlZCBpbiB0aGUgZGViYXRlLWNoYW1iZXIgbGF5ZXIKKGJ1bGwvYmVhciBhZ2VudHMgd2VyZSBmb3VuZCB0byByZWx5IG9uIGEgbGF6eSAidmlldyIgc3VtbWFyeSBpbnN0ZWFkIG9mCnRoZSBpbmRpY2F0b3JzIHRoZW1zZWx2ZXM7IHRoaXMgYWdlbnQgYXZvaWRzIHRoYXQgbWlzdGFrZSBmcm9tIHRoZSBzdGFydCkuCiIiIgoKCmRlZiB0ZWNobmljYWxzX25vZGUoc3RhdGU6IGRpY3QpIC0+IGRpY3Q6CiAgICBzbmFwc2hvdCA9IHN0YXRlWyJzbmFwc2hvdCJdCiAgICByc2kgPSBzbmFwc2hvdFsicnNpIl0KICAgIG1hY2QgPSBzbmFwc2hvdFsibWFjZCJdCiAgICBtYWNkX3NpZ25hbCA9IHNuYXBzaG90WyJtYWNkX3NpZ25hbCJdCiAgICBjbG9zZSA9IHNuYXBzaG90WyJjbG9zZSJdCiAgICBiYl9taWQgPSBzbmFwc2hvdFsiYmJfbWlkIl0KCiAgICBidWxsaXNoX3ZvdGVzID0gMAogICAgYmVhcmlzaF92b3RlcyA9IDAKICAgIHJlYXNvbnMgPSBbXQoKICAgIGlmIHJzaSA+IDcwOgogICAgICAgIGJlYXJpc2hfdm90ZXMgKz0gMQogICAgICAgIHJlYXNvbnMuYXBwZW5kKGYiUlNJPXtyc2k6LjJmfSBvdmVyYm91Z2h0ICg+NzApIikKICAgIGVsaWYgcnNpIDwgMzA6CiAgICAgICAgYnVsbGlzaF92b3RlcyArPSAxCiAgICAgICAgcmVhc29ucy5hcHBlbmQoZiJSU0k9e3JzaTouMmZ9IG92ZXJzb2xkICg8MzApIikKCiAgICBpZiBtYWNkID4gbWFjZF9zaWduYWw6CiAgICAgICAgYnVsbGlzaF92b3RlcyArPSAxCiAgICAgICAgcmVhc29ucy5hcHBlbmQoIk1BQ0QgYWJvdmUgc2lnbmFsOiBwb3NpdGl2ZSBtb21lbnR1bSIpCiAgICBlbGlmIG1hY2QgPCBtYWNkX3NpZ25hbDoKICAgICAgICBiZWFyaXNoX3ZvdGVzICs9IDEKICAgICAgICByZWFzb25zLmFwcGVuZCgiTUFDRCBiZWxvdyBzaWduYWw6IG5lZ2F0aXZlIG1vbWVudHVtIikKCiAgICBpZiBjbG9zZSA+IGJiX21pZDoKICAgICAgICBidWxsaXNoX3ZvdGVzICs9IDEKICAgICAgICByZWFzb25zLmFwcGVuZCgiY2xvc2UgYWJvdmUgQm9sbGluZ2VyIG1pZHBvaW50IikKICAgIGVsaWYgY2xvc2UgPCBiYl9taWQ6CiAgICAgICAgYmVhcmlzaF92b3RlcyArPSAxCiAgICAgICAgcmVhc29ucy5hcHBlbmQoImNsb3NlIGJlbG93IEJvbGxpbmdlciBtaWRwb2ludCIpCgogICAgaWYgYnVsbGlzaF92b3RlcyA+IGJlYXJpc2hfdm90ZXM6CiAgICAgICAgdmlldyA9ICJidWxsaXNoIgogICAgZWxpZiBiZWFyaXNoX3ZvdGVzID4gYnVsbGlzaF92b3RlczoKICAgICAgICB2aWV3ID0gImJlYXJpc2giCiAgICBlbHNlOgogICAgICAgIHZpZXcgPSAibmV1dHJhbCIKCiAgICB0b3RhbF92b3RlcyA9IGJ1bGxpc2hfdm90ZXMgKyBiZWFyaXNoX3ZvdGVzCiAgICBzY29yZSA9IDAuMCBpZiB0b3RhbF92b3RlcyA9PSAwIGVsc2UgKGJ1bGxpc2hfdm90ZXMgLSBiZWFyaXNoX3ZvdGVzKSAvIHRvdGFsX3ZvdGVzCgogICAgcmV0dXJuIHsKICAgICAgICAidGVjaG5pY2FscyI6IHsKICAgICAgICAgICAgInZpZXciOiB2aWV3LAogICAgICAgICAgICAic2NvcmUiOiBzY29yZSwKICAgICAgICAgICAgInJlYXNvbiI6ICI7ICIuam9pbihyZWFzb25zKSBpZiByZWFzb25zIGVsc2UgIm5vIHNpZ25hbCBmcm9tIGF2YWlsYWJsZSBpbmRpY2F0b3JzIiwKICAgICAgICAgICAgImluZGljYXRvcnMiOiB7CiAgICAgICAgICAgICAgICAicnNpIjogcnNpLAogICAgICAgICAgICAgICAgIm1hY2QiOiBtYWNkLAogICAgICAgICAgICAgICAgIm1hY2Rfc2lnbmFsIjogbWFjZF9zaWduYWwsCiAgICAgICAgICAgICAgICAiYmJfbWlkIjogYmJfbWlkLAogICAgICAgICAgICAgICAgImJiX3VwcGVyIjogc25hcHNob3RbImJiX3VwcGVyIl0sCiAgICAgICAgICAgICAgICAiYmJfbG93ZXIiOiBzbmFwc2hvdFsiYmJfbG93ZXIiXSwKICAgICAgICAgICAgICAgICJ2b2xhdGlsaXR5Ijogc25hcHNob3RbInZvbGF0aWxpdHkiXSwKICAgICAgICAgICAgfSwKICAgICAgICB9CiAgICB9Cg==
+"""
+Technicals agent. Builds its view directly from the raw indicators
+(RSI, MACD vs signal, close vs Bollinger mid) rather than any pre-summarized
+data from market_data. Receives the full snapshot and computes its own signals.
+
+View: {rsi_signal, macd_signal, bollinger_signal}
+where each signal is one of: "bullish", "bearish", "neutral".
+
+Logic:
+  - RSI: < 30 = oversold (bullish), > 70 = overbought (bearish), else neutral.
+  - MACD: macd > signal = bullish, macd < signal = bearish, else neutral.
+  - Bollinger: close > bb_upper = overbought (bearish), close < bb_lower = oversold (bullish),
+              else neutral.
+
+Each signal is independent; no voting or aggregation happens at this layer.
+The council layer (graph.py) handles aggregation via LangGraph.
+"""
+
+
+def technicals_node(state: dict) -> dict:
+    """Build technicals view from snapshot."""
+    snapshot = state["snapshot"]
+    
+    required_fields = ["rsi", "macd", "macd_signal", "close", "bb_lower", "bb_mid", "bb_upper"]
+    missing = [f for f in required_fields if f not in snapshot]
+    if missing:
+        raise ValueError(f"snapshot missing required fields: {missing}")
+    
+    rsi = snapshot["rsi"]
+    macd = snapshot["macd"]
+    macd_signal = snapshot["macd_signal"]
+    close = snapshot["close"]
+    bb_lower = snapshot["bb_lower"]
+    bb_upper = snapshot["bb_upper"]
+    
+    # RSI signal.
+    if rsi < 30:
+        rsi_signal = "bullish"
+    elif rsi > 70:
+        rsi_signal = "bearish"
+    else:
+        rsi_signal = "neutral"
+    
+    # MACD signal.
+    if macd > macd_signal:
+        macd_signal_val = "bullish"
+    elif macd < macd_signal:
+        macd_signal_val = "bearish"
+    else:
+        macd_signal_val = "neutral"
+    
+    # Bollinger signal.
+    if close > bb_upper:
+        bollinger_signal = "bearish"
+    elif close < bb_lower:
+        bollinger_signal = "bullish"
+    else:
+        bollinger_signal = "neutral"
+    
+    return {
+        "technicals": {
+            "rsi_signal": rsi_signal,
+            "macd_signal": macd_signal_val,
+            "bollinger_signal": bollinger_signal,
+        }
+    }

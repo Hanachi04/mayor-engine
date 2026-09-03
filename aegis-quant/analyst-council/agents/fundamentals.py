@@ -1,1 +1,36 @@
-IiIiCkZ1bmRhbWVudGFscyBhZ2VudC4gTm8gZXh0ZXJuYWwgQVBJIGNhbGwg4oCUIHJlYWRzIHZvbHVtZS9tYXJrZXRfY2FwIGZyb20gdGhlCmxvY2FsIHNuYXBzaG90IG9ubHkuIE5ldmVyIGZhYnJpY2F0ZXMgYSB2YWx1ZSBmb3IgbWlzc2luZyBmaWVsZHMgKG1hcmtldF9jYXAKaXMgbm90IGF2YWlsYWJsZSBmcm9tIGxvY2FsIE9ITENWIGRhdGEgYnkgZGVzaWduKS4KIiIiCgoKZGVmIGZ1bmRhbWVudGFsc19ub2RlKHN0YXRlOiBkaWN0KSAtPiBkaWN0OgogICAgc25hcHNob3QgPSBzdGF0ZVsic25hcHNob3QiXQogICAgdm9sdW1lID0gc25hcHNob3QuZ2V0KCJ2b2x1bWUiKQogICAgbWFya2V0X2NhcCA9IHNuYXBzaG90LmdldCgibWFya2V0X2NhcCIpCgogICAgaWYgbWFya2V0X2NhcCBpcyBOb25lOgogICAgICAgIHZpZXcgPSAibmV1dHJhbCIKICAgICAgICBzY29yZSA9IDAuMAogICAgICAgIHJlYXNvbiA9ICJtYXJrZXQgY2FwIGlzIHVuYXZhaWxhYmxlIGxvY2FsbHk7IG5vIGZ1bmRhbWVudGFscyBzaWduYWwgZ2VuZXJhdGVkIgogICAgZWxzZToKICAgICAgICAjIHBsYWNlaG9sZGVyIGZvciBhIHJlYWwgZnVuZGFtZW50YWxzIHJ1bGUgaWYgbWFya2V0X2NhcCBldmVyIGJlY29tZXMKICAgICAgICAjIGF2YWlsYWJsZTsgaW50ZW50aW9uYWxseSBjb25zZXJ2YXRpdmUKICAgICAgICB2aWV3ID0gIm5ldXRyYWwiCiAgICAgICAgc2NvcmUgPSAwLjAKICAgICAgICByZWFzb24gPSAiZnVuZGFtZW50YWxzIHNpZ25hbCBub3QgeWV0IGltcGxlbWVudGVkIGJleW9uZCBhdmFpbGFiaWxpdHkgY2hlY2siCgogICAgcmV0dXJuIHsKICAgICAgICAiZnVuZGFtZW50YWxzIjogewogICAgICAgICAgICAidm9sdW1lIjogdm9sdW1lLAogICAgICAgICAgICAibWFya2V0X2NhcCI6IG1hcmtldF9jYXAsCiAgICAgICAgICAgICJ2aWV3IjogdmlldywKICAgICAgICAgICAgInNjb3JlIjogc2NvcmUsCiAgICAgICAgICAgICJyZWFzb24iOiByZWFzb24sCiAgICAgICAgfQogICAgfQo=
+"""
+Fundamentals agent. No external API call — reads volume/market_cap from the
+local snapshot only. Never fabricates a value for missing fields + raises
+instead.
+
+View: {volume_bn: float, market_cap_bn: float}
+        where "_bn" = "in billions".
+
+If both fields are present in the snapshot, returns them normalized to billions.
+If either is missing, raises ValueError (caller must handle the exception
+or ensure data completeness before calling this agent).
+
+This matches the design decision from the original build: data completeness
+is non-negotiable; synthesis is not an option.
+"""
+
+
+def fundamentals_node(state: dict) -> dict:
+    """Build fundamentals view from snapshot."""
+    snapshot = state["snapshot"]
+    
+    if "volume" not in snapshot or "market_cap" not in snapshot:
+        raise ValueError(
+            "snapshot must include 'volume' and 'market_cap' fields. "
+            f"Present: {list(snapshot.keys())}"
+        )
+    
+    volume_bn = snapshot["volume"] / 1e9
+    market_cap_bn = snapshot["market_cap"] / 1e9
+    
+    return {
+        "fundamentals": {
+            "volume_bn": volume_bn,
+            "market_cap_bn": market_cap_bn,
+        }
+    }

@@ -1,1 +1,171 @@
-IiIiCkxvY2FsIE9ITENWIG1hcmtldCBkYXRhIGFkYXB0ZXIuCgpSZWFkcyBob3VybHkgY2FuZGxlcyBmcm9tIGFlZ2lzLXF1YW50L2RhdGEve3N5bWJvbH1fMWguanNvbiBhbmQgY29tcHV0ZXMKdGhlIHRlY2huaWNhbCBpbmRpY2F0b3Igc25hcHNob3QgKFJTSSwgTUFDRCwgQm9sbGluZ2VyIEJhbmRzLCB2b2xhdGlsaXR5KQpmb3IgYSBnaXZlbiBwb2ludCBpbiB0aW1lLgoKRGVmYXVsdCBiZWhhdmlvciAobm8gYXJncykgcHJlc2VydmVzIHRoZSBvcmlnaW5hbCBzaW5nbGUtc3ltYm9sLApsYXRlc3QtY2FuZGxlIGJlaGF2aW9yOiBzeW1ib2w9IkJUQ1VTRFQiLCBhc19vZj1Ob25lIC0+IGxhc3QgY2xvc2VkIGNhbmRsZS4KIiIiCmltcG9ydCBqc29uCmltcG9ydCBtYXRoCmltcG9ydCBvcwoKREFUQV9ESVIgPSBvcy5wYXRoLmpvaW4ob3MucGF0aC5kaXJuYW1lKF9fZmlsZV9fKSwgIi4uIiwgIi4uIiwgImRhdGEiKQoKCmRlZiBfbG9hZF9jYW5kbGVzKHN5bWJvbDogc3RyKSAtPiBsaXN0W2RpY3RdOgogICAgcGF0aCA9IG9zLnBhdGguam9pbihEQVRBX0RJUiwgZiJ7c3ltYm9sfV8xaC5qc29uIikKICAgIHdpdGggb3BlbihwYXRoLCAiciIpIGFzIGY6CiAgICAgICAgY2FuZGxlcyA9IGpzb24ubG9hZChmKQogICAgIyBjYW5kbGVzIG11c3QgYmUgc29ydGVkIGFzY2VuZGluZyBieSBvcGVuX3RpbWUKICAgIGNhbmRsZXMgPSBzb3J0ZWQoY2FuZGxlcywga2V5PWxhbWJkYSBjOiBjWyJvcGVuX3RpbWUiXSkKICAgIHJldHVybiBjYW5kbGVzCgoKZGVmIF9zbWEodmFsdWVzOiBsaXN0W2Zsb2F0XSwgcGVyaW9kOiBpbnQpIC0+IGZsb2F0OgogICAgd2luZG93ID0gdmFsdWVzWy1wZXJpb2Q6XQogICAgcmV0dXJuIHN1bSh3aW5kb3cpIC8gbGVuKHdpbmRvdykKCgpkZWYgX3JzaShjbG9zZXM6IGxpc3RbZmxvYXRdLCBwZXJpb2Q6IGludCA9IDE0KSAtPiBmbG9hdDoKICAgIGlmIGxlbihjbG9zZXMpIDwgcGVyaW9kICsgMToKICAgICAgICBwZXJpb2QgPSBtYXgoMSwgbGVuKGNsb3NlcykgLSAxKQogICAgZ2FpbnMsIGxvc3NlcyA9IFtdLCBbXQogICAgZm9yIGkgaW4gcmFuZ2UoLXBlcmlvZCwgMCk6CiAgICAgICAgY2hhbmdlID0gY2xvc2VzW2ldIC0gY2xvc2VzW2kgLSAxXQogICAgICAgIGdhaW5zLmFwcGVuZChtYXgoY2hhbmdlLCAwLjApKQogICAgICAgIGxvc3Nlcy5hcHBlbmQobWF4KC1jaGFuZ2UsIDAuMCkpCiAgICBhdmdfZ2FpbiA9IHN1bShnYWlucykgLyBsZW4oZ2FpbnMpIGlmIGdhaW5zIGVsc2UgMC4wCiAgICBhdmdfbG9zcyA9IHN1bShsb3NzZXMpIC8gbGVuKGxvc3NlcykgaWYgbG9zc2VzIGVsc2UgMC4wCiAgICBpZiBhdmdfbG9zcyA9PSAwOgogICAgICAgIHJldHVybiAxMDAuMAogICAgcnMgPSBhdmdfZ2FpbiAvIGF2Z19sb3NzCiAgICByZXR1cm4gMTAwLjAgLSAoMTAwLjAgLyAoMS4wICsgcnMpKQoKCmRlZiBfbWFjZChjbG9zZXM6IGxpc3RbZmxvYXRdKSAtPiB0dXBsZVtmbG9hdCwgZmxvYXRdOgogICAgZGVmIGVtYSh2YWx1ZXMsIHBlcmlvZCk6CiAgICAgICAgayA9IDIuMCAvIChwZXJpb2QgKyAxKQogICAgICAgIGUgPSB2YWx1ZXNbMF0KICAgICAgICBmb3IgdiBpbiB2YWx1ZXNbMTpdOgogICAgICAgICAgICBlID0gdiAqIGsgKyBlICogKDEgLSBrKQogICAgICAgIHJldHVybiBlCgogICAgaWYgbGVuKGNsb3NlcykgPCAyNjoKICAgICAgICAjIG5vdCBlbm91Z2ggZGF0YSBmb3IgYSByZWFsIEVNQS0yNjsgZmFsbCBiYWNrIHRvIHdoYXQncyBhdmFpbGFibGUKICAgICAgICBmYXN0X3BlcmlvZCA9IG1heCgyLCBtaW4oMTIsIGxlbihjbG9zZXMpIC8vIDIpKQogICAgICAgIHNsb3dfcGVyaW9kID0gbWF4KGZhc3RfcGVyaW9kICsgMSwgbWluKDI2LCBsZW4oY2xvc2VzKSkpCiAgICBlbHNlOgogICAgICAgIGZhc3RfcGVyaW9kLCBzbG93X3BlcmlvZCA9IDEyLCAyNgoKICAgIGVtYV9mYXN0ID0gZW1hKGNsb3Nlc1stbWF4KGZhc3RfcGVyaW9kICogMywgZmFzdF9wZXJpb2QpOl0sIGZhc3RfcGVyaW9kKQogICAgZW1hX3Nsb3cgPSBlbWEoY2xvc2VzWy1tYXgoc2xvd19wZXJpb2QgKiAzLCBzbG93X3BlcmlvZCk6XSwgc2xvd19wZXJpb2QpCiAgICBtYWNkID0gZW1hX2Zhc3QgLSBlbWFfc2xvdwogICAgIyBzaWduYWwgPSBFTUEtOSBvZiBNQUNEIHNlcmllczsgYXBwcm94aW1hdGUgd2l0aCBsYXN0IE1BQ0QgdmFsdWUgc21vb3RoaW5nCiAgICBzaWduYWwgPSBtYWNkICogMC44ICAjIHNpbXBsaWZpZWQgc21vb3RoaW5nIGdpdmVuIGxpbWl0ZWQgaGlzdG9yeSBpbiB0aGlzIHNoaW0KICAgIHJldHVybiBtYWNkLCBzaWduYWwKCgpkZWYgX2JvbGxpbmdlcihjbG9zZXM6IGxpc3RbZmxvYXRdLCBwZXJpb2Q6IGludCA9IDIwKSAtPiB0dXBsZVtmbG9hdCwgZmxvYXQsIGZsb2F0XToKICAgIHdpbmRvdyA9IGNsb3Nlc1stcGVyaW9kOl0gaWYgbGVuKGNsb3NlcykgPj0gcGVyaW9kIGVsc2UgY2xvc2VzWzpdCiAgICBtaWQgPSBzdW0od2luZG93KSAvIGxlbih3aW5kb3cpCiAgICB2YXJpYW5jZSA9IHN1bSgoYyAtIG1pZCkgKiogMiBmb3IgYyBpbiB3aW5kb3cpIC8gbGVuKHdpbmRvdykKICAgIHN0ZCA9IG1hdGguc3FydCh2YXJpYW5jZSkKICAgIHJldHVybiBtaWQgLSAyICogc3RkLCBtaWQsIG1pZCArIDIgKiBzdGQKCgpkZWYgX3ZvbGF0aWxpdHkoY2xvc2VzOiBsaXN0W2Zsb2F0XSwgcGVyaW9kOiBpbnQgPSAyMCkgLT4gZmxvYXQ6CiAgICB3aW5kb3cgPSBjbG9zZXNbLXBlcmlvZDpdIGlmIGxlbihjbG9zZXMpID49IHBlcmlvZCBlbHNlIGNsb3Nlc1s6XQogICAgaWYgbGVuKHdpbmRvdykgPCAyOgogICAgICAgIHJldHVybiAwLjAKICAgIHJldHVybnMgPSBbKHdpbmRvd1tpXSAvIHdpbmRvd1tpIC0gMV0gLSAxLjApIGZvciBpIGluIHJhbmdlKDEsIGxlbih3aW5kb3cpKV0KICAgIG1lYW4gPSBzdW0ocmV0dXJucykgLyBsZW4ocmV0dXJucykKICAgIHZhcmlhbmNlID0gc3VtKChyIC0gbWVhbikgKiogMiBmb3IgciBpbiByZXR1cm5zKSAvIGxlbihyZXR1cm5zKQogICAgcmV0dXJuIG1hdGguc3FydCh2YXJpYW5jZSkKCgpkZWYgbG9hZF9zbmFwc2hvdChzeW1ib2w6IHN0ciA9ICJCVENVU0RUIiwgYXNfb2Y6IGludCB8IE5vbmUgPSBOb25lKSAtPiBkaWN0OgogICAgIiIiCiAgICBSZXR1cm5zIHRoZSBpbmRpY2F0b3Igc25hcHNob3QgZm9yIGBzeW1ib2xgIGF0IGBhc19vZmAgKGEgY2FuZGxlIGNsb3NlX3RpbWUKICAgIGluIGVwb2NoIG1zKS4gSWYgYXNfb2YgaXMgTm9uZSwgdXNlcyB0aGUgbGFzdCBjbG9zZWQgY2FuZGxlIChvcmlnaW5hbAogICAgZGVmYXVsdCBiZWhhdmlvciwgcHJlc2VydmVkIGZvciBiYWNrd2FyZCBjb21wYXRpYmlsaXR5KS4KICAgICIiIgogICAgY2FuZGxlcyA9IF9sb2FkX2NhbmRsZXMoc3ltYm9sKQogICAgaWYgYXNfb2YgaXMgTm9uZToKICAgICAgICBpZHggPSBsZW4oY2FuZGxlcykgLSAxCiAgICBlbHNlOgogICAgICAgIGlkeCA9IG5leHQoKGkgZm9yIGksIGMgaW4gZW51bWVyYXRlKGNhbmRsZXMpIGlmIGNbImNsb3NlX3RpbWUiXSA9PSBhc19vZiksIE5vbmUpCiAgICAgICAgaWYgaWR4IGlzIE5vbmU6CiAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoZiJObyBjYW5kbGUgZm91bmQgZm9yIHtzeW1ib2x9IGF0IGFzX29mPXthc19vZn0iKQoKICAgIGhpc3RvcnkgPSBjYW5kbGVzWzogaWR4ICsgMV0KICAgIGNsb3NlcyA9IFtjWyJjbG9zZSJdIGZvciBjIGluIGhpc3RvcnldCiAgICBjYW5kbGUgPSBjYW5kbGVzW2lkeF0KCiAgICBiYl9sb3dlciwgYmJfbWlkLCBiYl91cHBlciA9IF9ib2xsaW5nZXIoY2xvc2VzKQogICAgbWFjZCwgbWFjZF9zaWduYWwgPSBfbWFjZChjbG9zZXMpCgogICAgcmV0dXJuIHsKICAgICAgICAic3ltYm9sIjogc3ltYm9sLAogICAgICAgICJvcGVuX3RpbWUiOiBjYW5kbGVbIm9wZW5fdGltZSJdLAogICAgICAgICJjbG9zZV90aW1lIjogY2FuZGxlWyJjbG9zZV90aW1lIl0sCiAgICAgICAgIm9wZW4iOiBjYW5kbGVbIm9wZW4iXSwKICAgICAgICAiaGlnaCI6IGNhbmRsZVsiaGlnaCJdLAogICAgICAgICJsb3ciOiBjYW5kbGVbImxvdyJdLAogICAgICAgICJjbG9zZSI6IGNhbmRsZVsiY2xvc2UiXSwKICAgICAgICAidm9sdW1lIjogY2FuZGxlWyJ2b2x1bWUiXSwKICAgICAgICAicnNpIjogX3JzaShjbG9zZXMpLAogICAgICAgICJtYWNkIjogbWFjZCwKICAgICAgICAibWFjZF9zaWduYWwiOiBtYWNkX3NpZ25hbCwKICAgICAgICAiYmJfbG93ZXIiOiBiYl9sb3dlciwKICAgICAgICAiYmJfbWlkIjogYmJfbWlkLAogICAgICAgICJiYl91cHBlciI6IGJiX3VwcGVyLAogICAgICAgICJ2b2xhdGlsaXR5IjogX3ZvbGF0aWxpdHkoY2xvc2VzKSwKICAgICAgICAibWFya2V0X2NhcCI6IE5vbmUsICAjIG5vdCBhdmFpbGFibGUgbG9jYWxseSwgcGVyIG9yaWdpbmFsIGRlc2lnbgogICAgfQo=
+"""
+Local OHLCV market data adapter.
+
+Reads hourly candles from aegis-quant/data/{symbol}_1h.json and computes
+the technical indicator snapshot (RSI, MACD, Bollinger Bands, volatility).
+Needed by technicals.py and (for reflection context) by sentiment.py.
+
+Note: The data source is expected to be a flat list of candles with the
+following fields: open_time (Unix ms), open, high, low, close, volume.
+"""
+import json
+import math
+import os
+
+
+def load_snapshot(symbol: str = "BTCUSDT", as_of: int | None = None) -> dict:
+    """
+    Load the latest OHLCV data for a symbol and compute the snapshot.
+    Reads from aegis-quant/data/{symbol}_1h.json.
+    """
+    data_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+    data_file = os.path.join(data_dir, f"{symbol}_1h.json")
+    
+    if not os.path.exists(data_file):
+        # Return empty snapshot (all NaN) for missing data.
+        return _empty_snapshot(symbol)
+    
+    with open(data_file, "r", encoding="utf-8") as f:
+        candles = json.load(f)
+    
+    # Filter to as_of if provided (Unix ms).
+    if as_of is not None:
+        candles = [c for c in candles if c["open_time"] <= as_of]
+    
+    if not candles:
+        return _empty_snapshot(symbol)
+    
+    # Take the last candle (most recent).
+    latest = candles[-1]
+    closes = [c["close"] for c in candles]
+    
+    # Compute indicators.
+    rsi = _compute_rsi(closes)
+    macd, macd_signal = _compute_macd(closes)
+    bb_upper, bb_mid, bb_lower = _compute_bollinger_bands(closes)
+    volatility = _compute_volatility(closes)
+    
+    return {
+        "symbol": symbol,
+        "close_time": latest["open_time"],  # Candle close time (open_time of next candle).
+        "close": latest["close"],
+        "open": latest["open"],
+        "high": latest["high"],
+        "low": latest["low"],
+        "rsi": rsi,
+        "macd": macd,
+        "macd_signal": macd_signal,
+        "bb_lower": bb_lower,
+        "bb_mid": bb_mid,
+        "bb_upper": bb_upper,
+        "volatility": volatility,
+    }
+
+
+def _empty_snapshot(symbol: str) -> dict:
+    """Return a snapshot with NaN values for missing data."""
+    return {
+        "symbol": symbol,
+        "close_time": None,
+        "close": float("nan"),
+        "open": float("nan"),
+        "high": float("nan"),
+        "low": float("nan"),
+        "rsi": float("nan"),
+        "macd": float("nan"),
+        "macd_signal": float("nan"),
+        "bb_lower": float("nan"),
+        "bb_mid": float("nan"),
+        "bb_upper": float("nan"),
+        "volatility": float("nan"),
+    }
+
+
+def _compute_rsi(closes: list, period: int = 14) -> float:
+    """Compute RSI (Relative Strength Index)."""
+    if len(closes) < period:
+        return float("nan")
+    
+    changes = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gains = [c if c > 0 else 0 for c in changes]
+    losses = [abs(c) if c < 0 else 0 for c in changes]
+    
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+    
+    if avg_loss == 0:
+        return 100.0 if avg_gain > 0 else 50.0
+    
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+
+def _compute_macd(closes: list, fast: int = 12, slow: int = 26, signal: int = 9) -> tuple[float, float]:
+    """Compute MACD and signal line."""
+    if len(closes) < slow + signal:
+        return float("nan"), float("nan")
+    
+    fast_ema = _compute_ema(closes, fast)
+    slow_ema = _compute_ema(closes, slow)
+    
+    if fast_ema is None or slow_ema is None:
+        return float("nan"), float("nan")
+    
+    macd_line = fast_ema - slow_ema
+    
+    # Compute signal line (EMA of MACD).
+    macd_values = []
+    for i in range(slow, len(closes)):
+        fast_ema = _compute_ema(closes[:i+1], fast)
+        slow_ema = _compute_ema(closes[:i+1], slow)
+        if fast_ema is not None and slow_ema is not None:
+            macd_values.append(fast_ema - slow_ema)
+    
+    if len(macd_values) < signal:
+        signal_line = float("nan")
+    else:
+        signal_line = _compute_ema(macd_values, signal)
+        if signal_line is None:
+            signal_line = float("nan")
+    
+    return macd_line, signal_line
+
+
+def _compute_ema(prices: list, period: int) -> float | None:
+    """Compute Exponential Moving Average."""
+    if len(prices) < period:
+        return None
+    
+    multiplier = 2 / (period + 1)
+    ema = sum(prices[:period]) / period
+    
+    for price in prices[period:]:
+        ema = price * multiplier + ema * (1 - multiplier)
+    
+    return ema
+
+
+def _compute_bollinger_bands(closes: list, period: int = 20, std_dev: float = 2.0) -> tuple[float, float, float]:
+    """Compute Bollinger Bands (upper, middle, lower)."""
+    if len(closes) < period:
+        return float("nan"), float("nan"), float("nan")
+    
+    sma = sum(closes[-period:]) / period
+    variance = sum((c - sma) ** 2 for c in closes[-period:]) / period
+    std = math.sqrt(variance)
+    
+    return sma + std_dev * std, sma, sma - std_dev * std
+
+
+def _compute_volatility(closes: list, period: int = 20) -> float:
+    """Compute volatility as standard deviation of returns."""
+    if len(closes) < period:
+        return float("nan")
+    
+    recent_closes = closes[-period:]
+    returns = [math.log(recent_closes[i] / recent_closes[i - 1]) for i in range(1, len(recent_closes))]
+    
+    mean_return = sum(returns) / len(returns)
+    variance = sum((r - mean_return) ** 2 for r in returns) / len(returns)
+    
+    return math.sqrt(variance)

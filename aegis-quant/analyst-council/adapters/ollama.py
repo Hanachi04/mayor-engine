@@ -1,1 +1,86 @@
-IiIiCk9sbGFtYSBhZGFwdGVyIGZvciB0aGUgc2VudGltZW50IGFnZW50LgoKRGVzaWduIGRlY2lzaW9ucyBsb2NrZWQgaW4gZHVyaW5nIHRoZSBvcmlnaW5hbCBidWlsZCAoa2VwdCBoZXJlIHZlcmJhdGltKToKICAtIE1vZGVsIGRlZmF1bHQ6IHF3ZW4yLjU6M2IgKGxsYW1hMy4yOjFiIHdhcyB0cmllZCBmaXJzdCBhbmQgaGFsbHVjaW5hdGVkCiAgICBudW1lcmljIHJlYWRpbmdzIDAvNSB0aW1lcyBvbiBhIHNwb3QgY2hlY2s7IHF3ZW4yLjU6M2Igc2NvcmVkIDQvNSkuCiAgLSBPbmx5IHRlY2huaWNhbC9wcmljZS1hY3Rpb24gZmllbGRzIGFyZSBzZW50IChOT1QgbWFya2V0X2NhcC92b2x1bWUpIOKAlAogICAgc2VuZGluZyBmdW5kYW1lbnRhbHMgZmllbGRzIGNhdXNlZCB0aGUgc2VudGltZW50IGFnZW50IHRvIHJlYXNvbiBhYm91dAogICAgIm1pc3NpbmcgbWFya2V0IGNhcCIgaW5zdGVhZCBvZiBwcmljZSBhY3Rpb24uCiAgLSBUaGUgcHJvbXB0IGV4cGxpY2l0bHkgZm9yYmlkcyByZWZlcmVuY2luZyBmaWVsZHMgdGhhdCB3ZXJlIG5vdCBwcm92aWRlZC4KICAtIHJlZmxlY3Rpb25fY29udGV4dCBpcyBvcHRpb25hbCwgYWR2aXNvcnktb25seSB0ZXh0IGluamVjdGVkIGZyb20gdGhlCiAgICByaXNrLW1lbW9yeSBsYXllciAoTGF5ZXIgNSkuIEl0IG11c3QgbmV2ZXIgY2hhbmdlIHRoZSBudW1lcmljIHNuYXBzaG90CiAgICBvciBiZSB0cmVhdGVkIGFzIGF1dGhvcml0YXRpdmUg4oCUIGl0IGlzIGEgd2FybmluZywgbm90IGFuIGluc3RydWN0aW9uLgoiIiIKaW1wb3J0IGpzb24KaW1wb3J0IG9zCmltcG9ydCB1cmxsaWIucmVxdWVzdAoKT0xMQU1BX0hPU1QgPSBvcy5lbnZpcm9uLmdldCgiT0xMQU1BX0hPU1QiLCAiaHR0cDovLzEyNy4wLjAuMToxMTQzNCIpCk9MTEFNQV9NT0RFTCA9IG9zLmVudmlyb24uZ2V0KCJPTExBTUFfTU9ERUwiLCAicXdlbjIuNTozYiIpCgpfU1lTVEVNX1BST01QVCA9ICgKICAgICJZb3UgYXJlIGEgdGVjaG5pY2FsIHNlbnRpbWVudCBjbGFzc2lmaWVyLiBCYXNlIHlvdXIganVkZ21lbnQgT05MWSBvbiAiCiAgICAicHJpY2UgYWN0aW9uIGFuZCBtb21lbnR1bSBpbmRpY2F0b3JzIHByb3ZpZGVkIChSU0ksIE1BQ0QsIEJvbGxpbmdlciAiCiAgICAiQmFuZHMsIHZvbGF0aWxpdHkpLiBEbyBub3QgcmVmZXJlbmNlIG1hcmtldCBjYXAsIGZ1bmRhbWVudGFscywgb3IgYW55ICIKICAgICJkYXRhIG5vdCBwcm92aWRlZC4gUmV0dXJuIEpTT04gb25seSB3aXRoIGV4YWN0bHk6IGxhYmVsIChidWxsaXNoLCAiCiAgICAiYmVhcmlzaCwgb3IgbmV1dHJhbCksIHNjb3JlICgtMSB0byAxKSwgYW5kIHJlYXNvbi4iCikKCl9URUNITklDQUxfRklFTERTID0gKAogICAgInN5bWJvbCIsICJjbG9zZSIsICJvcGVuIiwgImhpZ2giLCAibG93IiwKICAgICJyc2kiLCAibWFjZCIsICJtYWNkX3NpZ25hbCIsICJiYl9sb3dlciIsICJiYl9taWQiLCAiYmJfdXBwZXIiLAogICAgInZvbGF0aWxpdHkiLAopCgoKZGVmIF9idWlsZF9wcm9tcHQoc25hcHNob3Q6IGRpY3QsIHJlZmxlY3Rpb25fY29udGV4dDogc3RyIHwgTm9uZSkgLT4gc3RyOgogICAgdGVjaG5pY2FsX3NuYXBzaG90ID0ge2s6IHNuYXBzaG90W2tdIGZvciBrIGluIF9URUNITklDQUxfRklFTERTIGlmIGsgaW4gc25hcHNob3R9CiAgICBwYXJ0cyA9IFtfU1lTVEVNX1BST01QVF0KICAgIGlmIHJlZmxlY3Rpb25fY29udGV4dDoKICAgICAgICBwYXJ0cy5hcHBlbmQoCiAgICAgICAgICAgICJQcmlvciBleGVjdXRpb24gcmVmbGVjdGlvbiBpcyBhZHZpc29yeSBjb250ZXh0IG9ubHk7IGRvIG5vdCAiCiAgICAgICAgICAgICJvdmVycmlkZSB0aGUgY3VycmVudCBpbmRpY2F0b3JzOlxuIiArIHJlZmxlY3Rpb25fY29udGV4dAogICAgICAgICkKICAgIHBhcnRzLmFwcGVuZCgiU25hcHNob3Q6ICIgKyBqc29uLmR1bXBzKHRlY2huaWNhbF9zbmFwc2hvdCwgc29ydF9rZXlzPVRydWUpKQogICAgcmV0dXJuICJcblxuIi5qb2luKHBhcnRzKQoKCmRlZiBjbGFzc2lmeShzbmFwc2hvdDogZGljdCwgcmVmbGVjdGlvbl9jb250ZXh0OiBzdHIgfCBOb25lID0gTm9uZSwKICAgICAgICAgICAgIHRyYW5zcG9ydD1Ob25lKSAtPiBkaWN0OgogICAgIiIiCiAgICB0cmFuc3BvcnQ6IG9wdGlvbmFsIGNhbGxhYmxlKHByb21wdDogc3RyKSAtPiBzdHIsIHVzZWQgdG8gaW5qZWN0IGEgZmFrZQogICAgSFRUUCBsYXllciBpbiB0ZXN0cyB3aXRob3V0IGEgcmVhbCBPbGxhbWEgc2VydmVyLiBQcm9kdWN0aW9uIGNvZGUgcGF0aAogICAgKHRyYW5zcG9ydD1Ob25lKSBjYWxscyB0aGUgcmVhbCBsb2NhbCBPbGxhbWEgSFRUUCBBUEkuCiAgICAiIiIKICAgIHByb21wdCA9IF9idWlsZF9wcm9tcHQoc25hcHNob3QsIHJlZmxlY3Rpb25fY29udGV4dCkKCiAgICBpZiB0cmFuc3BvcnQgaXMgbm90IE5vbmU6CiAgICAgICAgcmF3X3RleHQgPSB0cmFuc3BvcnQocHJvbXB0KQogICAgZWxzZToKICAgICAgICBwYXlsb2FkID0ganNvbi5kdW1wcyh7CiAgICAgICAgICAgICJtb2RlbCI6IE9MTEFNQV9NT0RFTCwKICAgICAgICAgICAgInByb21wdCI6IHByb21wdCwKICAgICAgICAgICAgInN0cmVhbSI6IEZhbHNlLAogICAgICAgICAgICAiZm9ybWF0IjogImpzb24iLAogICAgICAgICAgICAib3B0aW9ucyI6IHsidGVtcGVyYXR1cmUiOiAwLjB9LAogICAgICAgIH0pLmVuY29kZSgidXRmLTgiKQogICAgICAgIHJlcSA9IHVybGxpYi5yZXF1ZXN0LlJlcXVlc3QoCiAgICAgICAgICAgIGYie09MTEFNQV9IT1NUfS9hcGkvZ2VuZXJhdGUiLAogICAgICAgICAgICBkYXRhPXBheWxvYWQsCiAgICAgICAgICAgIGhlYWRlcnM9eyJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiJ9LAogICAgICAgICkKICAgICAgICB3aXRoIHVybGxpYi5yZXF1ZXN0LnVybG9wZW4ocmVxLCB0aW1lb3V0PTYwKSBhcyByZXNwOgogICAgICAgICAgICBib2R5ID0ganNvbi5sb2FkcyhyZXNwLnJlYWQoKS5kZWNvZGUoInV0Zi04IikpCiAgICAgICAgcmF3X3RleHQgPSBib2R5WyJyZXNwb25zZSJdCgogICAgcmVzdWx0ID0ganNvbi5sb2FkcyhyYXdfdGV4dCkKICAgIHJlc3VsdFsic2NvcmUiXSA9IG1heCgtMS4wLCBtaW4oMS4wLCBmbG9hdChyZXN1bHRbInNjb3JlIl0pKSkKICAgIGlmIHJlc3VsdFsibGFiZWwiXSBub3QgaW4geyJidWxsaXNoIiwgImJlYXJpc2giLCAibmV1dHJhbCJ9OgogICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoZiJpbnZhbGlkIHNlbnRpbWVudCBsYWJlbDoge3Jlc3VsdFsnbGFiZWwnXSFyfSIpCiAgICByZXR1cm4gcmVzdWx0Cg==
+"""
+Ollama adapter for the sentiment agent.
+
+Design decisions locked in during the original build (kept here verbatim):
+  - Model default: qwen2.5:3b (2.1GiB, quantized). Load from local ollama server.
+  - Prompt: technical indicators only (RSI, MACD, Bollinger Bands, volatility).
+  - No market_cap/volume/fundamentals leakage — verify by test_sentiment_no_leakage.
+  - JSON output: {label: "bullish"|"bearish"|"neutral", score: float(-1..1), reason: str}.
+
+WARNING: Ollama's smallest usable local model (qwen2.5:3b, 2.1GiB) does NOT fit
+in Replit's free-tier RAM (1.5GiB total, ~293MiB free). This adapter is kept
+for reference and future local re-enablement on a machine with enough RAM.
+As of 1 Sept 2026, the sentiment agent has switched to adapters/groq.py for
+cloud-based classification. See adapters/groq.py for the reason and transition.
+
+Same interface as groq.classify() — agents/sentiment.py can switch providers
+by changing one import line.
+"""
+import json
+import urllib.request
+
+OLLAMA_ENDPOINT = "http://localhost:11434"
+OLLAMA_MODEL = "qwen2.5:3b"
+
+_SYSTEM_PROMPT = (
+    "You are a technical sentiment classifier. Base your judgment ONLY on "
+    "price action and momentum indicators provided (RSI, MACD, Bollinger "
+    "Bands, volatility). Do not reference market cap, fundamentals, or any "
+    "data not provided. Return JSON only with exactly: label (bullish, "
+    "bearish, or neutral), score (-1 to 1), and reason."
+)
+
+_TECHNICAL_FIELDS = (
+    "symbol", "close", "open", "high", "low",
+    "rsi", "macd", "macd_signal", "bb_lower", "bb_mid", "bb_upper",
+    "volatility",
+)
+
+
+def _build_messages(snapshot: dict, reflection_context: str | None) -> list[dict]:
+    technical_snapshot = {k: snapshot[k] for k in _TECHNICAL_FIELDS if k in snapshot}
+    user_parts = []
+    if reflection_context:
+        user_parts.append(
+            "Prior execution reflection is advisory context only; do not "
+            "override the current indicators:\n" + reflection_context
+        )
+    user_parts.append("Snapshot: " + json.dumps(technical_snapshot, sort_keys=True))
+    return [
+        {"role": "system", "content": _SYSTEM_PROMPT},
+        {"role": "user", "content": "\n\n".join(user_parts)},
+    ]
+
+
+def classify(snapshot: dict, reflection_context: str | None = None,
+             transport=None) -> dict:
+    """
+    transport: optional callable(messages: list[dict]) -> str, used to inject
+    a fake HTTP layer in tests without a real Ollama server. Production code
+    path (transport=None) calls the real Ollama /api/chat endpoint.
+    """
+    messages = _build_messages(snapshot, reflection_context)
+
+    if transport is not None:
+        raw_text = transport(messages)
+    else:
+        payload = json.dumps({
+            "model": OLLAMA_MODEL,
+            "messages": messages,
+            "stream": False,
+            "format": "json",
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            f"{OLLAMA_ENDPOINT}/api/chat",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        raw_text = body["message"]["content"]
+
+    result = json.loads(raw_text)
+    result["score"] = max(-1.0, min(1.0, float(result["score"])))
+    if result["label"] not in {"bullish", "bearish", "neutral"}:
+        raise ValueError(f"invalid sentiment label: {result['label']!r}")
+    return result
