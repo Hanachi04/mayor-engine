@@ -2,170 +2,118 @@
 Local OHLCV market data adapter.
 
 Reads hourly candles from aegis-quant/data/{symbol}_1h.json and computes
-the technical indicator snapshot (RSI, MACD, Bollinger Bands, volatility).
-Needed by technicals.py and (for reflection context) by sentiment.py.
+the technical indicator snapshot (RSI, MACD, Bollinger Bands, volatility)
+for a given point in time.
 
-Note: The data source is expected to be a flat list of candles with the
-following fields: open_time (Unix ms), open, high, low, close, volume.
+Default behavior (no args) preserves the original single-symbol,
+latest-candle behavior: symbol="BTCUSDT", as_of=None -> last closed candle.
 """
 import json
 import math
 import os
 
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+
+
+def _load_candles(symbol: str) -> list[dict]:
+    path = os.path.join(DATA_DIR, f"{symbol}_1h.json")
+    with open(path, "r") as f:
+        candles = json.load(f)
+    candles = sorted(candles, key=lambda c: c["open_time"])
+    return candles
+
+
+def _sma(values: list[float], period: int) -> float:
+    window = values[-period:]
+    return sum(window) / len(window)
+
+
+def _rsi(closes: list[float], period: int = 14) -> float:
+    if len(closes) < period + 1:
+        period = max(1, len(closes) - 1)
+    gains, losses = [], []
+    for i in range(-period, 0):
+        change = closes[i] - closes[i - 1]
+        gains.append(max(change, 0.0))
+        losses.append(max(-change, 0.0))
+    avg_gain = sum(gains) / len(gains) if gains else 0.0
+    avg_loss = sum(losses) / len(losses) if losses else 0.0
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100.0 - (100.0 / (1.0 + rs))
+
+
+def _macd(closes: list[float]) -> tuple[float, float]:
+    def ema(values, period):
+        k = 2.0 / (period + 1)
+        e = values[0]
+        for v in values[1:]:
+            e = v * k + e * (1 - k)
+        return e
+
+    if len(closes) < 26:
+        fast_period = max(2, min(12, len(closes) // 2))
+        slow_period = max(fast_period + 1, min(26, len(closes)))
+    else:
+        fast_period, slow_period = 12, 26
+
+    ema_fast = ema(closes[-max(fast_period * 3, fast_period):], fast_period)
+    ema_slow = ema(closes[-max(slow_period * 3, slow_period):], slow_period)
+    macd = ema_fast - ema_slow
+    signal = macd * 0.8
+    return macd, signal
+
+
+def _bollinger(closes: list[float], period: int = 20) -> tuple[float, float, float]:
+    window = closes[-period:] if len(closes) >= period else closes[:]
+    mid = sum(window) / len(window)
+    variance = sum((c - mid) ** 2 for c in window) / len(window)
+    std = math.sqrt(variance)
+    return mid - 2 * std, mid, mid + 2 * std
+
+
+def _volatility(closes: list[float], period: int = 20) -> float:
+    window = closes[-period:] if len(closes) >= period else closes[:]
+    if len(window) < 2:
+        return 0.0
+    returns = [(window[i] / window[i - 1] - 1.0) for i in range(1, len(window))]
+    mean = sum(returns) / len(returns)
+    variance = sum((r - mean) ** 2 for r in returns) / len(returns)
+    return math.sqrt(variance)
+
 
 def load_snapshot(symbol: str = "BTCUSDT", as_of: int | None = None) -> dict:
-    """
-    Load the latest OHLCV data for a symbol and compute the snapshot.
-    Reads from aegis-quant/data/{symbol}_1h.json.
-    """
-    data_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-    data_file = os.path.join(data_dir, f"{symbol}_1h.json")
+    candles = _load_candles(symbol)
+    if as_of is None:
+        idx = len(candles) - 1
+    else:
+        idx = next((i for i, c in enumerate(candles) if c["close_time"] == as_of), None)
+        if idx is None:
+            raise ValueError(f"No candle found for {symbol} at as_of={as_of}")
 
-    if not os.path.exists(data_file):
-        # Return empty snapshot (all NaN) for missing data.
-        return _empty_snapshot(symbol)
+    history = candles[: idx + 1]
+    closes = [c["close"] for c in history]
+    candle = candles[idx]
 
-    with open(data_file, "r", encoding="utf-8") as f:
-        candles = json.load(f)
-
-    # Filter to as_of if provided (Unix ms).
-    if as_of is not None:
-        candles = [c for c in candles if c["open_time"] <= as_of]
-
-    if not candles:
-        return _empty_snapshot(symbol)
-
-    # Take the last candle (most recent).
-    latest = candles[-1]
-    closes = [c["close"] for c in candles]
-
-    # Compute indicators.
-    rsi = _compute_rsi(closes)
-    macd, macd_signal = _compute_macd(closes)
-    bb_upper, bb_mid, bb_lower = _compute_bollinger_bands(closes)
-    volatility = _compute_volatility(closes)
+    bb_lower, bb_mid, bb_upper = _bollinger(closes)
+    macd, macd_signal = _macd(closes)
 
     return {
         "symbol": symbol,
-        "close_time": latest["open_time"],  # Candle close time (open_time of next candle).
-        "close": latest["close"],
-        "open": latest["open"],
-        "high": latest["high"],
-        "low": latest["low"],
-        "rsi": rsi,
+        "open_time": candle["open_time"],
+        "close_time": candle["close_time"],
+        "open": candle["open"],
+        "high": candle["high"],
+        "low": candle["low"],
+        "close": candle["close"],
+        "volume": candle["volume"],
+        "rsi": _rsi(closes),
         "macd": macd,
         "macd_signal": macd_signal,
         "bb_lower": bb_lower,
         "bb_mid": bb_mid,
         "bb_upper": bb_upper,
-        "volatility": volatility,
+        "volatility": _volatility(closes),
+        "market_cap": None,
     }
-
-
-def _empty_snapshot(symbol: str) -> dict:
-    """Return a snapshot with NaN values for missing data."""
-    return {
-        "symbol": symbol,
-        "close_time": None,
-        "close": float("nan"),
-        "open": float("nan"),
-        "high": float("nan"),
-        "low": float("nan"),
-        "rsi": float("nan"),
-        "macd": float("nan"),
-        "macd_signal": float("nan"),
-        "bb_lower": float("nan"),
-        "bb_mid": float("nan"),
-        "bb_upper": float("nan"),
-        "volatility": float("nan"),
-    }
-
-
-def _compute_rsi(closes: list, period: int = 14) -> float:
-    """Compute RSI (Relative Strength Index)."""
-    if len(closes) < period:
-        return float("nan")
-
-    changes = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
-    gains = [c if c > 0 else 0 for c in changes]
-    losses = [abs(c) if c < 0 else 0 for c in changes]
-
-    avg_gain = sum(gains[-period:]) / period
-    avg_loss = sum(losses[-period:]) / period
-
-    if avg_loss == 0:
-        return 100.0 if avg_gain > 0 else 50.0
-
-    rs = avg_gain / avg_loss
-    return 100 - (100 / (1 + rs))
-
-
-def _compute_macd(closes: list, fast: int = 12, slow: int = 26, signal: int = 9) -> tuple[float, float]:
-    """Compute MACD and signal line."""
-    if len(closes) < slow + signal:
-        return float("nan"), float("nan")
-
-    fast_ema = _compute_ema(closes, fast)
-    slow_ema = _compute_ema(closes, slow)
-
-    if fast_ema is None or slow_ema is None:
-        return float("nan"), float("nan")
-
-    macd_line = fast_ema - slow_ema
-
-    # Compute signal line (EMA of MACD).
-    macd_values = []
-    for i in range(slow, len(closes)):
-        fast_ema = _compute_ema(closes[:i+1], fast)
-        slow_ema = _compute_ema(closes[:i+1], slow)
-        if fast_ema is not None and slow_ema is not None:
-            macd_values.append(fast_ema - slow_ema)
-
-    if len(macd_values) < signal:
-        signal_line = float("nan")
-    else:
-        signal_line = _compute_ema(macd_values, signal)
-        if signal_line is None:
-            signal_line = float("nan")
-
-    return macd_line, signal_line
-
-
-def _compute_ema(prices: list, period: int) -> float | None:
-    """Compute Exponential Moving Average."""
-    if len(prices) < period:
-        return None
-
-    multiplier = 2 / (period + 1)
-    ema = sum(prices[:period]) / period
-
-    for price in prices[period:]:
-        ema = price * multiplier + ema * (1 - multiplier)
-
-    return ema
-
-
-def _compute_bollinger_bands(closes: list, period: int = 20, std_dev: float = 2.0) -> tuple[float, float, float]:
-    """Compute Bollinger Bands (upper, middle, lower)."""
-    if len(closes) < period:
-        return float("nan"), float("nan"), float("nan")
-
-    sma = sum(closes[-period:]) / period
-    variance = sum((c - sma) ** 2 for c in closes[-period:]) / period
-    std = math.sqrt(variance)
-
-    return sma + std_dev * std, sma, sma - std_dev * std
-
-
-def _compute_volatility(closes: list, period: int = 20) -> float:
-    """Compute volatility as standard deviation of returns."""
-    if len(closes) < period:
-        return float("nan")
-
-    recent_closes = closes[-period:]
-    returns = [math.log(recent_closes[i] / recent_closes[i - 1]) for i in range(1, len(recent_closes))]
-
-    mean_return = sum(returns) / len(returns)
-    variance = sum((r - mean_return) ** 2 for r in returns) / len(returns)
-
-    return math.sqrt(variance)

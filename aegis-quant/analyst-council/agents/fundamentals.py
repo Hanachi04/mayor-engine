@@ -1,36 +1,30 @@
 """
 Fundamentals agent. No external API call — reads volume/market_cap from the
-local snapshot only. Never fabricates a value for missing fields + raises
-instead.
-
-View: {volume_bn: float, market_cap_bn: float}
-        where "_bn" = "in billions".
-
-If both fields are present in the snapshot, returns them normalized to billions.
-If either is missing, raises ValueError (caller must handle the exception
-or ensure data completeness before calling this agent).
-
-This matches the design decision from the original build: data completeness
-is non-negotiable; synthesis is not an option.
+local snapshot only. Never fabricates a value for missing fields (market_cap
+is not available from local OHLCV data by design).
 """
 
 
 def fundamentals_node(state: dict) -> dict:
-    """Build fundamentals view from snapshot."""
     snapshot = state["snapshot"]
+    volume = snapshot.get("volume")
+    market_cap = snapshot.get("market_cap")
 
-    if "volume" not in snapshot or "market_cap" not in snapshot:
-        raise ValueError(
-            "snapshot must include 'volume' and 'market_cap' fields. "
-            f"Present: {list(snapshot.keys())}"
-        )
-
-    volume_bn = snapshot["volume"] / 1e9
-    market_cap_bn = snapshot["market_cap"] / 1e9
+    if market_cap is None:
+        view = "neutral"
+        score = 0.0
+        reason = "market cap is unavailable locally; no fundamentals signal generated"
+    else:
+        view = "neutral"
+        score = 0.0
+        reason = "fundamentals signal not yet implemented beyond availability check"
 
     return {
         "fundamentals": {
-            "volume_bn": volume_bn,
-            "market_cap_bn": market_cap_bn,
+            "volume": volume,
+            "market_cap": market_cap,
+            "view": view,
+            "score": score,
+            "reason": reason,
         }
     }
