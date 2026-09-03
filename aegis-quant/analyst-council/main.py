@@ -1,1 +1,32 @@
-aW1wb3J0IG9zCmltcG9ydCBzcWxpdGUzCmltcG9ydCBzeXMKCiMgVGhpcyBsYXllcidzIG93biBkaXJlY3RvcnkgYmVjb21lcyB0aGUgaW1wb3J0IHJvb3QgKHNlZSBhZ2VudHMvc2VudGltZW50LnB5CiMgZm9yIHdoeTogImFuYWx5c3QtY291bmNpbCIgaGFzIGEgaHlwaGVuIGFuZCBjYW5ub3QgYmUgYSBwYWNrYWdlIG5hbWUpLgpzeXMucGF0aC5pbnNlcnQoMCwgb3MucGF0aC5kaXJuYW1lKG9zLnBhdGguYWJzcGF0aChfX2ZpbGVfXykpKQoKZnJvbSBncmFwaCBpbXBvcnQgYnVpbGRfZ3JhcGggICMgbm9xYTogRTQwMgpmcm9tIGFkYXB0ZXJzIGltcG9ydCBtYXJrZXRfZGF0YSAgIyBub3FhOiBFNDAyCmZyb20gcGVyc2lzdGVuY2UgaW1wb3J0IHNxbGl0ZV9zdG9yZSAgIyBub3FhOiBFNDAyCgpEQl9QQVRIID0gb3MucGF0aC5qb2luKG9zLnBhdGguZGlybmFtZShfX2ZpbGVfXyksICIuLiIsICJkYXRhIiwgImFlZ2lzLnNxbGl0ZTMiKQoKCmRlZiBydW5fb25jZShzeW1ib2w6IHN0ciA9ICJCVENVU0RUIiwgYXNfb2Y6IGludCB8IE5vbmUgPSBOb25lKSAtPiBkaWN0OgogICAgc25hcHNob3QgPSBtYXJrZXRfZGF0YS5sb2FkX3NuYXBzaG90KHN5bWJvbD1zeW1ib2wsIGFzX29mPWFzX29mKQogICAgZ3JhcGggPSBidWlsZF9ncmFwaCgpCiAgICBzdGF0ZSA9IGdyYXBoLmludm9rZSh7CiAgICAgICAgInN5bWJvbCI6IHN5bWJvbCwKICAgICAgICAiYXNfb2YiOiBzbmFwc2hvdFsiY2xvc2VfdGltZSJdLAogICAgICAgICJzbmFwc2hvdCI6IHNuYXBzaG90LAogICAgfSkKICAgIGNvbm4gPSBzcWxpdGUzLmNvbm5lY3QoREJfUEFUSCkKICAgIHRyeToKICAgICAgICBzdGF0ZVsic3FsaXRlX2RlY2lzaW9uX2lkIl0gPSBzcWxpdGVfc3RvcmUubG9nX2RlY2lzaW9uKGNvbm4sIHN0YXRlKQogICAgZmluYWxseToKICAgICAgICBjb25uLmNsb3NlKCkKICAgIHJldHVybiBzdGF0ZQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICByZXN1bHQgPSBydW5fb25jZSgpCiAgICBwcmludChyZXN1bHQpCg==
+import os
+import sqlite3
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from graph import build_graph  # noqa: E402
+from adapters import market_data  # noqa: E402
+from persistence import sqlite_store  # noqa: E402
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "aegis.sqlite3")
+
+
+def run_once(symbol: str = "BTCUSDT", as_of: int | None = None) -> dict:
+    snapshot = market_data.load_snapshot(symbol=symbol, as_of=as_of)
+    graph = build_graph()
+    state = graph.invoke({
+        "symbol": symbol,
+        "as_of": snapshot["close_time"],
+        "snapshot": snapshot,
+    })
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        state["sqlite_decision_id"] = sqlite_store.log_decision(conn, state)
+    finally:
+        conn.close()
+    return state
+
+
+if __name__ == "__main__":
+    result = run_once()
+    print(result)
