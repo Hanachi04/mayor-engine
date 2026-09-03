@@ -3,33 +3,33 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "monthly",
   "periodLabel": "الشهري (آخر 30 يومًا)",
-  "generatedAt": "2026-09-01T02:13:40.451Z",
-  "windowStart": "2026-08-02T02:13:40.451Z",
-  "windowEnd": "2026-09-01T02:13:40.451Z",
+  "generatedAt": "2026-08-20T12:53:14.393Z",
+  "windowStart": "2026-07-21T12:53:14.393Z",
+  "windowEnd": "2026-08-20T12:53:14.393Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 9,
-    "closed": 9,
-    "open": 0,
-    "wins": 6,
-    "losses": 3,
+    "signals": 6,
+    "closed": 5,
+    "open": 1,
+    "wins": 3,
+    "losses": 2,
     "neutral": 0,
-    "winRatePct": 66.66666666666666,
-    "grossPnlPct": 20.551388880156438,
-    "feesPct": 0.8999999999999999,
-    "slippagePct": 0.36,
-    "netPnlPct": 19.651388880156436,
-    "netPnlUsd": 67.4168,
-    "averageNetPnlPct": 2.1834876533507153,
-    "profitFactor": 7.926575308726074,
+    "winRatePct": 60,
+    "grossPnlPct": 8.802188880156436,
+    "feesPct": 0.5,
+    "slippagePct": 0.2,
+    "netPnlPct": 8.302188880156436,
+    "netPnlUsd": null,
+    "averageNetPnlPct": 1.6604377760312872,
+    "profitFactor": 4.9188990833118575,
     "maxDrawdownPct": -2.118500299104478,
     "bestSymbol": {
       "symbol": "SOLUSDT",
-      "netPct": 7.555888033465941
+      "netPct": 5.20808803346594
     },
     "worstSymbol": {
       "symbol": "XRPUSDT",
@@ -37,17 +37,17 @@
     }
   },
   "byResult": {
-    "TP3": 4,
+    "TP3": 2,
     "TP1": 1,
-    "SL": 3,
-    "TP2": 1
+    "SL": 2,
+    "مفتوحة": 1
   },
   "bySymbol": {
     "SOLUSDT": {
-      "count": 2,
-      "wins": 2,
+      "count": 1,
+      "wins": 1,
       "losses": 0,
-      "netPct": 7.555888033465941
+      "netPct": 5.20808803346594
     },
     "ADAUSDT": {
       "count": 1,
@@ -72,24 +72,6 @@
       "wins": 1,
       "losses": 0,
       "netPct": 2.353792907442637
-    },
-    "LTCUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 3.7935
-    },
-    "TRXUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -0.7186
-    },
-    "UNIUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 5.9265
     }
   }
 }
