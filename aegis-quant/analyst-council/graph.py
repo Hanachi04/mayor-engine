@@ -86,11 +86,11 @@ def council_decision_node(state: dict) -> dict:
 
     # Render decision.
     if bullish_score > bearish_score:
-        decision = "BUY"
+        decision = "LONG"
     elif bearish_score > bullish_score:
-        decision = "SELL"
+        decision = "SHORT"
     else:
-        decision = "HOLD"
+        decision = None
 
     return {
         "council_decision": decision,
