@@ -58,6 +58,13 @@ jobs:
       - name: Layer 3 - DRL Sizing
         run: python3 aegis-quant/drl-sizing/main.py
 
+      - name: Test - Risk Memory
+        run: |
+          python3 aegis-quant/risk-memory/test/test_metrics.py -v
+          python3 aegis-quant/risk-memory/test/test_risk_gate.py -v
+          python3 aegis-quant/risk-memory/test/test_reflection_agent.py -v
+          python3 aegis-quant/risk-memory/test/test_pipeline.py -v
+
       - name: Test - Analyst Council
         run: python3 aegis-quant/analyst-council/test/test_parallel_graph.py -v
 
