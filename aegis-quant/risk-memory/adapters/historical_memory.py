@@ -22,15 +22,34 @@ def fetch_recent_rewards(symbol: str, as_of: str, limit: int = 50, db_path: str 
         if cursor.fetchone() is None:
             return []
 
-        rows = conn.execute(
-            """
-            SELECT reward FROM drl_sizing_decisions
-            WHERE symbol = ? AND as_of <= ? AND reward IS NOT NULL
-            ORDER BY as_of DESC
-            LIMIT ?
-            """,
-            (symbol, as_of, limit),
-        ).fetchall()
+        try:
+            from datetime import datetime
+            dt = datetime.fromisoformat(as_of)
+            as_of_ms = int(dt.timestamp() * 1000)
+        except Exception:
+            as_of_ms = None
+
+        if as_of_ms is not None:
+            rows = conn.execute(
+                """
+                SELECT reward FROM drl_sizing_decisions
+                WHERE symbol = ? AND as_of <= ? AND reward IS NOT NULL
+                ORDER BY as_of DESC
+                LIMIT ?
+                """,
+                (symbol, as_of_ms, limit),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT reward FROM drl_sizing_decisions
+                WHERE symbol = ? AND reward IS NOT NULL
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (symbol, limit),
+            ).fetchall()
+
         rewards = [r[0] for r in rows]
         rewards.reverse()  # oldest first, for equity-curve / Sharpe math
         return rewards

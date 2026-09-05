@@ -16,11 +16,32 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 
 
 def _load_candles(symbol: str) -> list[dict]:
-    path = os.path.join(DATA_DIR, f"{symbol}_1h.json")
-    with open(path, "r") as f:
-        candles = json.load(f)
-    candles = sorted(candles, key=lambda c: c["open_time"])
-    return candles
+    path_csv = os.path.join(DATA_DIR, f"{symbol}_1h.csv")
+    if os.path.exists(path_csv):
+        import csv
+        candles = []
+        with open(path_csv, "r", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                t = int(row["timestamp"])
+                candles.append({
+                    "open_time": t,
+                    "close_time": t + 3599999,
+                    "open": float(row["open"]),
+                    "high": float(row["high"]),
+                    "low": float(row["low"]),
+                    "close": float(row["close"]),
+                    "volume": float(row["volume"]),
+                })
+        return sorted(candles, key=lambda c: c["open_time"])
+
+    path_json = os.path.join(DATA_DIR, f"{symbol}_1h.json")
+    if os.path.exists(path_json):
+        with open(path_json, "r") as f:
+            candles = json.load(f)
+        return sorted(candles, key=lambda c: c["open_time"])
+
+    raise FileNotFoundError(f"No candle data found for {symbol} in {DATA_DIR}")
 
 
 def _sma(values: list[float], period: int) -> float:
@@ -88,7 +109,7 @@ def load_snapshot(symbol: str = "BTCUSDT", as_of: int | None = None) -> dict:
     if as_of is None:
         idx = len(candles) - 1
     else:
-        idx = next((i for i, c in enumerate(candles) if c["close_time"] == as_of), None)
+        idx = next((i for i, c in enumerate(candles) if c["close_time"] == as_of or c["open_time"] == as_of), None)
         if idx is None:
             raise ValueError(f"No candle found for {symbol} at as_of={as_of}")
 

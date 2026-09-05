@@ -31,24 +31,44 @@ def fetch_latest_drl_decision(symbol: str, as_of: str, db_path: str = DB_PATH) -
         if cursor.fetchone() is None:
             return None
 
-        row = conn.execute(
-            """
-            SELECT * FROM drl_sizing_decisions
-            WHERE symbol = ? AND as_of <= ?
-            ORDER BY as_of DESC
-            LIMIT 1
-            """,
-            (symbol, as_of),
-        ).fetchone()
+        try:
+            from datetime import datetime
+            dt = datetime.fromisoformat(as_of)
+            as_of_ms = int(dt.timestamp() * 1000)
+        except Exception:
+            as_of_ms = None
+
+        row = None
+        if as_of_ms is not None:
+            row = conn.execute(
+                """
+                SELECT * FROM drl_sizing_decisions
+                WHERE symbol = ? AND as_of <= ?
+                ORDER BY as_of DESC
+                LIMIT 1
+                """,
+                (symbol, as_of_ms),
+            ).fetchone()
+
+        if row is None:
+            row = conn.execute(
+                """
+                SELECT * FROM drl_sizing_decisions
+                WHERE symbol = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (symbol,),
+            ).fetchone()
 
         if row is None:
             return None
 
         result = dict(row)
         return {
-            "drl_direction": result.get("direction"),
-            "drl_risk_fraction": result.get("risk_fraction"),
-            "drl_timing_offset": result.get("timing_offset"),
+            "drl_direction": result.get("final_decision") or result.get("direction"),
+            "drl_risk_fraction": result.get("selected_risk_pct") or result.get("risk_fraction"),
+            "drl_timing_offset": result.get("selected_timing_offset_ms") or result.get("timing_offset"),
             "drl_reward": result.get("reward"),
         }
     finally:

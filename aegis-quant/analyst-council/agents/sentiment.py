@@ -8,10 +8,20 @@
 # Switched from Ollama to Groq on 1 Sept 2026 — see adapters/groq.py
 # docstring for why (Replit free-tier RAM too small for any workable local
 # model). adapters/ollama.py is kept for future local re-enablement.
+import os
 from adapters import groq as sentiment_provider
 
 
 def sentiment_node(state: dict) -> dict:
+    if os.environ.get("AEGIS_BACKTEST_MODE") == "1":
+        return {
+            "sentiment": {
+                "label": "neutral",
+                "score": 0.0,
+                "reason": "sentiment unavailable historically in backtest mode",
+            }
+        }
+
     snapshot = state["snapshot"]
     reflection_context = state.get("reflection_context")
     try:

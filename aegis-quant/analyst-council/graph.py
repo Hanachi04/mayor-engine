@@ -44,56 +44,45 @@ def council_decision_node(state: dict) -> dict:
     Aggregate fundamentals, technicals, and sentiment into a council decision.
 
     Logic:
-      1. Technicals: weight 40% (most responsive to real-time price action).
-      2. Sentiment: weight 35% (AI-powered momentum detector, external validation).
-      3. Fundamentals: weight 25% (long-term health check, lowest frequency change).
-
-    Decision: count bullish/bearish votes (using weights) and return majority.
-    Risk: fixed at 2% per position (placeholder, can be overridden later).
+      1. Technicals: 55% weight (or 100% when sentiment is unavailable in backtest mode).
+      2. Sentiment: 45% weight (when available).
+      3. Fundamentals: informational health check.
     """
     technicals = state.get("technicals", {})
     sentiment = state.get("sentiment", {})
     fundamentals = state.get("fundamentals", {})
 
-    # Extract signals (default to neutral if missing).
-    tech_signals = [
-        technicals.get("rsi_signal", "neutral"),
-        technicals.get("macd_signal", "neutral"),
-        technicals.get("bollinger_signal", "neutral"),
-    ]
-    sent_signal = sentiment.get("label", "neutral")
-    fund_signals = []  # Fundamentals don't produce directional signals yet; only info.
+    tech_view = technicals.get("view", "neutral")
+    sent_label = sentiment.get("label", "neutral")
+    sent_reason = sentiment.get("reason", "")
 
-    # Weighted vote.
-    bullish_score = 0.0
-    bearish_score = 0.0
+    # Sentiment is unavailable if backtest mode or explicitly failed
+    sentiment_available = (
+        sent_label in ("bullish", "bearish")
+        and not sent_reason.startswith("sentiment unavailable")
+    )
 
-    # Technicals: 40% (3 signals, 40/3 ≈ 13.3% each).
-    for sig in tech_signals:
-        if sig == "bullish":
-            bullish_score += 0.4 / 3
-        elif sig == "bearish":
-            bearish_score += 0.4 / 3
-
-    # Sentiment: 35%.
-    if sent_signal == "bullish":
-        bullish_score += 0.35
-    elif sent_signal == "bearish":
-        bearish_score += 0.35
-
-    # Fundamentals: 25% (no signals yet, placeholder).
-    # (could add fundamentals-based signals here in future iterations).
-
-    # Render decision.
-    if bullish_score > bearish_score:
-        decision = "LONG"
-    elif bearish_score > bullish_score:
-        decision = "SHORT"
+    if not sentiment_available:
+        # Backtest mode or sentiment unavailable: decision based on technicals view
+        if tech_view == "bullish":
+            decision = "LONG"
+        elif tech_view == "bearish":
+            decision = "SHORT"
+        else:
+            decision = None
     else:
-        decision = None
+        bullish_score = (0.55 if tech_view == "bullish" else 0.0) + (0.45 if sent_label == "bullish" else 0.0)
+        bearish_score = (0.55 if tech_view == "bearish" else 0.0) + (0.45 if sent_label == "bearish" else 0.0)
+
+        if bullish_score > bearish_score:
+            decision = "LONG"
+        elif bearish_score > bullish_score:
+            decision = "SHORT"
+        else:
+            decision = None
 
     return {
         "council_decision": decision,
         "risk_pct": 2.0,
-        "reflection_context": f"Technicals: {tech_signals}, Sentiment: {sent_signal}",
+        "reflection_context": f"Technicals: {tech_view}, Sentiment: {sent_label}",
     }
