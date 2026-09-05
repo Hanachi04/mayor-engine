@@ -44,8 +44,17 @@
     "slippageRate": 0.0003,
     "date": "2026-09-04",
     "ts": 1788514624219,
-    "closed": false,
-    "entryFillPrice": 104.35129599999999
+    "closed": true,
+    "entryFillPrice": 104.35129599999999,
+    "closePrice": 103.77,
+    "closeResult": "SL",
+    "exitFillPrice": 103.738869,
+    "grossPnlPct": -0.5869,
+    "feesPct": 0.08,
+    "slippagePct": 0.06,
+    "closePct": -0.6669,
+    "netPnlUsd": -14.9929,
+    "closeAt": "2026-09-05T21:30:12.903Z"
   },
   {
     "symbol": "BTCUSDT",
@@ -92,7 +101,16 @@
     "slippageRate": 0.0003,
     "date": "2026-09-04",
     "ts": 1788514624713,
-    "closed": false,
-    "entryFillPrice": 81141.13504
+    "closed": true,
+    "entryFillPrice": 81141.13504,
+    "closePrice": 79819,
+    "closeResult": "SL",
+    "exitFillPrice": 79795.0543,
+    "grossPnlPct": -1.6589,
+    "feesPct": 0.08,
+    "slippagePct": 0.06,
+    "closePct": -1.7389,
+    "netPnlUsd": -67.4865,
+    "closeAt": "2026-09-05T21:30:13.374Z"
   }
 ]
