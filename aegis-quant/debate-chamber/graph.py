@@ -26,6 +26,9 @@ def judge_node(state: dict) -> dict:
     }
 
 
+import functools
+
+@functools.lru_cache(maxsize=1)
 def build_graph():
     graph = StateGraph(DebateState)
     graph.add_node("bull", bull_node)

@@ -39,6 +39,9 @@ def log_result_node(state: dict) -> dict:
     return {}
 
 
+import functools
+
+@functools.lru_cache(maxsize=1)
 def build_graph():
     graph = StateGraph(SizingState)
     graph.add_node("load_debate_input", load_debate_input_node)

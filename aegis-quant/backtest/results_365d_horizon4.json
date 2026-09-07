@@ -1,0 +1,42 @@
+{
+  "BTCUSDT": {
+    "starting_capital": 10000.0,
+    "ending_capital": 10008.312148897965,
+    "net_pnl_usd": 8.312148897965017,
+    "net_pnl_pct": 0.08312148897965017,
+    "num_trades": 157,
+    "num_blocked_or_no_signal": 8540,
+    "total_decisions": 8697,
+    "win_rate_pct": 21.019108280254777,
+    "max_drawdown_pct": 0.6791310732355401,
+    "sharpe_ratio": 0.00990804898689926
+  },
+  "ETHUSDT": {
+    "starting_capital": 10000.0,
+    "ending_capital": 10235.349485938923,
+    "net_pnl_usd": 235.34948593892295,
+    "net_pnl_pct": 2.3534948593892295,
+    "num_trades": 114,
+    "num_blocked_or_no_signal": 8583,
+    "total_decisions": 8697,
+    "win_rate_pct": 24.561403508771928,
+    "max_drawdown_pct": 0.8721310457975426,
+    "sharpe_ratio": 0.15719973277814764
+  },
+  "SOLUSDT": {
+    "starting_capital": 10000.0,
+    "ending_capital": 10029.767882845583,
+    "net_pnl_usd": 29.76788284558279,
+    "net_pnl_pct": 0.2976788284558279,
+    "num_trades": 94,
+    "num_blocked_or_no_signal": 8603,
+    "total_decisions": 8697,
+    "win_rate_pct": 22.340425531914892,
+    "max_drawdown_pct": 0.7856586575203264,
+    "sharpe_ratio": 0.041539000181431814
+  },
+  "COMBINED": {
+    "total_net_pnl_usd": 273.42951768247076,
+    "total_trades": 365
+  }
+}

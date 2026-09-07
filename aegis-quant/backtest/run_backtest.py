@@ -27,11 +27,30 @@ from volatility import compute_rolling_volatility, compute_stop_distance_pct
 DB_PATH = os.path.join(config.DATA_DIR, "aegis.sqlite3")
 
 
-def run_backtest_for_symbol(symbol: str, limit: int = None) -> Portfolio:
-    candles = load_candles(symbol)
+def run_backtest_for_symbol(
+    symbol: str, limit: int = None, start_date: str = None, end_date: str = None, trade_records: list = None
+) -> Portfolio:
+    all_candles = load_candles(symbol)
+
+    if start_date or end_date:
+        from datetime import datetime, timezone
+        start_ms = (
+            int(datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc).timestamp() * 1000)
+            if start_date
+            else 0
+        )
+        end_ms = (
+            int(datetime.fromisoformat(end_date).replace(tzinfo=timezone.utc).timestamp() * 1000)
+            if end_date
+            else float("inf")
+        )
+        candles = [c for c in all_candles if start_ms <= c["timestamp"] <= end_ms]
+    else:
+        candles = all_candles
+
     portfolio = Portfolio(config.STARTING_CAPITAL)
 
-    start = config.WARMUP_CANDLES
+    start = config.WARMUP_CANDLES if len(candles) > config.WARMUP_CANDLES else 0
     end = len(candles) - config.EXIT_HORIZON
     if limit is not None:
         end = min(end, start + limit)
@@ -72,6 +91,20 @@ def run_backtest_for_symbol(symbol: str, limit: int = None) -> Portfolio:
         )
         portfolio.record_step(pnl, was_trade=final_decision is not None)
 
+        if trade_records is not None:
+            trade_records.append({
+                "symbol": symbol,
+                "as_of": as_of_iso,
+                "as_of_ms": as_of_ms,
+                "decision": final_decision,
+                "risk_fraction": risk_fraction,
+                "entry_price": entry_price,
+                "exit_price": exit_price,
+                "pnl_usd": pnl,
+                "was_trade": final_decision is not None,
+                "portfolio_capital_after": portfolio.capital,
+            })
+
     return portfolio
 
 
@@ -79,14 +112,29 @@ def main():
     parser = argparse.ArgumentParser(description="Run the full Aegis Quant backtest.")
     parser.add_argument("--symbols", nargs="+", default=config.SYMBOLS)
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--start-date", type=str, default=None)
+    parser.add_argument("--end-date", type=str, default=None)
+    parser.add_argument("--trades-output", type=str, default=None)
     args = parser.parse_args()
 
     results = {}
+    all_trade_records = []
     for symbol in args.symbols:
         print(f"Running backtest for {symbol}...", flush=True)
-        portfolio = run_backtest_for_symbol(symbol, limit=args.limit)
+        portfolio = run_backtest_for_symbol(
+            symbol,
+            limit=args.limit,
+            start_date=args.start_date,
+            end_date=args.end_date,
+            trade_records=all_trade_records,
+        )
         results[symbol] = portfolio.summary()
         print(json.dumps(results[symbol], indent=2, ensure_ascii=False), flush=True)
+
+    if args.trades_output:
+        with open(args.trades_output, "w") as f:
+            json.dump(all_trade_records, f, indent=2)
+        print(f"Saved {len(all_trade_records)} trade records to {args.trades_output}", flush=True)
 
     combined_net = sum(r["net_pnl_usd"] for r in results.values())
     combined_trades = sum(r["num_trades"] for r in results.values())

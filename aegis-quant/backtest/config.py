@@ -11,7 +11,7 @@ SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
 
 # Matches the documented, already-implemented exit policy: close on the
 # next candle only.
-EXIT_HORIZON = 1
+EXIT_HORIZON = 4
 
 # Matches the documented stop-distance formula:
 # stop_distance_pct = clamp(3.0 * volatility, 0.002, 0.02)

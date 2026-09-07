@@ -114,6 +114,9 @@ def run_pipeline(symbol: str, as_of: str) -> dict:
     return state
 
 
+import functools
+
+@functools.lru_cache(maxsize=1)
 def build_graph():
     """Compile the LangGraph version of this pipeline (used in production)."""
     from langgraph.graph import END, StateGraph

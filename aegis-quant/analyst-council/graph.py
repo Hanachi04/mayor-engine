@@ -6,6 +6,9 @@ from agents.sentiment import sentiment_node
 from agents.technicals import technicals_node
 
 
+import functools
+
+@functools.lru_cache(maxsize=1)
 def build_graph() -> StateGraph:
     """
     Build the Analyst Council layer graph.

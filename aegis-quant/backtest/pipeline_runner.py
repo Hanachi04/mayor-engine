@@ -9,8 +9,8 @@ import sys
 from typing import Optional
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-AEGIS_ROOT = os.path.join(os.path.dirname(__file__), "..")
-DB_PATH = os.path.join(AEGIS_ROOT, "data", "aegis.sqlite3")
+AEGIS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DB_PATH = os.environ.get("AEGIS_DB_PATH", os.path.join(AEGIS_ROOT, "data", "aegis.sqlite3"))
 
 LAYER_ENTRYPOINTS = [
     "analyst-council",
@@ -19,81 +19,178 @@ LAYER_ENTRYPOINTS = [
     "risk-memory",
 ]
 
+_LAYER_CACHE = {}
 
-def run_layer(layer_folder: str, symbol: str, as_of_iso: str, as_of_ms: Optional[int] = None, timeout: int = 60) -> None:
-    for mod_name in list(sys.modules.keys()):
-        if mod_name in ("adapters", "persistence", "agents", "metrics", "risk", "reflection", "graph", "main", "config", "state", "environment", "sizing", "agent", "reward") or mod_name.startswith(("adapters.", "persistence.", "agents.", "metrics.", "risk.", "reflection.", "environment.", "sizing.", "agent.", "reward.")):
-            del sys.modules[mod_name]
 
-    cwd = os.path.join(AEGIS_ROOT, layer_folder)
-    sys.path.insert(0, cwd)
-    try:
+def clear_layer_modules():
+    keys_to_del = [
+        k
+        for k in sys.modules.keys()
+        if k
+        in (
+            "adapters",
+            "persistence",
+            "agents",
+            "metrics",
+            "risk",
+            "reflection",
+            "graph",
+            "main",
+            "config",
+            "state",
+            "environment",
+            "sizing",
+            "agent",
+            "reward",
+        )
+        or k.startswith(
+            (
+                "adapters.",
+                "persistence.",
+                "agents.",
+                "metrics.",
+                "risk.",
+                "reflection.",
+                "environment.",
+                "sizing.",
+                "agent.",
+                "reward.",
+            )
+        )
+    ]
+    for k in keys_to_del:
+        del sys.modules[k]
+
+
+def _init_layer_cache():
+    if _LAYER_CACHE:
+        return
+
+    for layer_folder in LAYER_ENTRYPOINTS:
+        clear_layer_modules()
+        cwd = os.path.abspath(os.path.join(AEGIS_ROOT, layer_folder))
+        sys.path.insert(0, cwd)
+
+        before = dict(sys.modules)
+
         if layer_folder == "analyst-council":
             import adapters.market_data as m_data
-            import persistence.sqlite_store as ac_store
             import graph as ac_graph
-            snapshot = m_data.load_snapshot(symbol=symbol, as_of=as_of_ms)
+            import persistence.sqlite_store as ac_store
+
             graph = ac_graph.build_graph()
-            state = graph.invoke({
-                "symbol": symbol,
-                "as_of": snapshot["close_time"],
-                "snapshot": snapshot,
-            })
+            funcs = {"m_data": m_data, "ac_store": ac_store, "graph": graph}
+        elif layer_folder == "debate-chamber":
+            import adapters.council_input as c_input
+            import graph as dc_graph
+            import persistence.sqlite_store as dc_store
+
+            graph = dc_graph.build_graph()
+            funcs = {"c_input": c_input, "dc_store": dc_store, "graph": graph}
+        elif layer_folder == "drl-sizing":
+            import adapters.debate_input as d_input
+            import adapters.local_market as l_market
+            import graph as drl_graph
+            import persistence.sqlite_store as drl_store
+
+            graph = drl_graph.build_graph()
+            funcs = {
+                "d_input": d_input,
+                "l_market": l_market,
+                "drl_store": drl_store,
+                "graph": graph,
+            }
+        elif layer_folder == "risk-memory":
+            import graph as rm_graph
+
+            funcs = {"rm_graph": rm_graph}
+
+        added = {k: v for k, v in sys.modules.items() if k not in before}
+        _LAYER_CACHE[layer_folder] = {"added": added, "funcs": funcs, "cwd": cwd}
+        sys.path.pop(0)
+
+
+def run_layer(
+    layer_folder: str,
+    symbol: str,
+    as_of_iso: str,
+    as_of_ms: Optional[int] = None,
+    timeout: int = 60,
+) -> None:
+    _init_layer_cache()
+    clear_layer_modules()
+    cache = _LAYER_CACHE[layer_folder]
+    sys.modules.update(cache["added"])
+    funcs = cache["funcs"]
+
+    sys.path.insert(0, cache["cwd"])
+    try:
+        if layer_folder == "analyst-council":
+            snapshot = funcs["m_data"].load_snapshot(symbol=symbol, as_of=as_of_ms)
+            state = funcs["graph"].invoke(
+                {
+                    "symbol": symbol,
+                    "as_of": snapshot["close_time"],
+                    "snapshot": snapshot,
+                }
+            )
             conn = sqlite3.connect(DB_PATH)
             try:
-                state["sqlite_decision_id"] = ac_store.log_decision(conn, state)
+                state["sqlite_decision_id"] = funcs["ac_store"].log_decision(conn, state)
             finally:
                 conn.close()
 
         elif layer_folder == "debate-chamber":
-            import adapters.council_input as c_input
-            import persistence.sqlite_store as dc_store
-            import graph as dc_graph
             conn = sqlite3.connect(DB_PATH)
             try:
-                council = c_input.load_council_output(conn, symbol=symbol, as_of=as_of_ms)
-                graph = dc_graph.build_graph()
-                state = graph.invoke({
-                    "symbol": council["symbol"],
-                    "as_of": council["as_of"],
-                    "snapshot": council["snapshot"],
-                    "fundamentals": council["fundamentals"],
-                    "sentiment": council["sentiment"],
-                    "technicals": council["technicals"],
-                })
-                state["sqlite_decision_id"] = dc_store.log_debate(conn, state)
+                council = funcs["c_input"].load_council_output(conn, symbol=symbol, as_of=as_of_ms)
+                state = funcs["graph"].invoke(
+                    {
+                        "symbol": council["symbol"],
+                        "as_of": council["as_of"],
+                        "snapshot": council["snapshot"],
+                        "fundamentals": council["fundamentals"],
+                        "sentiment": council["sentiment"],
+                        "technicals": council["technicals"],
+                    }
+                )
+                state["sqlite_decision_id"] = funcs["dc_store"].log_debate(conn, state)
             finally:
                 conn.close()
 
         elif layer_folder == "drl-sizing":
-            import adapters.debate_input as d_input
-            import adapters.local_market as l_market
-            import persistence.sqlite_store as drl_store
-            import graph as drl_graph
             conn = sqlite3.connect(DB_PATH)
             try:
-                debate = d_input.load_debate_output(conn, symbol=symbol, as_of=as_of_ms)
-                market_snapshot = l_market.load_market_snapshot(symbol=symbol, as_of=debate["as_of"])
-                graph = drl_graph.build_graph()
-                state = graph.invoke({
-                    "symbol": debate["symbol"],
-                    "as_of": debate["as_of"],
-                    "final_decision": debate["final_decision"],
-                    "final_score": debate["final_score"],
-                    "decisive_side": debate["decisive_side"],
-                    "market_snapshot": market_snapshot,
-                })
+                debate = funcs["d_input"].load_debate_output(conn, symbol=symbol, as_of=as_of_ms)
+                market_snapshot = funcs["l_market"].load_market_snapshot(
+                    symbol=symbol, as_of=debate["as_of"]
+                )
+                state = funcs["graph"].invoke(
+                    {
+                        "symbol": debate["symbol"],
+                        "as_of": debate["as_of"],
+                        "final_decision": debate["final_decision"],
+                        "final_score": debate["final_score"],
+                        "decisive_side": debate["decisive_side"],
+                        "market_snapshot": market_snapshot,
+                    }
+                )
                 state.pop("market_snapshot", None)
                 state.pop("execution_candidates", None)
-                state["sqlite_decision_id"] = drl_store.log_result(conn, state)
+                state["sqlite_decision_id"] = funcs["drl_store"].log_result(conn, state)
             finally:
                 conn.close()
 
         elif layer_folder == "risk-memory":
-            import graph as rm_graph
-            rm_graph.run_pipeline(symbol, as_of_iso)
+            try:
+                import risk_memory.config as rm_cfg
+
+                rm_cfg.DB_PATH = DB_PATH
+            except Exception:
+                pass
+            funcs["rm_graph"].run_pipeline(symbol, as_of_iso)
     finally:
-        if sys.path[0] == cwd:
+        if sys.path[0] == cache["cwd"]:
             sys.path.pop(0)
 
 

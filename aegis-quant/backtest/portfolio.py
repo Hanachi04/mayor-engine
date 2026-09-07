@@ -55,7 +55,6 @@ class Portfolio:
     def sharpe_ratio(self) -> float:
         if len(self.trade_pnls) < 2:
             return 0.0
-        mean = sum(1 for p in self.trade_pnls if p > 0)
         mean = sum(self.trade_pnls) / len(self.trade_pnls)
         variance = sum((p - mean) ** 2 for p in self.trade_pnls) / (len(self.trade_pnls) - 1)
         std_dev = math.sqrt(variance)

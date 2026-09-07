@@ -3,3 +3,9 @@ __pycache__/
 *.pyo
 *.pyd
 *.sqlite3
+*.json
+aegis-quant/data/*.csv
+data/reports/
+*.log
+*.txt
+aegis-quant/backtest/trades_log_*.json
