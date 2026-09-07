@@ -112,5 +112,53 @@
     "closePct": -1.7389,
     "netPnlUsd": -67.4865,
     "closeAt": "2026-09-05T21:30:13.374Z"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "dir": "SHORT",
+    "price": 743.33,
+    "atr": 0.50542216019602,
+    "atrPct": 0.0006799431748967754,
+    "rsi": 31.997043380567504,
+    "e9": 743.8193334671676,
+    "e21": 744.1464570667999,
+    "volSpike": true,
+    "recentCross": false,
+    "volume": 406.4,
+    "avgVolume": 256.57800000000003,
+    "closedCandle": 1788791880000,
+    "orderBookImbalance": 0.23,
+    "obAligned": false,
+    "sl": 743.8859643762156,
+    "tp1": 742.4960534356766,
+    "tp2": 742.0790801535148,
+    "rr": 1.5,
+    "liquidity24h": 400873992.832,
+    "position": {
+      "capital": 1000,
+      "riskPct": 0.35,
+      "riskCapital": 3.5,
+      "leverage": 5,
+      "stopDistancePct": 0.0748,
+      "notional": 4679.54,
+      "margin": 935.91,
+      "quantity": 6.29536738,
+      "maxLossBeforeCosts": 3.5
+    },
+    "filters": [
+      "EMA9/21 SHORT",
+      "VOL_SPIKE",
+      "RSI7 32",
+      "ATR×1.1",
+      "RR 1:1.5",
+      "3m+5m OK"
+    ],
+    "engineVersion": "futures-scalper-v1.0",
+    "feeRate": 0.0004,
+    "slippageRate": 0.0003,
+    "date": "2026-09-07",
+    "ts": 1788791944022,
+    "closed": false,
+    "entryFillPrice": 743.1070010000001
   }
 ]
