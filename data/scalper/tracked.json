@@ -215,7 +215,16 @@
     "slippageRate": 0.0003,
     "date": "2026-09-10",
     "ts": 1789069488410,
-    "closed": false,
-    "entryFillPrice": 2471.581252
+    "closed": true,
+    "entryFillPrice": 2471.581252,
+    "closePrice": 2605.86,
+    "closeResult": "TP1",
+    "exitFillPrice": 2605.078242,
+    "grossPnlPct": 5.4013,
+    "feesPct": 0.08,
+    "slippagePct": 0.06,
+    "closePct": 5.3213,
+    "netPnlUsd": 238.0601,
+    "closeAt": "2026-09-11T15:50:38.507Z"
   }
 ]
