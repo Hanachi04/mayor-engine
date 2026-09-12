@@ -220,8 +220,9 @@ def fetch_final_decision(symbol: str, as_of: str, db_path: str) -> Optional[dict
         conn.close()
 
 
-def fetch_drl_risk_fraction(symbol: str, as_of: str, db_path: str) -> Optional[float]:
-    """Read the DRL layer's chosen risk_fraction for this (symbol, as_of)."""
+def fetch_drl_risk_fraction(symbol: str, as_of_ms: int, db_path: str) -> Optional[float]:
+    """Read the DRL risk fraction using the shared millisecond timestamp type."""
+    as_of_ms = int(as_of_ms)
     conn = sqlite3.connect(db_path)
     try:
         cursor = conn.execute(
@@ -232,15 +233,15 @@ def fetch_drl_risk_fraction(symbol: str, as_of: str, db_path: str) -> Optional[f
         cols = {col[1] for col in conn.execute("PRAGMA table_info(drl_sizing_decisions)")}
         if "selected_risk_pct" in cols:
             row = conn.execute(
-                "SELECT selected_risk_pct FROM drl_sizing_decisions WHERE symbol = ? AND (as_of = ? OR as_of = ? - 3599999) ORDER BY id DESC LIMIT 1",
-                (symbol, as_of, as_of),
+                "SELECT selected_risk_pct FROM drl_sizing_decisions WHERE symbol = ? AND CAST(as_of AS INTEGER) = ? ORDER BY id DESC LIMIT 1",
+                (symbol, as_of_ms),
             ).fetchone()
             if row and row[0] is not None:
                 return row[0]
         if "risk_fraction" in cols:
             row = conn.execute(
-                "SELECT risk_fraction FROM drl_sizing_decisions WHERE symbol = ? AND (as_of = ? OR as_of = ? - 3599999) ORDER BY id DESC LIMIT 1",
-                (symbol, as_of, as_of),
+                "SELECT risk_fraction FROM drl_sizing_decisions WHERE symbol = ? AND CAST(as_of AS INTEGER) = ? ORDER BY id DESC LIMIT 1",
+                (symbol, as_of_ms),
             ).fetchone()
             if row and row[0] is not None:
                 return row[0]

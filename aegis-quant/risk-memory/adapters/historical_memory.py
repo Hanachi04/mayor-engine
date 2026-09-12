@@ -22,14 +22,18 @@ def fetch_recent_rewards(symbol: str, as_of: str, limit: int = 50, db_path: str 
         if cursor.fetchone() is None:
             return []
 
-        try:
+        as_of_declared_type = next(
+            (
+                row[2]
+                for row in conn.execute("PRAGMA table_info(drl_sizing_decisions)")
+                if row[1] == "as_of"
+            ),
+            "",
+        ).upper()
+        if "INT" in as_of_declared_type:
             from datetime import datetime
-            dt = datetime.fromisoformat(as_of)
-            as_of_ms = int(dt.timestamp() * 1000)
-        except Exception:
-            as_of_ms = None
 
-        if as_of_ms is not None:
+            as_of_value = int(datetime.fromisoformat(as_of).timestamp() * 1000)
             rows = conn.execute(
                 """
                 SELECT reward FROM drl_sizing_decisions
@@ -37,17 +41,17 @@ def fetch_recent_rewards(symbol: str, as_of: str, limit: int = 50, db_path: str 
                 ORDER BY as_of DESC
                 LIMIT ?
                 """,
-                (symbol, as_of_ms, limit),
+                (symbol, as_of_value, limit),
             ).fetchall()
         else:
             rows = conn.execute(
                 """
                 SELECT reward FROM drl_sizing_decisions
-                WHERE symbol = ? AND reward IS NOT NULL
-                ORDER BY id DESC
+                WHERE symbol = ? AND as_of <= ? AND reward IS NOT NULL
+                ORDER BY as_of DESC
                 LIMIT ?
                 """,
-                (symbol, limit),
+                (symbol, as_of, limit),
             ).fetchall()
 
         rewards = [r[0] for r in rows]

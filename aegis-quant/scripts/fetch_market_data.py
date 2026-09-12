@@ -18,8 +18,26 @@ from datetime import datetime, timedelta, timezone
 import requests
 
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
+# Binance's public market-data host is not geo-restricted and is still the
+# Binance public API, so use it before the Binance.US fallback.
+BINANCE_DATA_VISION_URL = "https://data-api.binance.vision/api/v3/klines"
 BINANCE_US_KLINES_URL = "https://api.binance.us/api/v3/klines"
-SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
+SYMBOLS = [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "AVAXUSDT",
+    "DOTUSDT",
+    "LINKUSDT",
+    # Binance migrated MATIC to POL; fetch the liquid replacement.
+    "POLUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+]
 INTERVAL = "1h"
 LIMIT_PER_REQUEST = 1000
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -41,15 +59,24 @@ def fetch_klines(symbol: str, start_time_ms: int, end_time_ms: int, session=None
             "startTime": cursor,
             "limit": LIMIT_PER_REQUEST,
         }
-        try:
-            response = session.get(BINANCE_KLINES_URL, params=params, timeout=30)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            if err.response is not None and err.response.status_code == 451:
-                response = session.get(BINANCE_US_KLINES_URL, params=params, timeout=30)
-                response.raise_for_status()
-            else:
-                raise
+        response = None
+        last_error = None
+        for endpoint in (
+            BINANCE_KLINES_URL,
+            BINANCE_DATA_VISION_URL,
+            BINANCE_US_KLINES_URL,
+        ):
+            try:
+                candidate = session.get(endpoint, params=params, timeout=30)
+                candidate.raise_for_status()
+                response = candidate
+                break
+            except requests.exceptions.HTTPError as err:
+                last_error = err
+                if err.response is None or err.response.status_code not in (400, 403, 451):
+                    raise
+        if response is None:
+            raise last_error
         rows = response.json()
 
         if not rows:

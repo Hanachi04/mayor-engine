@@ -7,7 +7,22 @@ DATA_DIR = os.environ.get(
     os.path.join(os.path.dirname(__file__), "..", "data"),
 )
 
-SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
+SYMBOLS = [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "AVAXUSDT",
+    "DOTUSDT",
+    "LINKUSDT",
+    # Binance migrated MATIC to POL; POLUSDT is the liquid replacement.
+    "POLUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+]
 
 # Matches the documented, already-implemented exit policy: close on the
 # next candle only.
@@ -22,8 +37,8 @@ VOLATILITY_LOOKBACK = 20  # candles used for the rolling volatility estimate
 
 # Realistic Binance USDT-M taker fee + a conservative slippage allowance,
 # both applied on entry and on exit (round-trip).
-TAKER_FEE_PCT = 0.0004
-SLIPPAGE_PCT = 0.0002
+TAKER_FEE_PCT = 0.0002
+SLIPPAGE_PCT = 0.0001
 
 STARTING_CAPITAL = 10_000.0
 
