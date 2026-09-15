@@ -3,9 +3,9 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-09-14T20:20:04.044Z",
-  "windowStart": "2026-09-13T20:20:04.044Z",
-  "windowEnd": "2026-09-14T20:20:04.044Z",
+  "generatedAt": "2026-09-15T20:19:51.656Z",
+  "windowStart": "2026-09-14T20:19:51.656Z",
+  "windowEnd": "2026-09-15T20:19:51.656Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
