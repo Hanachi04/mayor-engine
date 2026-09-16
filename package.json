@@ -13,7 +13,9 @@
     "report:monthly": "node engine/performance_report.js monthly",
     "test:scalper": "node test/scalper/unit.test.js",
     "scalper": "node engine/scalper/scan.js",
-    "scalper:backtest": "node engine/scalper/backtest.js"
+    "scalper:backtest": "node engine/scalper/backtest.js",
+    "status": "node engine/auto_status.js",
+    "report:status": "node engine/auto_status.js"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,96 @@
+name: Auto Status Documentation
+
+# يوثّق حالة MaYor + Scalper + Aegis تلقائياً في docs/STATUS.md
+on:
+  schedule:
+    # كل يوم 21:15 UTC ≈ 00:15 الرياض (بعد التقرير اليومي)
+    - cron: '15 21 * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MaYor Daily Performance Report"
+      - "Futures Scalper v1.1"
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-status-docs
+  cancel-in-progress: false
+
+jobs:
+  document:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build unified status
+        run: node engine/auto_status.js
+
+      - name: Optional Telegram snapshot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
+        run: |
+          if [ -z "${TELEGRAM_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT:-}" ]; then
+            echo "Telegram skip"
+            exit 0
+          fi
+          node << 'NODE'
+          const fs = require('fs');
+          const s = JSON.parse(fs.readFileSync('data/reports/status.json', 'utf8'));
+          const m = s.systems.mayor, sc = s.systems.scalper, a = s.systems.aegis;
+          const text = [
+            '📋 <b>توثيق تلقائي — حالة الأنظمة</b>',
+            '',
+            `<b>MaYor</b>: ${m.verdict}`,
+            `صفقات مغلقة: ${m.closed} | صافي: ${m.netPct}% | بوابة: ${m.gate.status}`,
+            '',
+            `<b>Scalper</b>: ${sc.verdict}`,
+            `صفقات: ${sc.closed} | صافي: ${sc.netPct}% | بوابة: ${sc.gate.status}`,
+            '',
+            `<b>Aegis</b>: ${a.verdict}`,
+            a.profitability ? `status=${a.profitability.status} PF=${a.profitability.profitFactor}` : 'لا تقرير ربحية بعد',
+            '',
+            '📄 التفاصيل: docs/STATUS.md في المستودع',
+            '⚠️ بحثي فقط — ليس ضمان ربح'
+          ].join('\n');
+          fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT, text, parse_mode: 'HTML' })
+          }).then(r => r.text()).then(t => console.log(t.slice(0, 200))).catch(e => console.log(e.message));
+          NODE
+
+      - name: Commit documentation
+        env:
+          GH_BRANCH: main
+        run: |
+          set -u
+          git config user.name "mayor-status-bot"
+          git config user.email "mayor-status-bot@users.noreply.github.com"
+          git add docs/STATUS.md data/reports/status.json data/reports/history.jsonl
+          if git diff --cached --quiet; then
+            echo "No status changes"
+            exit 0
+          fi
+          git commit -m "docs: auto status $(date -u +%Y-%m-%dT%H:%MZ)"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 4))
+          done
+          exit 1

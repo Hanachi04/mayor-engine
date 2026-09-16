@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T19:24:51.666Z",
+  "systems": {
+    "mayor": {
+      "label": "MaYor",
+      "total": 9,
+      "open": 0,
+      "closed": 9,
+      "wins": 6,
+      "losses": 3,
+      "winRatePct": 66.7,
+      "netPct": 13.332,
+      "lastAt": "2026-08-30T18:07:20.232Z",
+      "engineVersion": "cloud-pro-mtf-2.0",
+      "strategyMode": "balanced",
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "reason": "one or more symbol gates blocked"
+      },
+      "verdict": "✅ صافي موجب (بحثي)"
+    },
+    "scalper": {
+      "label": "Scalper",
+      "total": 4,
+      "open": 0,
+      "closed": 4,
+      "wins": 2,
+      "losses": 2,
+      "winRatePct": 50,
+      "netPct": 6.458,
+      "lastAt": "2026-09-11T15:50:38.507Z",
+      "engineVersion": "futures-scalper-v1.0",
+      "gate": {
+        "status": "BLOCKED",
+        "passed": false,
+        "reason": "awaiting-first-local-backtest"
+      },
+      "heartbeat": "2026-09-16T19:21:06.130Z",
+      "heartbeatOk": false,
+      "verdict": "⏳ جمع عينة"
+    },
+    "aegis": {
+      "symbol": "BTCUSDT",
+      "tradeDecisions": 16,
+      "profitabilityEvaluated": false,
+      "profitability": null,
+      "verdict": "⏳ لم يُقيَّم بعد"
+    }
+  },
+  "reports": {
+    "dailyNetPct": 0,
+    "weeklyNetPct": 0,
+    "dailyClosed": 0,
+    "weeklyClosed": 0
+  },
+  "note": "نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية."
+}
