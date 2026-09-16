@@ -22,7 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ENGINE_VERSION = 'cloud-pro-mtf-3.0-unified';
+const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
 const TOKEN = process.env.TELEGRAM_TOKEN || '';
 const CHAT = process.env.TELEGRAM_CHAT || '';
 const SHEET_CSV_URL = process.env.SHEET_CSV_URL || '';
@@ -47,9 +47,9 @@ const CONFIG = {
   limits: { '5m': 300, '15m': 600, '1h': 300, '4h': 250 },
   frameWeights: { '5m': 1, '15m': 1.25, '1h': 1.5, '4h': 2 },
   minFrames: 3,
-  minMtfPct: 65,
-  minCorePct: 55,
-  minAdx: 18,
+  minMtfPct: Number(process.env.MIN_MTF_PCT || (STRATEGY_MODE === 'core' ? 60 : 65)),
+  minCorePct: Number(process.env.MIN_CORE_PCT || (STRATEGY_MODE === 'core' ? 50 : 55)),
+  minAdx: Number(process.env.MIN_ADX || (STRATEGY_MODE === 'core' ? 16 : 18)),
   minAtrPct: 0.001,
   maxAtrPct: 0.08,
   minKlines: 55,
@@ -85,12 +85,16 @@ const CONFIG = {
 // ملاحظة تحفّظية: بوابة التحقق الإحصائي لا تقارن بين الأنماط تلقائيًا؛ اختيار النمط
 // قرار بشري واحد وقت النشر، وليس اختيارًا ديناميكيًا لكل صفقة — لتفادي مخاطر Overfitting.
 const WEIGHT_PROFILES = {
+  // Legacy full vote stack (v13-compatible)
   balanced: { trend: 1.5, macd: 1.5, rsi: 1.2, smc_fvg: 2, supertrend: 1.5,
-    volume: 1.3, bollinger: 1, stochrsi: 1.2, structure: 1.3, taker_flow: 1, sentiment: 0.5 },
+    volume: 1.3, bollinger: 1, stochrsi: 1.2, structure: 1.3, taker_flow: 1, sentiment: 0.8 },
   momentum: { trend: 1.4, macd: 1.8, rsi: 1, smc_fvg: 1.6, supertrend: 2,
-    volume: 1.8, bollinger: 0.6, stochrsi: 1, structure: 1, taker_flow: 1.4, sentiment: 0.4 },
+    volume: 1.6, bollinger: 0.8, stochrsi: 1, structure: 1.1, taker_flow: 1.2, sentiment: 0.6 },
   breakout: { trend: 1.2, macd: 1.1, rsi: 0.9, smc_fvg: 1.8, supertrend: 1.3,
-    volume: 1.6, bollinger: 1.6, stochrsi: 0.8, structure: 2, taker_flow: 1, sentiment: 0.4 }
+    volume: 1.4, bollinger: 1.5, stochrsi: 1.1, structure: 1.8, taker_flow: 1.1, sentiment: 0.5 },
+  // v2.1 core: fewer votes → less overfitting surface, clearer hypothesis
+  core: { trend: 2.0, macd: 1.8, supertrend: 1.8, structure: 1.5,
+    rsi: 0, smc_fvg: 0, volume: 1.0, bollinger: 0, stochrsi: 0, taker_flow: 0, sentiment: 0 }
 };
 const WEIGHTS = WEIGHT_PROFILES[STRATEGY_MODE] || WEIGHT_PROFILES.balanced;
 const TOTAL_VOTE_WEIGHT = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
@@ -507,7 +511,8 @@ async function getMTFAnalysis(symbol, liquidity24h, sentiment = null) {
   const totalWeight = longWeight + shortWeight, dir = longWeight >= shortWeight ? 'LONG' : 'SHORT';
   const winningWeight = dir === 'LONG' ? longWeight : shortWeight, mtfPct = totalWeight ? winningWeight / totalWeight * 100 : 0;
   if (mtfPct < CONFIG.minMtfPct) return { ok: false, reason: `mtf-threshold:${mtfPct.toFixed(1)}%`, frames, valid, mtfPct };
-  if (!frames['1h']?.signal || !frames['4h']?.signal || frames['1h'].signal.dir !== dir || frames['4h'].signal.dir !== dir)
+  const requireHtf = !/^(0|false|no)$/i.test(String(process.env.REQUIRE_HTF_ALIGN ?? '1'));
+  if (requireHtf && (!frames['1h']?.signal || !frames['4h']?.signal || frames['1h'].signal.dir !== dir || frames['4h'].signal.dir !== dir))
     return { ok: false, reason: 'higher-timeframe-conflict', frames, valid, mtfPct };
   if (!frames[CONFIG.baseInterval]?.signal || frames[CONFIG.baseInterval].signal.dir !== dir)
     return { ok: false, reason: 'base-frame-conflict', frames, valid, mtfPct };

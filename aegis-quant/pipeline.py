@@ -137,6 +137,121 @@ def init_db(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+
+def evaluate_profitability(candles: list[dict[str, float]], decisions: list[dict[str, Any]]) -> dict[str, Any]:
+    """Rule-based paper trades from Aegis decisions. No LLM. Costs included.
+
+    Entry: next 1h open after decision bar close.
+    SL: 1.5x realized volatility (feature proxy); TP: 2.0x SL distance (R:R 1:2).
+    Exit: SL, TP, or max 24 bars (24h). Fees 0.04% * 2 + slippage 0.03% * 2.
+    """
+    if not candles:
+        return {"profitability_evaluated": True, "trades": 0, "reason": "no-candles"}
+    by_time = {int(c["close_time"]): i for i, c in enumerate(candles)}
+    opens = [c["open"] for c in candles]
+    highs = [c["high"] for c in candles]
+    lows = [c["low"] for c in candles]
+    closes = [c["close"] for c in candles]
+    fee = 0.0004
+    slip = 0.0003
+    trades = []
+    for d in decisions:
+        if not d.get("signal"):
+            continue
+        as_of = int(d["as_of"])
+        idx = by_time.get(as_of)
+        if idx is None or idx + 2 >= len(candles):
+            continue
+        entry_i = idx + 1
+        entry_raw = opens[entry_i]
+        direction = d["signal"]
+        # vol from last 20 returns ending at decision bar
+        if idx < 20:
+            continue
+        vol = sum(abs((closes[j] - closes[j - 1]) / closes[j - 1]) for j in range(idx - 19, idx + 1)) / 20
+        risk = max(vol * 1.5, 0.003)  # min 0.3% stop
+        if direction == "LONG":
+            sl = entry_raw * (1 - risk)
+            tp = entry_raw * (1 + risk * 2.0)
+            entry_fill = entry_raw * (1 + slip)
+        else:
+            sl = entry_raw * (1 + risk)
+            tp = entry_raw * (1 - risk * 2.0)
+            entry_fill = entry_raw * (1 - slip)
+        result = "TIMEOUT"
+        exit_raw = closes[min(entry_i + 24, len(candles) - 1)]
+        exit_i = min(entry_i + 24, len(candles) - 1)
+        for j in range(entry_i, min(entry_i + 25, len(candles))):
+            if direction == "LONG":
+                if lows[j] <= sl:
+                    exit_raw, result, exit_i = sl, "SL", j
+                    break
+                if highs[j] >= tp:
+                    exit_raw, result, exit_i = tp, "TP", j
+                    break
+            else:
+                if highs[j] >= sl:
+                    exit_raw, result, exit_i = sl, "SL", j
+                    break
+                if lows[j] <= tp:
+                    exit_raw, result, exit_i = tp, "TP", j
+                    break
+            exit_raw, exit_i = closes[j], j
+        exit_fill = exit_raw * (1 - slip if direction == "LONG" else 1 + slip)
+        sign = 1 if direction == "LONG" else -1
+        gross = sign * (exit_fill - entry_fill) / entry_fill * 100
+        net = gross - fee * 2 * 100
+        trades.append({
+            "signal": direction, "result": result,
+            "entry": entry_fill, "exit": exit_fill,
+            "gross_pct": round(gross, 4), "net_pct": round(net, 4),
+            "entry_time": int(candles[entry_i]["open_time"]),
+            "exit_time": int(candles[exit_i]["close_time"]),
+        })
+    if not trades:
+        return {
+            "profitability_evaluated": True,
+            "trades": 0, "wins": 0, "losses": 0,
+            "win_rate_pct": 0, "net_pct": 0, "avg_net_pct": 0,
+            "profit_factor": 0, "max_drawdown_pct": 0,
+            "status": "NO_TRADES",
+            "note": "No actionable decisions to simulate",
+        }
+    wins = [t for t in trades if t["net_pct"] > 0]
+    losses = [t for t in trades if t["net_pct"] <= 0]
+    gw = sum(t["net_pct"] for t in wins)
+    gl = abs(sum(t["net_pct"] for t in losses))
+    net = sum(t["net_pct"] for t in trades)
+    equity = peak = dd = 0.0
+    for t in trades:
+        equity += t["net_pct"]
+        peak = max(peak, equity)
+        dd = max(dd, peak - equity)
+    pf = (gw / gl) if gl > 0 else (99.0 if gw > 0 else 0.0)
+    status = "EDGE_CANDIDATE" if net > 0 and pf > 1.0 and len(trades) >= 8 else "WEAK_OR_NEGATIVE"
+    return {
+        "profitability_evaluated": True,
+        "trades": len(trades),
+        "wins": len(wins),
+        "losses": len(losses),
+        "win_rate_pct": round(len(wins) / len(trades) * 100, 2),
+        "net_pct": round(net, 4),
+        "avg_net_pct": round(net / len(trades), 4),
+        "profit_factor": round(pf, 3),
+        "max_drawdown_pct": round(dd, 4),
+        "status": status,
+        "assumptions": {
+            "entry": "next_1h_open",
+            "sl": "1.5x_20bar_vol",
+            "tp": "2R",
+            "max_bars": 24,
+            "fee_rt_pct": 0.08,
+            "slip_rt_pct": 0.06,
+        },
+        "sample_trades": trades[:5],
+    }
+
+
 def run() -> dict[str, Any]:
     candles = fetch_month()
     # One decision snapshot per UTC day keeps the first slice small and auditable.
@@ -153,7 +268,17 @@ def run() -> dict[str, Any]:
     count = conn.execute("SELECT COUNT(*) FROM decisions").fetchone()[0]
     signals = conn.execute("SELECT COUNT(*) FROM decisions WHERE decision IS NOT NULL").fetchone()[0]
     conn.close()
-    report = {"symbol": "BTCUSDT", "interval": INTERVAL, "candles": len(candles), "feature_rows": len(feats), "sqlite_rows": count, "trade_decisions": signals, "model": GEMINI_MODEL, "local_only": True, "profitability_evaluated": False, "first_decision": next((x for x in decisions if x["signal"]), None)}
+    # Rule-based decisions for profitability (avoid LLM non-determinism in edge measurement)
+    rule_decisions = []
+    for feature in feats:
+        sentiment = {"label": "neutral", "score": 0.0, "reason": "rule-only-for-profitability"}
+        # technical-only path mirrors decision() without LLM
+        technical = feature["macd"] > feature["macd_signal"] and feature["close"] > feature["bb_mid"]
+        technical_short = feature["macd"] < feature["macd_signal"] and feature["close"] < feature["bb_mid"]
+        sig = "LONG" if technical else ("SHORT" if technical_short else None)
+        rule_decisions.append({"as_of": int(feature["close_time"]), "signal": sig, "sentiment": sentiment})
+    profit = evaluate_profitability(candles, rule_decisions)
+    report = {"symbol": "BTCUSDT", "interval": INTERVAL, "candles": len(candles), "feature_rows": len(feats), "sqlite_rows": count, "trade_decisions": signals, "model": GEMINI_MODEL, "local_only": True, "profitability_evaluated": True, "profitability": profit, "first_decision": next((x for x in decisions if x["signal"]), None)}
     REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))
     return report
