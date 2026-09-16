@@ -98,7 +98,7 @@ async function requestJson(pathname, params = {}) {
         timer = setTimeout(() => controller.abort(), CONFIG.requestTimeoutMs);
         const res = await fetch(url, {
           signal: controller.signal,
-          headers: { 'user-agent': 'Futures-Scalper-v1/1.0' }
+          headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' }
         });
         if (!res.ok) {
           const body = await res.text().catch(() => '');
@@ -206,13 +206,32 @@ function analyze1m(ks, extra = {}) {
   const atr = Indicators.atr(h, l, c, CONFIG.atrPeriod);
   if (!Number.isFinite(atr) || atr <= 0) return { signal: null, reason: 'atr-invalid' };
 
-  const recentCross = (dir === 'LONG' && e9Prev <= e21Prev) || (dir === 'SHORT' && e9Prev >= e21Prev);
-  if (!recentCross && !volSpike) {
-    return { signal: null, reason: 'no-cross-no-volume', dir, rsi, atr };
+  const atrPct = atr / price;
+  if (!(atrPct >= CONFIG.minAtrPct)) {
+    return { signal: null, reason: `atr-too-small:${(atrPct * 100).toFixed(3)}%`, dir, rsi, atr, atrPct };
   }
-  const rsiExtreme = dir === 'LONG' ? rsi >= 90 : rsi <= 10;
-  if (rsiExtreme && !volSpike) {
-    return { signal: null, reason: 'rsi-extreme', dir, rsi, atr };
+
+  const recentCross = (dir === 'LONG' && e9Prev <= e21Prev) || (dir === 'SHORT' && e9Prev >= e21Prev);
+  if (CONFIG.requireRecentCross && !recentCross) {
+    return { signal: null, reason: 'no-recent-cross', dir, rsi, atr, atrPct };
+  }
+  if (!recentCross && !volSpike) {
+    return { signal: null, reason: 'no-cross-no-volume', dir, rsi, atr, atrPct };
+  }
+
+  // Hard extreme: reject even with volume spike (late chase)
+  const rsiHard = dir === 'LONG'
+    ? rsi >= CONFIG.rsiHardExtremeLong
+    : rsi <= CONFIG.rsiHardExtremeShort;
+  if (rsiHard) {
+    return { signal: null, reason: 'rsi-hard-extreme', dir, rsi, atr, atrPct };
+  }
+  // Soft extreme: reject unless volume spike confirms
+  const rsiSoft = dir === 'LONG'
+    ? rsi >= CONFIG.rsiSoftExtremeLong
+    : rsi <= CONFIG.rsiSoftExtremeShort;
+  if (rsiSoft && !volSpike) {
+    return { signal: null, reason: 'rsi-soft-extreme', dir, rsi, atr, atrPct };
   }
 
   return {
@@ -221,7 +240,7 @@ function analyze1m(ks, extra = {}) {
       dir,
       price,
       atr,
-      atrPct: atr / price,
+      atrPct,
       rsi,
       e9, e21,
       volSpike,
@@ -329,12 +348,13 @@ async function getMTFScalper(symbol, liquidity24h) {
   leveled.position = calculatePositionSize(leveled);
   leveled.filters = [
     `EMA9/21 ${dir}`,
-    base.signal.volSpike ? 'VOL_SPIKE' : 'EMA_CROSS',
+    base.signal.recentCross ? 'EMA_CROSS' : 'EMA_TREND',
+    base.signal.volSpike ? 'VOL_SPIKE' : null,
     `RSI7 ${round(base.signal.rsi, 1)}`,
-    `ATR×${CONFIG.atrSlMult}`,
+    `ATR ${(base.signal.atrPct * 100).toFixed(2)}%×${CONFIG.atrSlMult}`,
     `RR 1:${leveled.rr}`,
     '3m+5m OK'
-  ];
+  ].filter(Boolean);
   if (leveled.obAligned) leveled.filters.push('OB ✓');
 
   return { ok: true, signal: leveled, frames };
