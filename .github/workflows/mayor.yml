@@ -63,7 +63,10 @@ jobs:
           REQUEST_TIMEOUT_MS: '12000'
           REQUEST_RETRIES: '3'
           # --- إعدادات الدمج الموحّد (v3.0) — القيم الافتراضية تحافظ على السلوك القديم تمامًا ---
-          STRATEGY_MODE: 'balanced'        # balanced | momentum | breakout
+          STRATEGY_MODE: 'core'            # core (v2.1 simplified) | balanced | momentum | breakout
+          MIN_CORE_PCT: '50'
+          MIN_MTF_PCT: '60'
+          MIN_ADX: '16'
           SENTIMENT_ENABLED: '1'           # 0 لإيقاف مؤشر الخوف والجشع كمصدر تصويت تكميلي
           MAX_DAILY_LOSS_PCT: '0'          # مثال: 5  → إيقاف إشارات جديدة بعد خسارة يومية 5%. 0 = معطّل
           MAX_LOSS_STREAK: '0'             # مثال: 4  → إيقاف إشارات جديدة بعد 4 خسائر متتالية. 0 = معطّل

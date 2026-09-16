@@ -16,3 +16,16 @@ python3 aegis-quant/test/test_pipeline.py
 ```
 
 يحتاج وكيل المعنويات إلى `GEMINI_API_KEY` من Google AI Studio، ويمكن اختيار النموذج عبر `GEMINI_MODEL` (الافتراضي `gemini-3.6-flash`). يستخدم البرنامج واجهة Gemini `generateContent` مع إخراج JSON منظم. قد تستخدم الطبقة المجانية البيانات لتحسين منتجات Google، لذلك لا ترسل بيانات سرية. البيانات والنتائج تحفظ في `aegis-quant/data/`، ولا تحفظ الأسرار في المستودع.
+
+## Profitability evaluation (v1.1)
+
+`pipeline.py` now runs a **rule-based** paper-trade evaluator (no LLM randomness):
+
+- Entry: next 1h open after decision bar
+- SL: 1.5× 20-bar realized vol (min 0.3%)
+- TP: 2R, max hold 24h
+- Fees + slippage included
+
+Report field: `profitability` with `status` ∈ `EDGE_CANDIDATE` | `WEAK_OR_NEGATIVE` | `NO_TRADES`.
+
+This measures technical-signal expectancy only. It is **not** a guarantee of live profit.
