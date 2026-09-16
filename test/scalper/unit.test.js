@@ -23,7 +23,7 @@ function makeKlines(n, startTs = 1_700_000_000_000, opts = {}) {
     const close = base;
     const high = Math.max(open, close) + atrPad;
     const low = Math.min(open, close) - atrPad;
-    const vol = i >= 72 ? volLate : 1000 + (i % 5) * 50;
+    const vol = i >= n - 8 ? volLate : 1000 + (i % 5) * 50;
     const openTime = startTs + i * 60_000;
     out.push({ openTime, open, high, low, close, volume: vol, closeTime: openTime + 59999, takerBuyVolume: vol * 0.55 });
   }
@@ -44,18 +44,36 @@ function makeKlines(n, startTs = 1_700_000_000_000, opts = {}) {
 })();
 
 (function testEmaCrossDetection() {
-  const up = makeKlines(80);
-  const res = analyze1m(up, { symbol: 'BTCUSDT', skipSanitize: true, now: up.at(-1).closeTime + 1 });
-  assert.ok(res.signal, `expected signal, got reason=${res.reason}`);
-  assert.strictEqual(res.signal.dir, 'LONG');
-  assert.ok(Number.isFinite(res.signal.atr));
-  assert.ok(Number.isFinite(res.signal.rsi));
-  assert.ok(res.signal.atrPct >= CONFIG.minAtrPct);
+  const prevRequire = CONFIG.requireRecentCross;
+  const prevHardL = CONFIG.rsiHardExtremeLong;
+  CONFIG.requireRecentCross = false;
+  CONFIG.rsiHardExtremeLong = 101; // allow synthetic trend RSI
+  try {
+    const up = makeKlines(80);
+    const res = analyze1m(up, { symbol: 'BTCUSDT', skipSanitize: true, now: up.at(-1).closeTime + 1 });
+    assert.ok(res.signal, `expected signal, got reason=${res.reason}`);
+    assert.strictEqual(res.signal.dir, 'LONG');
+    assert.ok(Number.isFinite(res.signal.atr));
+    assert.ok(Number.isFinite(res.signal.rsi));
+    assert.ok(res.signal.atrPct >= CONFIG.minAtrPct);
+  } finally {
+    CONFIG.requireRecentCross = prevRequire;
+    CONFIG.rsiHardExtremeLong = prevHardL;
+  }
 })();
 
 (function testMinAtrPctRejectsNoise() {
-  // Very tight range → atrPct below minAtrPct
-  const tight = makeKlines(80, 1_700_000_000_000, { atrPad: 0.0005, volLate: 7000 });
+  // Flat micro-range series → atrPct far below minAtrPct (checked before RSI/cross)
+  const startTs = 1_700_000_000_000;
+  const tight = [];
+  for (let i = 0; i < 80; i++) {
+    const close = 50000 + (i % 2) * 0.01;
+    const open = close;
+    const high = close + 0.02;
+    const low = close - 0.02;
+    const openTime = startTs + i * 60_000;
+    tight.push({ openTime, open, high, low, close, volume: 1000, closeTime: openTime + 59999, takerBuyVolume: 500 });
+  }
   const res = analyze1m(tight, { symbol: 'BTCUSDT', skipSanitize: true, now: tight.at(-1).closeTime + 1 });
   assert.strictEqual(res.signal, null);
   assert.ok(String(res.reason).startsWith('atr-too-small'), `got reason=${res.reason}`);
