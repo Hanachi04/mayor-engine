@@ -1,8 +1,13 @@
 'use strict';
 
 /**
- * Futures Scalper v1 — configuration (isolated from MaYor Cloud Pro MTF)
+ * Futures Scalper v1.1 — configuration (isolated from MaYor Cloud Pro MTF)
  * Binance USDT-M Perpetual Futures only. Research/notification only — no real orders.
+ *
+ * v1.1 edge filters:
+ * - minAtrPct: reject noise-tight stops on majors
+ * - requireRecentCross: prefer fresh EMA9/21 cross (not lagging trend-only)
+ * - tighter RSI extreme thresholds
  */
 
 const DEFAULT_SYMBOLS = [
@@ -32,8 +37,18 @@ const CONFIG = {
   atrPeriod: 14,
   atrSlMult: Number(process.env.SCALPER_ATR_SL_MULT || 1.1),
   minRr: Number(process.env.SCALPER_MIN_RR || 1.5),
+  /** Minimum ATR as fraction of price (0.0015 = 0.15%). Filters noise on BTC/ETH. */
+  minAtrPct: Number(process.env.SCALPER_MIN_ATR_PCT || 0.0015),
+  /** If true, only emit when EMA9/21 crossed on the latest closed bar. */
+  requireRecentCross: !/^(0|false|no)$/i.test(String(process.env.SCALPER_REQUIRE_RECENT_CROSS ?? '1')),
   rsiOversold: 30,
   rsiOverbought: 70,
+  /** Soft extreme: reject without volume spike */
+  rsiSoftExtremeLong: Number(process.env.SCALPER_RSI_SOFT_LONG || 80),
+  rsiSoftExtremeShort: Number(process.env.SCALPER_RSI_SOFT_SHORT || 20),
+  /** Hard extreme: reject even with volume spike */
+  rsiHardExtremeLong: Number(process.env.SCALPER_RSI_HARD_LONG || 90),
+  rsiHardExtremeShort: Number(process.env.SCALPER_RSI_HARD_SHORT || 10),
   minQuoteVolume24h: Number(process.env.SCALPER_MIN_QUOTE_VOLUME_24H || 20_000_000),
   capital: Number(process.env.SCALPER_ACCOUNT_CAPITAL || 1000),
   riskPerTradePct: Number(process.env.SCALPER_RISK_PER_TRADE_PCT || 0.35),
@@ -51,7 +66,7 @@ const CONFIG = {
   dryRun: /^(1|true|yes)$/i.test(process.env.SCALPER_DRY_RUN || process.env.DRY_RUN || '')
 };
 
-const ENGINE_VERSION = 'futures-scalper-v1.0';
+const ENGINE_VERSION = 'futures-scalper-v1.1';
 const GATE_VERSION = 'scalper-statistical-gate-1';
 
 module.exports = { CONFIG, ENGINE_VERSION, GATE_VERSION, DEFAULT_SYMBOLS };
