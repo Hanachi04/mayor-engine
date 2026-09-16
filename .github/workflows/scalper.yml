@@ -1,4 +1,4 @@
-name: Futures Scalper v1
+name: Futures Scalper v1.1
 
 on:
   schedule:
@@ -53,6 +53,8 @@ jobs:
           SCALPER_MAX_OPEN: '4'
           SCALPER_MAX_TRADE_AGE_MINUTES: '25'
           SCALPER_ATR_SL_MULT: '1.1'
+          SCALPER_MIN_ATR_PCT: '0.0015'
+          SCALPER_REQUIRE_RECENT_CROSS: '1'
           SCALPER_MIN_RR: '1.5'
           SCALPER_RISK_PER_TRADE_PCT: '0.35'
           SCALPER_MIN_QUOTE_VOLUME_24H: '20000000'
