@@ -12,16 +12,18 @@ const {
   summarize, monteCarloSequence, concentrationCheck, splitIsoos
 } = require('../../engine/scalper/backtest');
 
-function makeKlines(n, startTs = 1_700_000_000_000) {
+function makeKlines(n, startTs = 1_700_000_000_000, opts = {}) {
   const out = [];
+  const atrPad = opts.atrPad != null ? opts.atrPad : 0.2;
+  const volLate = opts.volLate != null ? opts.volLate : 7000;
   for (let i = 0; i < n; i++) {
     const wave = Math.sin(i / 3) * 0.4;
     const base = 100 + i * 0.12 + wave;
     const open = base - 0.1 + (i % 2 === 0 ? 0.05 : -0.05);
     const close = base;
-    const high = Math.max(open, close) + 0.2;
-    const low = Math.min(open, close) - 0.2;
-    const vol = i >= 72 ? 7000 : 1000 + (i % 5) * 50;
+    const high = Math.max(open, close) + atrPad;
+    const low = Math.min(open, close) - atrPad;
+    const vol = i >= 72 ? volLate : 1000 + (i % 5) * 50;
     const openTime = startTs + i * 60_000;
     out.push({ openTime, open, high, low, close, volume: vol, closeTime: openTime + 59999, takerBuyVolume: vol * 0.55 });
   }
@@ -29,13 +31,16 @@ function makeKlines(n, startTs = 1_700_000_000_000) {
 }
 
 (function testConfigIsolation() {
-  assert.strictEqual(ENGINE_VERSION, 'futures-scalper-v1.0');
+  assert.strictEqual(ENGINE_VERSION, 'futures-scalper-v1.1');
   assert.strictEqual(GATE_VERSION, 'scalper-statistical-gate-1');
   assert.ok(CONFIG.cooldownMs <= 5 * 60 * 1000);
   assert.ok(CONFIG.maxSignalsPerDay >= 20);
   assert.ok(CONFIG.atrSlMult <= 1.5);
   assert.ok(CONFIG.minRr <= 2.0);
   assert.ok(CONFIG.riskPerTradePct <= 0.6);
+  assert.ok(CONFIG.minAtrPct > 0);
+  assert.ok(CONFIG.minAtrPct <= 0.01);
+  assert.strictEqual(CONFIG.requireRecentCross, true);
 })();
 
 (function testEmaCrossDetection() {
@@ -45,7 +50,15 @@ function makeKlines(n, startTs = 1_700_000_000_000) {
   assert.strictEqual(res.signal.dir, 'LONG');
   assert.ok(Number.isFinite(res.signal.atr));
   assert.ok(Number.isFinite(res.signal.rsi));
-  assert.strictEqual(res.signal.volSpike, true);
+  assert.ok(res.signal.atrPct >= CONFIG.minAtrPct);
+})();
+
+(function testMinAtrPctRejectsNoise() {
+  // Very tight range → atrPct below minAtrPct
+  const tight = makeKlines(80, 1_700_000_000_000, { atrPad: 0.0005, volLate: 7000 });
+  const res = analyze1m(tight, { symbol: 'BTCUSDT', skipSanitize: true, now: tight.at(-1).closeTime + 1 });
+  assert.strictEqual(res.signal, null);
+  assert.ok(String(res.reason).startsWith('atr-too-small'), `got reason=${res.reason}`);
 })();
 
 (function testLevelsRr() {
@@ -119,4 +132,4 @@ function makeKlines(n, startTs = 1_700_000_000_000) {
   assert.strictEqual(is.length + oos.length, 20);
 })();
 
-console.log('✓ test/scalper: all Futures Scalper v1 unit tests passed');
+console.log('✓ test/scalper: all Futures Scalper v1.1 unit tests passed');
