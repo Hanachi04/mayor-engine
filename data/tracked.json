@@ -791,7 +791,16 @@
     "date": "2026-09-17",
     "ts": 1789669011160,
     "slot": 6,
-    "closed": false,
-    "entryFillPrice": 0.18323664
+    "closed": true,
+    "entryFillPrice": 0.18323664,
+    "closePrice": 0.1762,
+    "closeResult": "SL",
+    "exitFillPrice": 0.17616476,
+    "grossPnlPct": -3.8594,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -3.9594,
+    "netPnlUsd": -15.1012,
+    "closeAt": "2026-09-17T21:13:54.206Z"
   }
 ]
