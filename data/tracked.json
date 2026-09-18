@@ -940,8 +940,17 @@
     "date": "2026-09-18",
     "ts": 1789701236209,
     "slot": 1,
-    "closed": false,
-    "entryFillPrice": 0.20524103999999999
+    "closed": true,
+    "entryFillPrice": 0.20524103999999999,
+    "closePrice": 0.2222,
+    "closeResult": "TP2",
+    "exitFillPrice": 0.22215556,
+    "grossPnlPct": 8.2413,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": 8.1413,
+    "netPnlUsd": 27.8286,
+    "closeAt": "2026-09-18T18:15:21.616Z"
   },
   {
     "symbol": "LTCUSDT",
@@ -1148,7 +1157,16 @@
     "date": "2026-09-18",
     "ts": 1789744425970,
     "slot": 5,
-    "closed": false,
-    "entryFillPrice": 110.782152
+    "closed": true,
+    "entryFillPrice": 110.782152,
+    "closePrice": 112.48,
+    "closeResult": "TP1",
+    "exitFillPrice": 112.457504,
+    "grossPnlPct": 1.5123,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": 1.4123,
+    "netPnlUsd": 13.9187,
+    "closeAt": "2026-09-18T18:15:22.190Z"
   }
 ]
