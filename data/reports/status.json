@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-18T15:01:55.486Z",
+  "generatedAt": "2026-09-18T15:21:21.420Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
-      "total": 17,
-      "open": 2,
+      "total": 18,
+      "open": 3,
       "closed": 15,
       "wins": 10,
       "losses": 5,
@@ -37,7 +37,7 @@
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-18T15:01:30.357Z",
+      "heartbeat": "2026-09-18T15:20:48.962Z",
       "heartbeatOk": false,
       "verdict": "⏳ جمع عينة"
     },
@@ -51,9 +51,9 @@
   },
   "reports": {
     "dailyNetPct": 18.4698,
-    "weeklyNetPct": 0,
+    "weeklyNetPct": 21.994999999999997,
     "dailyClosed": 3,
-    "weeklyClosed": 0
+    "weeklyClosed": 6
   },
   "note": "نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية."
 }
