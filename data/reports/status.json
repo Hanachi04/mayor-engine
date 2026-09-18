@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-18T19:58:31.705Z",
+  "generatedAt": "2026-09-18T20:19:44.349Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
@@ -50,9 +50,9 @@
     }
   },
   "reports": {
-    "dailyNetPct": 18.4698,
+    "dailyNetPct": 17.0382,
     "weeklyNetPct": 21.994999999999997,
-    "dailyClosed": 3,
+    "dailyClosed": 4,
     "weeklyClosed": 6
   },
   "note": "نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية."
