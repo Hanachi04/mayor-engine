@@ -3,57 +3,70 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-09-17T20:20:41.073Z",
-  "windowStart": "2026-09-16T20:20:41.073Z",
-  "windowEnd": "2026-09-17T20:20:41.073Z",
+  "generatedAt": "2026-09-18T20:19:18.300Z",
+  "windowStart": "2026-09-17T20:19:18.300Z",
+  "windowEnd": "2026-09-18T20:19:18.300Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 4,
-    "closed": 3,
+    "signals": 5,
+    "closed": 4,
     "open": 1,
     "wins": 3,
-    "losses": 0,
+    "losses": 1,
     "neutral": 0,
-    "winRatePct": 100,
-    "grossPnlPct": 18.7698,
-    "feesPct": 0.30000000000000004,
-    "slippagePct": 0.12,
-    "netPnlPct": 18.4698,
-    "netPnlUsd": 103.66470000000001,
-    "averageNetPnlPct": 6.1566,
-    "profitFactor": null,
-    "maxDrawdownPct": 0,
+    "winRatePct": 75,
+    "grossPnlPct": 17.4382,
+    "feesPct": 0.4,
+    "slippagePct": 0.16,
+    "netPnlPct": 17.0382,
+    "netPnlUsd": 67.1884,
+    "averageNetPnlPct": 4.25955,
+    "profitFactor": 11.1466174368747,
+    "maxDrawdownPct": -1.6791999999999998,
     "bestSymbol": {
-      "symbol": "UNIUSDT",
-      "netPct": 10.2601
+      "symbol": "NEARUSDT",
+      "netPct": 9.1638
     },
     "worstSymbol": {
-      "symbol": "NEARUSDT",
-      "netPct": 8.2097
+      "symbol": "LTCUSDT",
+      "netPct": -1.6792
     }
   },
   "byResult": {
-    "TP1": 1,
-    "TP2": 1,
     "TP3": 1,
-    "مفتوحة": 1
+    "TP2": 1,
+    "SL": 1,
+    "مفتوحة": 1,
+    "TP1": 1
   },
   "bySymbol": {
     "NEARUSDT": {
-      "count": 2,
-      "wins": 2,
-      "losses": 0,
-      "netPct": 8.2097
-    },
-    "UNIUSDT": {
       "count": 1,
       "wins": 1,
       "losses": 0,
-      "netPct": 10.2601
+      "netPct": 9.1638
+    },
+    "ARBUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 8.1413
+    },
+    "LTCUSDT": {
+      "count": 1,
+      "wins": 0,
+      "losses": 1,
+      "netPct": -1.6792
+    },
+    "SOLUSDT": {
+      "count": 1,
+      "wins": 1,
+      "losses": 0,
+      "netPct": 1.4123
     }
   }
 }
