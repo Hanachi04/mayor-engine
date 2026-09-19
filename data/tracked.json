@@ -1626,5 +1626,72 @@
     "slot": 4,
     "closed": false,
     "entryFillPrice": 0.049189836
+  },
+  {
+    "symbol": "PEPEUSDT",
+    "dir": "LONG",
+    "price": 0.00000419,
+    "atr": 6.153161748811994e-8,
+    "atrPct": 0.014685350235828148,
+    "adx": 65.33875000007909,
+    "pdi": 37.341826463855746,
+    "mdi": 4.081028770239039,
+    "corePct": 69.1,
+    "filters": [
+      "ADX 65.3",
+      "DI +DI",
+      "CORE 69.1%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "VOLUME",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1789839900000,
+    "liquidity24h": 45527858.64344037,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "5m",
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "5m→LONG",
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 70.83803551931675,
+    "adx4h": 33.05365700821712,
+    "sentiment": 71,
+    "sl": 0.00000409770257376782,
+    "tp1": 0.00000428229742623218,
+    "tp2": 0.0000043745948524643595,
+    "tp3": 0.0000044668922786965394,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 2.2028,
+      "notional": 453.97,
+      "margin": 453.97,
+      "quantity": 108345383,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 1
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-19",
+    "ts": 1789841704601,
+    "slot": 6,
+    "closed": false,
+    "entryFillPrice": 0.0000041908379999999995
   }
 ]
