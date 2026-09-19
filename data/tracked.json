@@ -1090,8 +1090,17 @@
     "date": "2026-09-18",
     "ts": 1789733833153,
     "slot": 4,
-    "closed": false,
-    "entryFillPrice": 6.5923182
+    "closed": true,
+    "entryFillPrice": 6.5923182,
+    "closePrice": 6.885,
+    "closeResult": "TP1",
+    "exitFillPrice": 6.883623,
+    "grossPnlPct": 4.4189,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": 4.3189,
+    "netPnlUsd": 15.753,
+    "closeAt": "2026-09-19T03:13:14.471Z"
   },
   {
     "symbol": "SOLUSDT",
@@ -1311,5 +1320,73 @@
     "slot": 0,
     "closed": false,
     "entryFillPrice": 58.86177
+  },
+  {
+    "symbol": "ADAUSDT",
+    "dir": "LONG",
+    "price": 0.2346,
+    "atr": 0.0019479536419778933,
+    "atrPct": 0.008303297706640636,
+    "adx": 40.55531833528162,
+    "pdi": 38.69247566695665,
+    "mdi": 10.216537585560385,
+    "corePct": 93.8,
+    "filters": [
+      "ADX 40.6",
+      "DI +DI",
+      "CORE 93.8%",
+      "TREND",
+      "MACD",
+      "SMC_FVG",
+      "SUPERTREND",
+      "BOLLINGER",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1789785900000,
+    "liquidity24h": 50629504.26705,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "5m",
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "5m→LONG",
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 73.81423385029333,
+    "adx4h": 28.289283233279093,
+    "sentiment": 71,
+    "sl": 0.23167806953703315,
+    "tp1": 0.23752193046296685,
+    "tp2": 0.24044386092593367,
+    "tp3": 0.24336579138890052,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 1.2455,
+      "notional": 802.87,
+      "margin": 802.87,
+      "quantity": 3422.3,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-19",
+    "ts": 1789787596881,
+    "slot": 1,
+    "closed": false,
+    "entryFillPrice": 0.23464692
   }
 ]
