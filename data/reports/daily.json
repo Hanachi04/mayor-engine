@@ -3,75 +3,62 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-09-19T20:19:00.562Z",
-  "windowStart": "2026-09-18T20:19:00.562Z",
-  "windowEnd": "2026-09-19T20:19:00.562Z",
+  "generatedAt": "2026-09-20T20:18:36.985Z",
+  "windowStart": "2026-09-19T20:18:36.985Z",
+  "windowEnd": "2026-09-20T20:18:36.985Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 7,
-    "closed": 5,
-    "open": 2,
-    "wins": 3,
+    "signals": 4,
+    "closed": 3,
+    "open": 1,
+    "wins": 1,
     "losses": 2,
     "neutral": 0,
-    "winRatePct": 60,
-    "grossPnlPct": 7.861800000000001,
-    "feesPct": 0.5,
-    "slippagePct": 0.2,
-    "netPnlPct": 7.361800000000001,
-    "netPnlUsd": 30.3787,
-    "averageNetPnlPct": 1.4723600000000001,
-    "profitFactor": 1.9795619660962822,
-    "maxDrawdownPct": -7.5154,
+    "winRatePct": 33.33333333333333,
+    "grossPnlPct": -14.0175,
+    "feesPct": 0.30000000000000004,
+    "slippagePct": 0.12,
+    "netPnlPct": -14.317499999999999,
+    "netPnlUsd": -78.3897,
+    "averageNetPnlPct": -4.7725,
+    "profitFactor": 0.012545346704001545,
+    "maxDrawdownPct": -14.4994,
     "bestSymbol": {
-      "symbol": "INJUSDT",
-      "netPct": 7.715
+      "symbol": "TRXUSDT",
+      "netPct": 0.1819
     },
     "worstSymbol": {
-      "symbol": "ADAUSDT",
-      "netPct": -4.9974
+      "symbol": "AVAXUSDT",
+      "netPct": -8.6487
     }
   },
   "byResult": {
-    "TP2": 1,
     "SL": 2,
-    "TP3": 2,
-    "مفتوحة": 2
+    "TP1": 1,
+    "مفتوحة": 1
   },
   "bySymbol": {
-    "FILUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.8159
-    },
-    "LTCUSDT": {
+    "SUIUSDT": {
       "count": 1,
       "wins": 0,
       "losses": 1,
-      "netPct": -2.518
-    },
-    "ADAUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -4.9974
-    },
-    "INJUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 7.715
+      "netPct": -5.8507
     },
     "AVAXUSDT": {
       "count": 1,
+      "wins": 0,
+      "losses": 1,
+      "netPct": -8.6487
+    },
+    "TRXUSDT": {
+      "count": 1,
       "wins": 1,
       "losses": 0,
-      "netPct": 4.3463
+      "netPct": 0.1819
     }
   }
 }
