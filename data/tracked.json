@@ -1624,8 +1624,17 @@
     "date": "2026-09-19",
     "ts": 1789820220457,
     "slot": 4,
-    "closed": false,
-    "entryFillPrice": 0.049189836
+    "closed": true,
+    "entryFillPrice": 0.049189836,
+    "closePrice": 0.04792,
+    "closeResult": "SL",
+    "exitFillPrice": 0.047910416,
+    "grossPnlPct": -2.601,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -2.701,
+    "netPnlUsd": -27.0098,
+    "closeAt": "2026-09-20T03:13:46.655Z"
   },
   {
     "symbol": "PEPEUSDT",
@@ -1691,8 +1700,17 @@
     "date": "2026-09-19",
     "ts": 1789841704601,
     "slot": 6,
-    "closed": false,
-    "entryFillPrice": 0.0000041908379999999995
+    "closed": true,
+    "entryFillPrice": 0.0000041908379999999995,
+    "closePrice": 0.00000394,
+    "closeResult": "SL",
+    "exitFillPrice": 0.000003939212000000001,
+    "grossPnlPct": -6.0042,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -6.1042,
+    "netPnlUsd": -27.7112,
+    "closeAt": "2026-09-20T03:13:47.219Z"
   },
   {
     "symbol": "SUIUSDT",
@@ -1756,8 +1774,17 @@
     "date": "2026-09-19",
     "ts": 1789852367369,
     "slot": 7,
-    "closed": false,
-    "entryFillPrice": 0.87187434
+    "closed": true,
+    "entryFillPrice": 0.87187434,
+    "closePrice": 0.8219,
+    "closeResult": "SL",
+    "exitFillPrice": 0.82173562,
+    "grossPnlPct": -5.7507,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -5.8507,
+    "netPnlUsd": -39.0972,
+    "closeAt": "2026-09-20T03:13:47.657Z"
   },
   {
     "symbol": "AVAXUSDT",
@@ -1824,7 +1851,16 @@
     "date": "2026-09-20",
     "ts": 1789863588560,
     "slot": 0,
-    "closed": false,
-    "entryFillPrice": 10.3990794
+    "closed": true,
+    "entryFillPrice": 10.3990794,
+    "closePrice": 9.512,
+    "closeResult": "SL",
+    "exitFillPrice": 9.5100976,
+    "grossPnlPct": -8.5487,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -8.6487,
+    "netPnlUsd": -41.1114,
+    "closeAt": "2026-09-20T03:13:47.828Z"
   }
 ]
