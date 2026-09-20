@@ -1,8 +1,7 @@
 {
   "engineVersion": "futures-scalper-v1.1",
-  "at": "2026-09-20T19:29:17.642Z",
-  "ts": 1789932557642,
-  "ok": true,
-  "phase": "no-candidates",
-  "candidates": 0
+  "at": "2026-09-20T19:43:09.577Z",
+  "ts": 1789933389577,
+  "ok": false,
+  "error": "HTTP 404 https://fstream.binance.com Invalid request path"
 }
