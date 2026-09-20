@@ -1862,5 +1862,70 @@
     "closePct": -8.6487,
     "netPnlUsd": -41.1114,
     "closeAt": "2026-09-20T03:13:47.828Z"
+  },
+  {
+    "symbol": "TRXUSDT",
+    "dir": "LONG",
+    "price": 0.3416,
+    "atr": 0.0004805803695668072,
+    "atrPct": 0.0014068511989660632,
+    "adx": 33.48620766904823,
+    "pdi": 32.40482055756312,
+    "mdi": 9.918520384129097,
+    "corePct": 69.1,
+    "filters": [
+      "ADX 33.5",
+      "DI +DI",
+      "CORE 69.1%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "TAKER_FLOW",
+      "ORDERBOOK ✓",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1789893900000,
+    "liquidity24h": 26645391.95325,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 69.02322431922644,
+    "adx4h": 20.842993565259064,
+    "sentiment": 71,
+    "sl": 0.3408791294456498,
+    "tp1": 0.34232087055435023,
+    "tp2": 0.34304174110870045,
+    "tp3": 0.34376261166305067,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 0.211,
+      "notional": 1000,
+      "margin": 1000,
+      "quantity": 2927.4,
+      "maxLossBeforeCosts": 2.11,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-20",
+    "ts": 1789895591916,
+    "slot": 3,
+    "closed": false,
+    "entryFillPrice": 0.34166832
   }
 ]
