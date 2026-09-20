@@ -1758,5 +1758,73 @@
     "slot": 7,
     "closed": false,
     "entryFillPrice": 0.87187434
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "dir": "LONG",
+    "price": 10.397,
+    "atr": 0.14578499279815801,
+    "atrPct": 0.014021832528436858,
+    "adx": 41.6015447292746,
+    "pdi": 39.58617814830428,
+    "mdi": 6.2200205078154625,
+    "corePct": 100,
+    "filters": [
+      "ADX 41.6",
+      "DI +DI",
+      "CORE 100.0%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "VOLUME",
+      "BOLLINGER",
+      "STRUCTURE",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1789862400000,
+    "liquidity24h": 88908066.48731,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "5m",
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "5m→LONG",
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 92.30477563300451,
+    "adx4h": 47.99887969526157,
+    "sentiment": 71,
+    "sl": 10.178322510802763,
+    "tp1": 10.615677489197237,
+    "tp2": 10.834354978394474,
+    "tp3": 11.053032467591711,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 2.1033,
+      "notional": 475.35,
+      "margin": 475.35,
+      "quantity": 45.72,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-20",
+    "ts": 1789863588560,
+    "slot": 0,
+    "closed": false,
+    "entryFillPrice": 10.3990794
   }
 ]
