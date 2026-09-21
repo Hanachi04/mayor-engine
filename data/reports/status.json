@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-20T23:58:56.631Z",
+  "generatedAt": "2026-09-21T00:29:21.329Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
-      "total": 30,
+      "total": 31,
       "open": 1,
-      "closed": 29,
-      "wins": 17,
+      "closed": 30,
+      "wins": 18,
       "losses": 12,
-      "winRatePct": 58.6,
-      "netPct": 30.034,
-      "lastAt": "2026-09-20",
+      "winRatePct": 60,
+      "netPct": 32.736,
+      "lastAt": "2026-09-21",
       "engineVersion": "cloud-pro-mtf-2.0",
       "strategyMode": "balanced",
       "gate": {
@@ -37,7 +37,7 @@
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-20T23:58:32.495Z",
+      "heartbeat": "2026-09-21T00:28:55.653Z",
       "heartbeatOk": false,
       "verdict": "⏳ جمع عينة"
     },
