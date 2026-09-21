@@ -2374,5 +2374,72 @@
     "slot": 3,
     "closed": false,
     "entryFillPrice": 0.99899976
+  },
+  {
+    "symbol": "BCHUSDT",
+    "dir": "LONG",
+    "price": 268.4,
+    "atr": 2.2282921911093028,
+    "atrPct": 0.008302131859572664,
+    "adx": 46.79098978142305,
+    "pdi": 34.61440614581481,
+    "mdi": 5.767206057277575,
+    "corePct": 87.7,
+    "filters": [
+      "ADX 46.8",
+      "DI +DI",
+      "CORE 87.7%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "STRUCTURE",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1789992000000,
+    "liquidity24h": 19046813.2617,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "5m",
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "5m→LONG",
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 74.63227299791718,
+    "adx4h": 33.29520472864048,
+    "sentiment": 70,
+    "sl": 265.05756171333604,
+    "tp1": 271.7424382866639,
+    "tp2": 275.0848765733279,
+    "tp3": 278.42731485999184,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 1.2453,
+      "notional": 802.78,
+      "margin": 802.78,
+      "quantity": 2.991,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-21",
+    "ts": 1789993005700,
+    "slot": 4,
+    "closed": false,
+    "entryFillPrice": 268.45367999999996
   }
 ]
