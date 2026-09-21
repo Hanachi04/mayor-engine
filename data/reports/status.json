@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-21T08:59:51.718Z",
+  "generatedAt": "2026-09-21T09:22:54.461Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
-      "total": 33,
+      "total": 34,
       "open": 2,
-      "closed": 31,
-      "wins": 18,
+      "closed": 32,
+      "wins": 19,
       "losses": 13,
-      "winRatePct": 58.1,
-      "netPct": 31.832,
+      "winRatePct": 59.4,
+      "netPct": 34.582,
       "lastAt": "2026-09-21",
       "engineVersion": "cloud-pro-mtf-2.0",
       "strategyMode": "balanced",
@@ -23,22 +23,22 @@
     },
     "scalper": {
       "label": "Scalper",
-      "total": 4,
-      "open": 0,
+      "total": 5,
+      "open": 1,
       "closed": 4,
       "wins": 2,
       "losses": 2,
       "winRatePct": 50,
       "netPct": 6.458,
-      "lastAt": "2026-09-11T15:50:38.507Z",
+      "lastAt": "2026-09-21",
       "engineVersion": "futures-scalper-v1.0",
       "gate": {
         "status": "BLOCKED",
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-21T08:59:24.063Z",
-      "heartbeatOk": false,
+      "heartbeat": "2026-09-21T09:22:29.762Z",
+      "heartbeatOk": true,
       "verdict": "⏳ جمع عينة"
     },
     "aegis": {
