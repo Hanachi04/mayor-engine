@@ -226,5 +226,53 @@
     "closePct": 5.3213,
     "netPnlUsd": 238.0601,
     "closeAt": "2026-09-11T15:50:38.507Z"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "dir": "LONG",
+    "price": 1.4744,
+    "atr": 0.0031730984974446606,
+    "atrPct": 0.002152128660773644,
+    "rsi": 50.35759165722421,
+    "e9": 1.474267091317689,
+    "e21": 1.4742586437543412,
+    "volSpike": false,
+    "recentCross": true,
+    "volume": 487376.5,
+    "avgVolume": 1037377.5649999998,
+    "closedCandle": 1789982460000,
+    "orderBookImbalance": -0.004,
+    "obAligned": false,
+    "sl": 1.4709095916528108,
+    "tp1": 1.4796356125207837,
+    "tp2": 1.4822534187811756,
+    "rr": 1.5,
+    "liquidity24h": 1201864922.0794,
+    "position": {
+      "capital": 1000,
+      "riskPct": 0.35,
+      "riskCapital": 3.5,
+      "leverage": 5,
+      "stopDistancePct": 0.2367,
+      "notional": 1478.45,
+      "margin": 295.69,
+      "quantity": 1002.74800306,
+      "maxLossBeforeCosts": 3.5
+    },
+    "filters": [
+      "EMA9/21 LONG",
+      "EMA_CROSS",
+      "RSI7 50.4",
+      "ATR 0.22%×1.1",
+      "RR 1:1.5",
+      "3m+5m OK"
+    ],
+    "engineVersion": "futures-scalper-v1.1",
+    "feeRate": 0.0004,
+    "slippageRate": 0.0003,
+    "date": "2026-09-21",
+    "ts": 1789982549355,
+    "closed": false,
+    "entryFillPrice": 1.4748423199999998
   }
 ]
