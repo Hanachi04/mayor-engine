@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-21T05:21:46.670Z",
+  "generatedAt": "2026-09-21T05:36:04.856Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
@@ -37,7 +37,7 @@
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-21T05:21:20.082Z",
+      "heartbeat": "2026-09-21T05:35:39.114Z",
       "heartbeatOk": false,
       "verdict": "⏳ جمع عينة"
     },
