@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-21T20:59:09.737Z",
+  "generatedAt": "2026-09-21T21:20:27.823Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
-      "total": 37,
-      "open": 2,
+      "total": 38,
+      "open": 3,
       "closed": 35,
       "wins": 20,
       "losses": 15,
@@ -37,7 +37,7 @@
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-21T20:58:42.483Z",
+      "heartbeat": "2026-09-21T21:20:02.140Z",
       "heartbeatOk": false,
       "verdict": "⏳ جمع عينة"
     },
