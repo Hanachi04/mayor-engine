@@ -2229,8 +2229,17 @@
     "date": "2026-09-21",
     "ts": 1789960446463,
     "slot": 1,
-    "closed": false,
-    "entryFillPrice": 2.980596
+    "closed": true,
+    "entryFillPrice": 2.980596,
+    "closePrice": 2.912,
+    "closeResult": "SL",
+    "exitFillPrice": 2.9114176,
+    "grossPnlPct": -2.321,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -2.421,
+    "netPnlUsd": -18.4078,
+    "closeAt": "2026-09-21T18:15:47.050Z"
   },
   {
     "symbol": "XRPUSDT",
@@ -2448,8 +2457,17 @@
     "date": "2026-09-21",
     "ts": 1789993005700,
     "slot": 4,
-    "closed": false,
-    "entryFillPrice": 268.45367999999996
+    "closed": true,
+    "entryFillPrice": 268.45367999999996,
+    "closePrice": 264.6,
+    "closeResult": "SL",
+    "exitFillPrice": 264.54708000000005,
+    "grossPnlPct": -1.4552,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -1.5552,
+    "netPnlUsd": -12.485,
+    "closeAt": "2026-09-21T18:15:47.587Z"
   },
   {
     "symbol": "PEPEUSDT",
@@ -2520,5 +2538,69 @@
     "slot": 5,
     "closed": false,
     "entryFillPrice": 0.0000048109619999999996
+  },
+  {
+    "symbol": "ETCUSDT",
+    "dir": "LONG",
+    "price": 8.9,
+    "atr": 0.0861142410667229,
+    "atrPct": 0.009675757423227292,
+    "adx": 17.53138780876967,
+    "pdi": 31.272085420369024,
+    "mdi": 19.157386263531453,
+    "corePct": 69.1,
+    "filters": [
+      "ADX 17.5",
+      "DI +DI",
+      "CORE 69.1%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1790013600000,
+    "liquidity24h": 5320504.7459,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 72.19447676846154,
+    "adx4h": 58.68837279938889,
+    "sentiment": 70,
+    "sl": 8.770828638399916,
+    "tp1": 9.029171361600085,
+    "tp2": 9.15834272320017,
+    "tp3": 9.287514084800254,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 1.4514,
+      "notional": 688.95,
+      "margin": 688.95,
+      "quantity": 77.41,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 5
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-21",
+    "ts": 1790014560760,
+    "slot": 6,
+    "closed": false,
+    "entryFillPrice": 8.90178
   }
 ]
