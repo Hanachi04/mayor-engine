@@ -2536,8 +2536,17 @@
     "date": "2026-09-21",
     "ts": 1790003597398,
     "slot": 5,
-    "closed": false,
-    "entryFillPrice": 0.0000048109619999999996
+    "closed": true,
+    "entryFillPrice": 0.0000048109619999999996,
+    "closePrice": 0.00000503,
+    "closeResult": "TP1",
+    "exitFillPrice": 0.000005028994,
+    "grossPnlPct": 4.532,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": 4.432,
+    "netPnlUsd": 17.2094,
+    "closeAt": "2026-09-22T03:13:46.882Z"
   },
   {
     "symbol": "ETCUSDT",
@@ -2600,8 +2609,17 @@
     "date": "2026-09-21",
     "ts": 1790014560760,
     "slot": 6,
-    "closed": false,
-    "entryFillPrice": 8.90178
+    "closed": true,
+    "entryFillPrice": 8.90178,
+    "closePrice": 8.75,
+    "closeResult": "SL",
+    "exitFillPrice": 8.74825,
+    "grossPnlPct": -1.7247,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -1.8247,
+    "netPnlUsd": -12.5713,
+    "closeAt": "2026-09-22T03:13:47.414Z"
   },
   {
     "symbol": "SOLUSDT",
@@ -2665,8 +2683,17 @@
     "date": "2026-09-21",
     "ts": 1790025206289,
     "slot": 7,
-    "closed": false,
-    "entryFillPrice": 119.213838
+    "closed": true,
+    "entryFillPrice": 119.213838,
+    "closePrice": 116.64,
+    "closeResult": "SL",
+    "exitFillPrice": 116.61667200000001,
+    "grossPnlPct": -2.1786,
+    "feesPct": 0.1,
+    "slippagePct": 0.04,
+    "closePct": -2.2786,
+    "netPnlUsd": -22.783,
+    "closeAt": "2026-09-22T03:13:47.931Z"
   },
   {
     "symbol": "WIFUSDT",
