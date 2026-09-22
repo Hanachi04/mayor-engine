@@ -20,6 +20,7 @@
 'use strict';
 
 const fs = require('fs');
+const adaptation = require('./adaptation');
 const path = require('path');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
@@ -743,8 +744,16 @@ async function scan() {
   console.log(`بدء ${ENGINE_VERSION} [${STRATEGY_MODE}] — ${SYMS.length} أزواج — ${new Date().toISOString()}`);
   let volumeMap;
   try { volumeMap = await get24hVolumeMap(SYMS); } catch (e) { console.log(`فشل حارس السيولة: ${e.message}`); return; }
-  const eligible = SYMS.filter(symbol => finite(volumeMap.get(symbol)?.quoteVolume, 0) >= CONFIG.minQuoteVolume24h);
-  console.log(`السيولة: ${eligible.length}/${SYMS.length} أزواج مؤهلة بحد $${CONFIG.minQuoteVolume24h.toLocaleString('en-US')}`);
+  const liquid = SYMS.filter(symbol => finite(volumeMap.get(symbol)?.quoteVolume, 0) >= CONFIG.minQuoteVolume24h);
+  const adaptResult = adaptation.filterEligible(liquid, tracked);
+  const eligible = adaptResult.allowed;
+  if (adaptResult.skipped.length) {
+    console.log(`التكيف (طبقة A): تخطي ${adaptResult.skipped.length} زوج محظور — ${adaptResult.skipped.map(s => s.symbol).join(', ')}`);
+  }
+  if (adaptResult.changes.length) {
+    console.log(`التكيف: ${adaptResult.changes.map(c => c.action + ':' + c.symbol).join(' | ')}`);
+  }
+  console.log(`السيولة+التكيف: ${eligible.length}/${SYMS.length} أزواج مؤهلة بحد $${CONFIG.minQuoteVolume24h.toLocaleString('en-US')}`);
   const sentiment = await getMarketSentiment();
   if (sentiment !== null) console.log(`مؤشر الخوف والجشع: ${sentiment}`);
   const results = await Promise.all(eligible.map(async symbol => {
@@ -775,6 +784,7 @@ if (process.env.CLOUD_PRO_TEST === '1' || require.main !== module) {
     CONFIG, WEIGHTS, WEIGHT_PROFILES, STRATEGY_MODE, TOTAL_VOTE_WEIGHT, Indicators, VOTE_PLUGINS, normalizeKlines, prepareKlines,
     getKlines, get24hVolumeMap, getOrderBookImbalance, getMarketSentiment, analyzeLatest, levelsFromSignal, calculatePositionSize,
     applyExchangeLotSizing, roundDownToStep, checkCircuitBreaker, entryFillPrice, exitFillPrice, netPnl,
+    adaptation,
     getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed
   };
 } else {

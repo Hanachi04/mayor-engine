@@ -68,6 +68,10 @@ function build() {
   const scalperVer = readJson(path.join(DATA, 'scalper', 'verification.json'), {});
   const scalperHb = readJson(path.join(DATA, 'scalper', 'heartbeat.json'), {});
   const aegisReport = readJson(path.join(ROOT, 'aegis-quant', 'data', 'pipeline_report.json'), {});
+  const adaptState = readJson(path.join(DATA, 'adaptation_state.json'), { blacklist: {} });
+  const adaptBans = Object.entries(adaptState.blacklist || {}).map(([sym, info]) => ({
+    symbol: sym, until: info.until, reason: info.reason, pf: info.pf, netSum: info.netSum
+  }));
   const daily = readJson(path.join(REPORTS, 'daily.json'), null);
   const weekly = readJson(path.join(REPORTS, 'weekly.json'), null);
 
@@ -118,7 +122,11 @@ function build() {
       dailyClosed: daily?.summary?.closed ?? null,
       weeklyClosed: weekly?.summary?.closed ?? null
     },
-    note: 'نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية.'
+    adaptation: {
+      activeBans: adaptBans.length,
+      bans: adaptBans.slice(0, 15)
+    },
+        note: 'نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية.'
   };
 
   const md = [
@@ -172,7 +180,18 @@ function build() {
     `| يومي | ${status.reports.dailyClosed ?? '—'} | ${status.reports.dailyNetPct ?? '—'} |`,
     `| أسبوعي | ${status.reports.weeklyClosed ?? '—'} | ${status.reports.weeklyNetPct ?? '—'} |`,
     '',
-    '## ماذا تفعل؟',
+    '',
+    '## التكيف الآمن (طبقة A)',
+    '',
+    adaptBans.length
+      ? [
+          `| رمز | حتى | سبب | PF | صافي |`,
+          `|-----|-----|-----|----|------|`,
+          ...adaptBans.slice(0, 12).map(b => `| ${b.symbol} | ${String(b.until || '').slice(0, 16)} | ${b.reason || '—'} | ${b.pf ?? '—'} | ${b.netSum ?? '—'} |`)
+        ].join('\n')
+      : 'لا رموز محظورة حالياً.',
+
+        '## ماذا تفعل؟',
     '',
     '1. لا تغيّر القواعد أثناء أسبوع القياس.',
     '2. اقرأ هذا الملف كل يوم (يُحدَّث تلقائياً من GitHub Actions).',

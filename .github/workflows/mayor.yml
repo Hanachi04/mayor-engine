@@ -68,8 +68,15 @@ jobs:
           MIN_MTF_PCT: '60'
           MIN_ADX: '16'
           SENTIMENT_ENABLED: '1'           # 0 لإيقاف مؤشر الخوف والجشع كمصدر تصويت تكميلي
-          MAX_DAILY_LOSS_PCT: '0'          # مثال: 5  → إيقاف إشارات جديدة بعد خسارة يومية 5%. 0 = معطّل
-          MAX_LOSS_STREAK: '0'             # مثال: 4  → إيقاف إشارات جديدة بعد 4 خسائر متتالية. 0 = معطّل
+          MAX_DAILY_LOSS_PCT: '4'          # إيقاف إشارات جديدة بعد خسارة يومية 4%
+          MAX_LOSS_STREAK: '4'             # إيقاف إشارات جديدة بعد 4 خسائر متتالية
+          ADAPTATION_ENABLED: '1'
+          ADAPT_LOOKBACK_TRADES: '8'
+          ADAPT_MIN_TRADES: '6'
+          ADAPT_MIN_PF: '0.85'
+          ADAPT_MAX_NET_PCT: '-3'
+          ADAPT_BAN_HOURS: '72'
+          ADAPT_MAX_NEW_BANS: '3'
         run: node engine/scan.js
 
       - name: Commit tracking data with rebase and retry
