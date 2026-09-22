@@ -77,6 +77,8 @@ jobs:
           ADAPT_MAX_NET_PCT: '-3'
           ADAPT_BAN_HOURS: '72'
           ADAPT_MAX_NEW_BANS: '3'
+          ML_SHADOW_MODE: 'log'          # log | filter | off — لا تفعّل filter قبل مراجعة الظل
+          BLOCK_UTC_HOURS: '18'          # ساعات UTC ضعيفة من العينة (قابلة للتعديل)
         run: node engine/scan.js
 
       - name: Commit tracking data with rebase and retry

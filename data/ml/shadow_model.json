@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "type": "logistic_win_prob",
+  "featureKeys": [
+    "bias",
+    "corePct",
+    "mtfPct",
+    "adx",
+    "atrPct",
+    "rr",
+    "rsi4h",
+    "dirLong",
+    "hourSin",
+    "hourCos",
+    "slot"
+  ],
+  "weights": [
+    0.153603,
+    -0.102065,
+    0.350791,
+    -0.592486,
+    0.325916,
+    0.092162,
+    -0.252312,
+    0.153603,
+    0.848386,
+    0.016948,
+    0.548731
+  ],
+  "trainedAt": "2026-09-22T19:43:22.746Z",
+  "trainSize": 21,
+  "testSize": 9,
+  "trainMetrics": {
+    "n": 21,
+    "accuracy": 0.7142857142857143,
+    "logloss": 0.6225036860111668,
+    "baseline": 0.5714285714285714,
+    "winRate": 0.5714285714285714
+  },
+  "testMetrics": {
+    "n": 9,
+    "accuracy": 0.4444444444444444,
+    "logloss": 0.6936113660395079,
+    "baseline": 0.5555555555555556,
+    "winRate": 0.4444444444444444
+  },
+  "suggestedMinPWin": 0.55,
+  "suggestedFilterStats": {
+    "thr": 0.55,
+    "net": 7.0578,
+    "n": 5,
+    "wr": 0.6
+  },
+  "note": "Shadow model only. Does not guarantee live edge. Prefer skip when P(win) low."
+}

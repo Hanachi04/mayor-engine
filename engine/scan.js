@@ -21,6 +21,7 @@
 
 const fs = require('fs');
 const adaptation = require('./adaptation');
+const shadowGate = require('./ml/shadow_gate');
 const path = require('path');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
@@ -760,9 +761,24 @@ async function scan() {
     try { return { symbol, ...(await evaluate(symbol, volumeMap.get(symbol).quoteVolume, sentiment)) }; }
     catch (e) { console.log(`فشل تقييم ${symbol}: ${e.message}`); return { symbol, ok: false, reason: 'evaluation-error' }; }
   }));
-  const candidates = results.filter(r => r.ok && r.signal).map(r => r.signal)
-    .filter(s => !tracked.some(t => t.date === today && t.symbol === s.symbol))
-    .sort((a, b) => b.mtfPct - a.mtfPct || b.corePct - a.corePct || b.liquidity24h - a.liquidity24h);
+  const blockHours = String(process.env.BLOCK_UTC_HOURS || '')
+    .split(',').map(s => s.trim()).filter(Boolean).map(Number).filter(n => Number.isFinite(n));
+  const hourNow = new Date().getUTCHours();
+  let candidates = results.filter(r => r.ok && r.signal).map(r => r.signal)
+    .filter(s => !tracked.some(t => t.date === today && t.symbol === s.symbol));
+  if (blockHours.includes(hourNow)) {
+    console.log(`حظر ساعات UTC ${blockHours.join(',')}: الساعة الحالية ${hourNow} — تخطي بث جديد`);
+    candidates = [];
+  }
+  // Shadow ML: log always; filter only if ML_SHADOW_MODE=filter
+  candidates = candidates.filter(s => {
+    const ev = shadowGate.evaluateCandidate(s);
+    if (ev.score) {
+      console.log(`ML shadow ${s.symbol}: pWin=${ev.score.pWin.toFixed(3)} → ${ev.reason}`);
+    }
+    return ev.allow;
+  });
+  candidates.sort((a, b) => b.mtfPct - a.mtfPct || b.corePct - a.corePct || b.liquidity24h - a.liquidity24h);
   const chosen = candidates[0];
   if (!chosen) { console.log('لا توجد إشارة تستوفي قواعد Cloud Pro MTF في هذه الدورة'); return; }
   const cd = canEmit(tracked, chosen);

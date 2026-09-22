@@ -16,7 +16,9 @@
     "scalper:backtest": "node engine/scalper/backtest.js",
     "status": "node engine/auto_status.js",
     "report:status": "node engine/auto_status.js",
-    "test:adapt": "node test/adaptation.test.js"
+    "test:adapt": "node test/adaptation.test.js",
+    "ml:train": "node engine/ml/train_shadow.js",
+    "test:ml": "node engine/ml/train_shadow.js"
   },
   "engines": {
     "node": ">=20"
