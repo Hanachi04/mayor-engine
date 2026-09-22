@@ -2667,5 +2667,70 @@
     "slot": 7,
     "closed": false,
     "entryFillPrice": 119.213838
+  },
+  {
+    "symbol": "WIFUSDT",
+    "dir": "LONG",
+    "price": 0.2444,
+    "atr": 0.003442894178811243,
+    "atrPct": 0.01408712839120803,
+    "adx": 23.141514397124663,
+    "pdi": 29.092770403051727,
+    "mdi": 15.25668123253614,
+    "corePct": 81.5,
+    "filters": [
+      "ADX 23.1",
+      "DI +DI",
+      "CORE 81.5%",
+      "TREND",
+      "MACD",
+      "SUPERTREND",
+      "VOLUME",
+      "TAKER_FLOW",
+      "MTF 100.0%"
+    ],
+    "closedCandle": 1790035200000,
+    "liquidity24h": 11433108.764363,
+    "mtfPct": 100,
+    "mtfFrames": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "votesByTf": [
+      "15m→LONG",
+      "1h→LONG",
+      "4h→LONG"
+    ],
+    "rsi4h": 73.42941269776884,
+    "adx4h": 33.76774737860952,
+    "sentiment": 78,
+    "sl": 0.23923565873178315,
+    "tp1": 0.24956434126821686,
+    "tp2": 0.2547286825364337,
+    "tp3": 0.2598930238046506,
+    "rr": 3,
+    "position": {
+      "capital": 1000,
+      "riskPct": 1,
+      "riskCapital": 10,
+      "leverage": 1,
+      "stopDistancePct": 2.1131,
+      "notional": 473.24,
+      "margin": 473.24,
+      "quantity": 1936.35,
+      "maxLossBeforeCosts": 10,
+      "belowExchangeMinNotional": false,
+      "exchangeMinNotional": 1
+    },
+    "engineVersion": "cloud-pro-mtf-2.1",
+    "strategyMode": "core",
+    "feeRate": 0.0005,
+    "slippageRate": 0.0002,
+    "date": "2026-09-22",
+    "ts": 1790036329928,
+    "slot": 0,
+    "closed": false,
+    "entryFillPrice": 0.24444888
   }
 ]
