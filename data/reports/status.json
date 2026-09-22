@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-22T19:59:07.000Z",
+  "generatedAt": "2026-09-22T20:19:12.796Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
@@ -50,9 +50,9 @@
     }
   },
   "reports": {
-    "dailyNetPct": 3.5146000000000006,
+    "dailyNetPct": 3.0620000000000003,
     "weeklyNetPct": 21.994999999999997,
-    "dailyClosed": 6,
+    "dailyClosed": 2,
     "weeklyClosed": 6
   },
   "adaptation": {
