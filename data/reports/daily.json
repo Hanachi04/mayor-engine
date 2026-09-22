@@ -3,81 +3,55 @@
   "engineVersion": "cloud-pro-mtf-3.0-unified",
   "period": "daily",
   "periodLabel": "اليومي",
-  "generatedAt": "2026-09-21T20:19:44.924Z",
-  "windowStart": "2026-09-20T20:19:44.924Z",
-  "windowEnd": "2026-09-21T20:19:44.924Z",
+  "generatedAt": "2026-09-22T20:18:41.193Z",
+  "windowStart": "2026-09-21T20:18:41.193Z",
+  "windowEnd": "2026-09-22T20:18:41.193Z",
   "accounting": {
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "note": "النتائج بحثية ومحسوبة بعد الرسوم والانزلاق النظريين."
   },
   "summary": {
-    "signals": 8,
-    "closed": 6,
-    "open": 2,
-    "wins": 3,
-    "losses": 3,
+    "signals": 2,
+    "closed": 2,
+    "open": 0,
+    "wins": 1,
+    "losses": 1,
     "neutral": 0,
     "winRatePct": 50,
-    "grossPnlPct": 4.114600000000001,
-    "feesPct": 0.6,
-    "slippagePct": 0.24000000000000002,
-    "netPnlPct": 3.5146000000000006,
-    "netPnlUsd": 15.327799999999996,
-    "averageNetPnlPct": 0.5857666666666668,
-    "profitFactor": 1.7200868710047532,
-    "maxDrawdownPct": -3.3255999999999997,
+    "grossPnlPct": 3.262,
+    "feesPct": 0.2,
+    "slippagePct": 0.08,
+    "netPnlPct": 3.0620000000000003,
+    "netPnlUsd": 2.4909999999999997,
+    "averageNetPnlPct": 1.5310000000000001,
+    "profitFactor": 2.3438076011586064,
+    "maxDrawdownPct": -2.2786,
     "bestSymbol": {
-      "symbol": "SUIUSDT",
-      "netPct": 2.9425
+      "symbol": "WIFUSDT",
+      "netPct": 5.3406
     },
     "worstSymbol": {
-      "symbol": "ICPUSDT",
-      "netPct": -2.421
+      "symbol": "SOLUSDT",
+      "netPct": -2.2786
     }
   },
   "byResult": {
-    "TP1": 2,
-    "SL": 3,
-    "TP3": 1,
-    "مفتوحة": 2
+    "SL": 1,
+    "TP2": 1
   },
   "bySymbol": {
-    "SEIUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.702
-    },
-    "ETHUSDT": {
+    "SOLUSDT": {
       "count": 1,
       "wins": 0,
       "losses": 1,
-      "netPct": -0.9046
+      "netPct": -2.2786
     },
-    "ICPUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -2.421
-    },
-    "XRPUSDT": {
+    "WIFUSDT": {
       "count": 1,
       "wins": 1,
       "losses": 0,
-      "netPct": 2.7509
-    },
-    "SUIUSDT": {
-      "count": 1,
-      "wins": 1,
-      "losses": 0,
-      "netPct": 2.9425
-    },
-    "BCHUSDT": {
-      "count": 1,
-      "wins": 0,
-      "losses": 1,
-      "netPct": -1.5552
+      "netPct": 5.3406
     }
   }
 }
