@@ -648,6 +648,11 @@ function saveBreakerState(state) { fs.writeFileSync(BREAKER_FILE, JSON.stringify
 // لا يسبب قفلاً دائماً من خسائر تاريخية قديمة خارج النافذة.
 function checkCircuitBreaker(tracked, today, nowMs = Date.now()) {
   const state = loadBreakerState();
+  // Fully disabled when both thresholds are 0 — ignore any stale cooldown file
+  if (!(CONFIG.maxDailyLossPct > 0) && !(CONFIG.maxLossStreak > 0)) {
+    if (state.lastReason || state.untilMs) saveBreakerState({});
+    return { tripped: false };
+  }
   // Cooldown: if previously tripped, stay blocked until untilMs
   if (state.untilMs && Number(state.untilMs) > nowMs) {
     const reason = state.lastReason || 'circuit-cooldown';
