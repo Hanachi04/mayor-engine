@@ -10,9 +10,21 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const STATE_FILE = path.join(DATA_DIR, 'adaptation_state.json');
-const LOG_FILE = path.join(DATA_DIR, 'adaptation_log.jsonl');
+function resolveDataDir() {
+  if (process.env.ADAPTATION_DATA_DIR) return process.env.ADAPTATION_DATA_DIR;
+  if (process.env.DATA_DIR) return path.join(process.env.DATA_DIR);
+  return path.join(__dirname, '..', 'data');
+}
+let DATA_DIR = resolveDataDir();
+let STATE_FILE = path.join(DATA_DIR, 'adaptation_state.json');
+let LOG_FILE = path.join(DATA_DIR, 'adaptation_log.jsonl');
+
+/** For tests: re-bind data dir without reloading module graph */
+function setDataDir(dir) {
+  DATA_DIR = dir;
+  STATE_FILE = path.join(DATA_DIR, 'adaptation_state.json');
+  LOG_FILE = path.join(DATA_DIR, 'adaptation_log.jsonl');
+}
 
 function envNum(name, fallback) {
   const n = Number(process.env[name]);
@@ -215,5 +227,7 @@ module.exports = {
   isBlacklisted,
   filterEligible,
   summarizeSymbol,
-  profitFactor
+  profitFactor,
+  setDataDir,
+  resolveDataDir
 };

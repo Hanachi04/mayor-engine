@@ -1,112 +1,118 @@
-# MaYor Cloud Pro MTF
+# mayor-engine
 
-هذه الحزمة تحتوي على النسخة السحابية الاحترافية من محرك MaYor، وهي استراتيجية مستقلة مبنية على مؤشرات v13 مع تحليل متعدد الأطر، حارس سيولة حقيقي، إدارة صفقات، وتوثيق النتائج.
+Research-oriented trading **signal** engine with multi-timeframe rules, adaptive risk controls, shadow ML scoring, optional futures scalper, and GitHub Actions automation.
 
-> **تنبيه:** النظام أداة بحث ومراقبة آلية، وليس ضمانًا للربح أو توصية مالية. لا ينفذ أوامر شراء أو بيع حقيقية؛ يسجل الإشارات الافتراضية ونتائجها فقط.
+> **Not financial advice.** Research / notification only. Does **not** place exchange orders by design.
 
-## مكونات المشروع
+## Overview
 
-| المسار | الوظيفة |
-|---|---|
-| `engine/scan.js` | المحرك الرئيسي: البيانات، المؤشرات، MTF، الفلاتر، Telegram، التوثيق، والإغلاق الذاتي |
-| `engine/performance_report.js` | مولد التقارير اليومية والأسبوعية والشهرية بعد الرسوم والانزلاق |
-| `engine/weekly_report.js` | نقطة توافق للتقرير الأسبوعي تستخدم مولد التقارير الموحد |
-| `engine/backtest.js` | backtest تاريخي مع دخول الشمعة التالية وIS/OOS وMonte Carlo والارتباط |
-| `data/backtest_report.json` | التقرير التفصيلي للتحقق الإحصائي |
-| `data/verification.json` | حالة البوابة التي تمنع أو تسمح بالبث |
-| `data/tracked.json` | سجل الصفقات الدائم |
-| `dashboard/mayor_dashboard.html` | لوحة HTML محلية تعمل على الهاتف لعرض الأداء |
-| `.github/workflows/mayor.yml` | تشغيل المحرك كل ثلاث ساعات وإعادة حفظ سجل الصفقات |
-| `.github/workflows/daily-report.yml` | إنشاء وإرسال وحفظ التقرير اليومي |
-| `.github/workflows/weekly-report.yml` | إنشاء وإرسال وحفظ التقرير الأسبوعي |
-| `.github/workflows/monthly-report.yml` | إنشاء وإرسال وحفظ التقرير الشهري لآخر 30 يومًا |
-| `CLOUD_PRO_SPEC.md` | مواصفات قواعد الاستراتيجية الجديدة |
+| Component | Role |
+|-----------|------|
+| **MaYor Cloud Pro MTF** | Primary signal engine (`engine/scan.js`) |
+| **STRATEGY_MODE=core** | Simplified vote weights (fewer indicators) |
+| **Adaptation layer A** | Temporary symbol blacklist from recent PF/net |
+| **Circuit breakers** | Daily loss + loss-streak window with cooldown |
+| **Shadow ML** | Logistic `P(win)` in **log** mode only |
+| **Futures Scalper** | Isolated 1m scalper (`engine/scalper/`) |
+| **Aegis Quant** | Multi-agent research stack (code present; not operationally gated live) |
+| **Reporting** | `docs/STATUS.md`, daily/weekly JSON, Telegram optional |
 
-## طريقة تشغيل المحرك على GitHub Actions
+## Architecture
 
-يعمل المحرك تلقائيًا في نافذة واحدة كل ثلاث ساعات. أضف السرّين التاليين من إعدادات المستودع في GitHub:
+```
+GitHub Actions schedule
+  → engine/scan.js (core filters, MTF, risk, adaptation, shadow log)
+  → data/tracked.json
+  → performance_report / auto_status → docs/STATUS.md
+```
 
-| اسم السر | المحتوى |
-|---|---|
-| `TELEGRAM_TOKEN` | توكن بوت Telegram |
-| `TELEGRAM_CHAT` | معرّف القناة أو المجموعة، ويفضل استخدام المعرّف الرقمي الصحيح |
+Shadow ML does **not** filter live signals unless `ML_SHADOW_MODE=filter` (not recommended until OOS proof).
 
-يمكن ضبط الإعدادات الاختيارية من خلال متغيرات البيئة في workflow إذا لزم الأمر:
+## Local setup
 
-| المتغير | الافتراضي | الوظيفة |
-|---|---:|---|
-| `MIN_QUOTE_VOLUME_24H` | `5000000` | الحد الأدنى لحجم التداول الاسمي خلال 24 ساعة |
-| `MAX_SIGNALS_PER_DAY` | `8` | الحد الأعلى للإشارات المؤهلة يوميًا |
-| `SIGNAL_SLOT_HOURS` | `3` | نافذة الإرسال؛ لا يرسل أكثر من إشارة واحدة داخل النافذة |
-| `SIGNAL_COOLDOWN_MINUTES` | `60` | أقل مدة بين إشارتين لنفس الزوج والاتجاه |
-| `TAKER_FEE_RATE` | `0.0005` | رسوم taker لكل جهة |
-| `SLIPPAGE_RATE` | `0.0002` | الانزلاق لكل جهة |
-| `ACCOUNT_CAPITAL` | `1000` | رأس المال النظري لحساب الحجم |
-| `RISK_PER_TRADE_PCT` | `1` | نسبة المخاطرة النظرية لكل إشارة |
-| `SYMBOLS` | 37 زوجًا (انظر أدناه) | قائمة الأزواج المفحوصة |
-| `STRATEGY_MODE` | `core` | نمط أوزان المؤشرات: `balanced` / `momentum` / `breakout` |
-| `SENTIMENT_ENABLED` | `1` | تفعيل مؤشر الخوف والجشع كصوت تكميلي إضافي |
-| `MAX_DAILY_LOSS_PCT` | `0` (معطّل) | إيقاف إشارات جديدة بعد تجاوز خسارة يومية معيّنة، مثال: `5` |
-| `MAX_LOSS_STREAK` | `0` (معطّل) | إيقاف إشارات جديدة بعد عدد خسائر متتالية معيّن، مثال: `4` |
-| `VERIFICATION_GATE_MODE` | `warn` في التشغيل السحابي | `warn` يسجّل تحذيرًا ويستمر في البحث؛ `enforce` يمنع البث حتى PASS |
+```bash
+git clone https://github.com/Hanachi04/mayor-engine.git
+cd mayor-engine
+# no npm dependencies required for core Node scripts (Node >= 20)
+node -v
+```
 
-## الدمج الموحّد (v3.0) — دمج v13 والنسخة السحابية في محرك واحد
-
-هذا الإصدار يوحّد كل ما كان مفرّقًا بين أداة البحث المتصفحية (v13) والمحرك السحابي في `engine/scan.js` واحد يعمل بالكامل عبر GitHub Actions، بلا اعتماد على متصفح مفتوح:
-
-- **كل مؤشرات v13 وأوزانها الأصلية** (EMA/MACD/RSI/FVG/Supertrend/Volume/Bollinger/StochRSI/Structure) كانت مدمجة أصلًا في هذا المحرك، مع تصويت `taker_flow` وOrder Book Imbalance إضافيين.
-- **إحساس السوق (Fear & Greed)** — صوت تصويت تعاكسي جديد (خوف شديد ≤25 → ميل شرائي خفيف، جشع شديد ≥75 → ميل بيعي خفيف)، يُجلب من `alternative.me` ويُخزَّن مؤقتًا 6 ساعات. لا يوقف البث لو تعذّر الجلب.
-- **3 أنماط أوزان قابلة للاختيار** عبر `STRATEGY_MODE`: `balanced` (الافتراضي، يطابق تمامًا سلوك ما قبل الدمج)، `momentum` (يرجّح MACD/Supertrend/Volume)، `breakout` (يرجّح Structure/Bollinger). **تنبيه متعمّد:** لا يوجد اختيار تلقائي أو مقارنة ديناميكية بين الأنماط لكل صفقة — القرار بشري واحد وقت الضبط، تفاديًا لمخاطر Overfitting التي كانت تُذكر صراحة في فلسفة v13.
-- **حجم متوافق مع البورصة الفعلية**: بعد اختيار الإشارة، يجلب المحرك `LOT_SIZE`/`MIN_NOTIONAL` الحقيقية من Binance ويقرّب الكمية النظرية عليها (`applyExchangeLotSizing`)، فيصبح الرقم المسجَّل أقرب لما يمكن تنفيذه فعليًا — رغم أن المحرك لا يزال لا يرسل أي أمر تنفيذ حقيقي.
-- **قواطع أمان اختيارية** (`MAX_DAILY_LOSS_PCT` و`MAX_LOSS_STREAK`): توقف بث الإشارات الجديدة مؤقتًا عند تجاوز حد خسارة، مع رسالة Telegram تنبيهية لمرة واحدة، دون التأثير على متابعة/إغلاق الصفقات المفتوحة أصلًا. الحالة تُحفظ في `data/circuit_breaker.json` وتُدفع تلقائيًا مع بقية بيانات المستودع.
-- **تغطية 37 زوجًا افتراضيًا** بدل 10، مطابقة لكون v13، مع بقاء `SYMBOLS` قابلة للتضييق.
-
-## التحقق الإحصائي والبوابة التشغيلية
-
-يتحقق `engine/scan.js` من `data/verification.json` قبل البث. في جدولة GitHub الحالية، وضع `VERIFICATION_GATE_MODE=warn` يسجّل التحذير ويستمر في إرسال الإشارات المؤهلة أثناء بناء العينة التاريخية. يمكن تحويله لاحقًا إلى `enforce` لمنع البث حتى توجد حالة `PASS` وبإصدار البوابة الصحيح. لتشغيل التحقق يدويًا على بيانات تاريخية مغلقة، ضع الملفات في `data/historical/` بصيغة `SYMBOL_INTERVAL.json` ثم شغّل:
+### Run tests (no Telegram secrets)
 
 ```bash
 npm test
-npm run verify
 ```
 
-يُقسّم `backtest.js` البيانات إلى In-Sample وOut-of-Sample، ويدخل عند فتح الشمعة التالية، ويستخدم تبديلات Monte Carlo لمسارات العوائد، ومصفوفة ارتباط Pearson، وتصحيح Bonferroni، وتحذيرًا عند صغر العينة. إذا لم تتحقق الشروط، تبقى الحالة `BLOCKED` عمدًا.
+### Generate status
 
-يمكن تشغيل خطوة التحقق من GitHub Actions فقط عبر `workflow_dispatch` مع تفعيل الإدخال `run_verification`. التشغيل الدوري كل ثلاث ساعات لا يخترع نتائج، ووضع `warn` لا يغيّر المؤشرات أو الفلاتر أو شروط اختيار الصفقة.
+```bash
+npm run status
+# or: node engine/auto_status.js
+```
 
-## التكاليف وإدارة المخاطر النظرية
+### Strategy mode core (no Telegram)
 
-يحسب المحرك رسوم taker بنسبة `0.05%` لكل جهة وانزلاقًا افتراضيًا بنسبة `0.02%` لكل جهة. كما يحسب حجمًا نظريًا اعتمادًا على رأس المال، ونسبة المخاطرة، ومسافة وقف الخسارة، والرافعة؛ ولا يرسل أوامر إلى منصة تداول.
+Telegram is optional. Without tokens the engine logs and skips send.
 
-## تشغيل لوحة المراقبة على الهاتف
+```bash
+STRATEGY_MODE=core VERIFICATION_GATE_MODE=warn DRY_RUN=1 node engine/scan.js
+```
 
-افتح الملف `dashboard/mayor_dashboard.html` بواسطة Chrome أو أي متصفح على الهاتف. اضغط **فتح tracked.json**، ثم اختر الملف الموجود في مجلد المشروع: `data/tracked.json`.
+### Backtest
 
-ستعرض اللوحة إجمالي الصفقات، الصفقات المفتوحة، نسبة النجاح، صافي النتائج، منحنى الأداء التراكمي، توزيع الأزواج، وسجلًا قابلًا للبحث والتصفية. كما تفتح ملفات `data/reports/daily.json` و`weekly.json` و`monthly.json` لعرض التقارير الموثقة. لا تحتاج اللوحة إلى خادم أو اتصال خارجي؛ كل المعالجة تتم محليًا داخل المتصفح.
+```bash
+STRATEGY_MODE=core node engine/backtest.js
+# Scalper (requires local 1m JSON under data/scalper/historical/):
+node engine/scalper/backtest.js
+```
 
-## قواعد النسخة
+### Shadow ML train
 
-تستخدم النسخة الأطر `5m` و`15m` و`1h` و`4h`. يشترط وجود ثلاثة أطر صالحة على الأقل، وتوافق الإطارين `1h` و`4h` مع الاتجاه النهائي، وإجماع MTF لا يقل عن 65%. كما تشترط النسخة شموعًا مغلقة فقط، حجمًا يوميًا لا يقل عن 5 ملايين USDT، ADX لا يقل عن 18، توافق DI، تصويتًا أساسيًا لا يقل عن 55%، ونسبة مخاطرة/عائد لا تقل عن 1:2.5.
+```bash
+npm run ml:train
+```
 
-يستمر المحرك في منع إغراق القناة عبر نافذة واحدة كل ثلاث ساعات وحد أقصى ثماني إشارات مؤهلة يوميًا وعدم تكرار الزوج في اليوم نفسه. الصفقات المفتوحة تغلق تلقائيًا عند SL أو TP1 أو TP2 أو TP3 أو بعد 48 ساعة، وتُحفظ النتيجة في `tracked.json`.
+## STRATEGY_MODE=core
 
-## الحماية والملكية
+- Uses `WEIGHT_PROFILES.core`: trend, MACD, supertrend, structure, volume only (other votes weight 0).
+- Slightly lower default `minMtfPct` / `minCorePct` / `minAdx` than balanced.
+- **Does not** mean proven edge. Live gate may remain BLOCKED; workflow often uses `warn`.
 
-لا تضع أي Token أو PAT داخل ملفات المشروع. احفظ الأسرار داخل GitHub Secrets فقط. عند مشاركة الحزمة مع أي شخص، شارك الملفات البرمجية دون أسرار، وغيّر أي توكن أو رمز وصول سبق نشره أو تخزينه داخل سكربتات قديمة.
+Balanced/momentum/breakout remain available for research comparison.
 
-## القياس الصحيح
+## Environment variables (selected)
 
-لا تُقيّم الاستراتيجية من صفقة أو أسبوع واحد. اترك القواعد ثابتة لمدة 30 يومًا على الأقل، ثم راجع عدد الصفقات المغلقة، نسبة النجاح، متوسط الربح والخسارة، صافي النتيجة، أسوأ سلسلة خسائر، وأقصى تراجع. لا تغيّر العتبات أثناء فترة القياس، وإلا ستختلط نتائج نسخ مختلفة.
+| Variable | Meaning |
+|----------|---------|
+| `STRATEGY_MODE` | `core` \| `balanced` \| `momentum` \| `breakout` |
+| `VERIFICATION_GATE_MODE` | `enforce` \| `warn` |
+| `MAX_DAILY_LOSS_PCT` | Circuit daily loss (e.g. 4) |
+| `MAX_LOSS_STREAK` | Consecutive losses in window (e.g. 4) |
+| `LOSS_STREAK_WINDOW_HOURS` | Default 48 |
+| `LOSS_STREAK_COOLDOWN_HOURS` | Default 12 |
+| `ADAPTATION_ENABLED` | Layer A on/off |
+| `ADAPTATION_DATA_DIR` / `DATA_DIR` | Override data dir (tests) |
+| `ML_SHADOW_MODE` | `log` (default) \| `filter` \| `off` |
+| `BLOCK_UTC_HOURS` | Comma hours 0-23; **empty = off** |
+| `TELEGRAM_TOKEN` / `TELEGRAM_CHAT` | Optional notifications |
+| `DRY_RUN` | Log signal without tracked write / telegram |
 
+## GitHub Actions
 
-## v2.1 — نمط `core` (تبسيط الوكيل)
+- `mayor.yml` — main signal scan
+- `scalper.yml` — futures scalper
+- `auto-status.yml` — STATUS docs (daily; reduced frequency)
+- `daily/weekly/monthly-report.yml` — performance JSON
+- `ci.yml` — `npm test` on push/PR
 
-لتقليل التعقيد ومساحة الـ overfitting، أُضيف النمط `core`:
+Secrets: `TELEGRAM_TOKEN`, `TELEGRAM_CHAT` (optional per workflow).
 
-- أصوات فعّالة فقط: **Trend EMA + MACD + Supertrend + Structure (+ Volume خفيف)**
-- معطّل وزنياً: RSI / FVG / Bollinger / StochRSI / Taker Flow / Sentiment
-- عتبات أخف افتراضياً في وضع core: `minCorePct=50`, `minMtfPct=60`, `minAdx=16`
-- التشغيل السحابي الحالي: `STRATEGY_MODE=core`
+## Security
 
-للرجوع للسلوك القديم: اضبط `STRATEGY_MODE=balanced`.
+- Never commit API keys or tokens.
+- `.env` is gitignored.
+- Research engine only — keep execution accounts separate.
 
+## License
+
+MIT — see `LICENSE`.

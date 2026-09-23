@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-09-23T13:59:55.884Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T14:06:55.426Z",
   "systems": {
     "mayor": {
       "label": "MaYor",
@@ -11,9 +11,62 @@
       "losses": 17,
       "winRatePct": 56.4,
       "netPct": 39.218,
+      "profitFactor": 1.768,
+      "expectancy": 1.006,
+      "maxDrawdownPct": 27.151,
+      "maxLosingStreak": 4,
       "lastAt": "2026-09-22T09:13:45.951Z",
-      "engineVersion": "cloud-pro-mtf-2.0",
-      "strategyMode": "balanced",
+      "engineVersion": "cloud-pro-mtf-2.1",
+      "strategyModeActive": "core",
+      "modeCounts": {
+        "core": 30,
+        "balanced": 3,
+        "legacy": 6
+      },
+      "core": {
+        "closed": 30,
+        "wins": 16,
+        "losses": 14,
+        "winRatePct": 53.3,
+        "netPct": 25.886,
+        "profitFactor": 1.53,
+        "expectancy": 0.863,
+        "maxDrawdownPct": 27.151,
+        "maxLosingStreak": 4
+      },
+      "coreLast7d": {
+        "closed": 30,
+        "wins": 16,
+        "losses": 14,
+        "winRatePct": 53.3,
+        "netPct": 25.886,
+        "profitFactor": 1.53,
+        "expectancy": 0.863,
+        "maxDrawdownPct": 27.151,
+        "maxLosingStreak": 4
+      },
+      "coreLast30d": {
+        "closed": 30,
+        "wins": 16,
+        "losses": 14,
+        "winRatePct": 53.3,
+        "netPct": 25.886,
+        "profitFactor": 1.53,
+        "expectancy": 0.863,
+        "maxDrawdownPct": 27.151,
+        "maxLosingStreak": 4
+      },
+      "legacyOrBalanced": {
+        "closed": 9,
+        "wins": 6,
+        "losses": 3,
+        "winRatePct": 66.7,
+        "netPct": 13.332,
+        "profitFactor": 6.985,
+        "expectancy": 1.481,
+        "maxDrawdownPct": 1.509,
+        "maxLosingStreak": 2
+      },
       "gate": {
         "status": "BLOCKED",
         "passed": false,
@@ -30,24 +83,37 @@
       "losses": 2,
       "winRatePct": 50,
       "netPct": 6.458,
-      "lastAt": "2026-09-21",
-      "engineVersion": "futures-scalper-v1.0",
+      "profitFactor": 3.685,
+      "expectancy": 1.615,
+      "maxDrawdownPct": 2.406,
+      "maxLosingStreak": 2,
+      "lastAt": "2026-09-11T15:50:38.507Z",
+      "engineVersion": "futures-scalper-v1.1",
       "gate": {
         "status": "BLOCKED",
         "passed": false,
         "reason": "awaiting-first-local-backtest"
       },
-      "heartbeat": "2026-09-22T19:31:44.934Z",
-      "heartbeatOk": false,
+      "heartbeat": {
+        "at": "2026-09-22T19:31:44.934Z",
+        "ok": false,
+        "phase": null,
+        "error": "HTTP 404 https://fstream.binance.com Invalid request path"
+      },
       "verdict": "⏳ جمع عينة"
     },
     "aegis": {
       "symbol": "BTCUSDT",
+      "operational": false,
       "tradeDecisions": 16,
       "profitabilityEvaluated": false,
       "profitability": null,
-      "verdict": "⏳ لم يُقيَّم بعد"
+      "verdict": "⏸️ منفّذ في الكود لكن غير مُقيَّم تشغيلياً"
     }
+  },
+  "adaptation": {
+    "activeBans": 0,
+    "bans": []
   },
   "reports": {
     "dailyNetPct": 3.0620000000000003,
@@ -55,9 +121,5 @@
     "dailyClosed": 2,
     "weeklyClosed": 6
   },
-  "adaptation": {
-    "activeBans": 0,
-    "bans": []
-  },
-  "note": "نتائج بحثية بعد رسوم/انزلاق نظريين حيث ينطبق. ليست ضمان ربح ولا توصية مالية."
+  "note": "نتائج بحثية. Core metrics منفصلة عن legacy/balanced. ليست ضمان ربح."
 }

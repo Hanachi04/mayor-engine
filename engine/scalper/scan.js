@@ -75,9 +75,13 @@ function verificationPassed(v = loadVerification()) {
 function writeHeartbeat(ok = true, extra = {}) {
   const payload = {
     engineVersion: ENGINE_VERSION,
+    gateVersion: GATE_VERSION,
     at: new Date().toISOString(),
     ts: Date.now(),
-    ok,
+    ok: !!ok,
+    workflowOk: true,
+    dataFetchOk: extra.dataFetchOk !== undefined ? !!extra.dataFetchOk : !!ok,
+    signalsAvailable: extra.signalsAvailable !== undefined ? !!extra.signalsAvailable : false,
     ...extra
   };
   fs.writeFileSync(HEARTBEAT_FILE, JSON.stringify(payload, null, 2));
@@ -110,6 +114,7 @@ async function requestJson(pathname, params = {}) {
       } catch (e) {
         lastError = e;
         const retryable = e.name === 'AbortError' || [418, 429, 500, 502, 503, 504].includes(e.status);
+        // 404 on REST path is not transient (wrong host/path)
         if (retryable && attempt < CONFIG.retries) {
           const delay = Math.min(15000, 400 * (2 ** attempt) + Math.floor(Math.random() * 200));
           await sleep(delay);
@@ -486,7 +491,7 @@ async function checkOpenTrades() {
 }
 
 async function scan() {
-  writeHeartbeat(true, { phase: 'start' });
+  writeHeartbeat(true, { phase: 'start', dataFetchOk: false, signalsAvailable: false });
   const today = fmtDate();
   await checkOpenTrades();
 
@@ -496,7 +501,7 @@ async function scan() {
       console.warn(`Scalper gate warn: ${verification.reason || verification.status}`);
     } else {
       console.log(`Scalper broadcast blocked by gate: ${verification.reason || verification.status}`);
-      writeHeartbeat(true, { phase: 'blocked-by-gate' });
+      writeHeartbeat(true, { phase: 'blocked-by-gate', dataFetchOk: true, signalsAvailable: false, gateBlocked: true });
       return;
     }
   }
@@ -505,7 +510,7 @@ async function scan() {
   const todayCount = tracked.filter(t => t.date === today).length;
   if (todayCount >= CONFIG.maxSignalsPerDay) {
     console.log('Scalper daily signal limit reached');
-    writeHeartbeat(true, { phase: 'daily-limit' });
+    writeHeartbeat(true, { phase: 'daily-limit', dataFetchOk: true, signalsAvailable: false });
     return;
   }
 
@@ -515,7 +520,7 @@ async function scan() {
     volumeMap = await get24hVolumeMap(CONFIG.symbols);
   } catch (e) {
     console.log(`Scalper volume map failed: ${e.message}`);
-    writeHeartbeat(false, { error: e.message });
+    writeHeartbeat(false, { error: e.message, dataFetchOk: false, signalsAvailable: false, phase: 'data-fetch-failed' });
     return;
   }
 
@@ -545,7 +550,7 @@ async function scan() {
 
   if (!take) {
     console.log('Scalper: no eligible candidates this cycle');
-    writeHeartbeat(true, { phase: 'no-candidates', candidates: candidates.length });
+    writeHeartbeat(true, { phase: 'no-candidates', candidates: candidates.length, dataFetchOk: true, signalsAvailable: false });
     return;
   }
 
@@ -577,7 +582,7 @@ async function scan() {
     console.log(`✓ SCALPER ${record.dir} ${record.symbol} | RR 1:${record.rr}`);
   }
 
-  writeHeartbeat(true, { phase: 'done', emitted: take });
+  writeHeartbeat(true, { phase: 'done', emitted: take, dataFetchOk: true, signalsAvailable: take > 0 });
 }
 
 if (process.env.SCALPER_TEST === '1' || require.main !== module) {

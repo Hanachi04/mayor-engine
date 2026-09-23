@@ -1,0 +1,22 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+tmp/
+temp/
+.cache/
+.DS_Store
+*.pem
+.idea/
+.vscode/
+
+# local runtime overrides
+data/circuit_breaker.json
+data/adaptation_log.jsonl
+data/ml/shadow_log.jsonl
+
+# OS / tooling
+npm-debug.log*
+yarn-error.log*

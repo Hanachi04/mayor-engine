@@ -17,10 +17,12 @@ const DEFAULT_SYMBOLS = [
 const CONFIG = {
   symbols: (process.env.SCALPER_SYMBOLS || DEFAULT_SYMBOLS)
     .split(',').map(s => s.trim().toUpperCase()).filter(Boolean),
-  futuresEndpoints: [
-    'https://fapi.binance.com',
-    'https://fstream.binance.com'
-  ],
+  // REST hosts only (fstream.binance.com is websocket — causes HTTP 404 on /fapi/*)
+  futuresEndpoints: (process.env.SCALPER_FUTURES_ENDPOINTS || 'https://fapi.binance.com')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .filter(u => !/fstream/i.test(u)),
   baseInterval: '1m',
   confirmIntervals: ['3m', '5m'],
   trendInterval: '15m',

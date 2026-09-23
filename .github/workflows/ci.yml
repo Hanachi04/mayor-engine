@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Unit & integration tests
+        run: npm test
+      - name: Adaptation isolation
+        run: node test/adaptation.test.js
+      - name: Shadow ML train (smoke)
+        run: node engine/ml/train_shadow.js
+      - name: Auto status smoke
+        run: node engine/auto_status.js

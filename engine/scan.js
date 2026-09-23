@@ -644,30 +644,54 @@ function loadBreakerState() {
 }
 function saveBreakerState(state) { fs.writeFileSync(BREAKER_FILE, JSON.stringify(state, null, 2)); }
 
-// قاطع أمان يوقف بث إشارات جديدة (لا يوقف متابعة الصفقات المفتوحة) عند تجاوز حدود
-// الخسارة اليومية أو سلسلة خسائر متتالية. معطّل افتراضيًا (القيم = 0 في CONFIG).
-function checkCircuitBreaker(tracked, today) {
+// قاطع أمان: خسارة يومية و/أو سلسلة خسائر ضمن نافذة زمنية + تبريد (cooldown).
+// لا يسبب قفلاً دائماً من خسائر تاريخية قديمة خارج النافذة.
+function checkCircuitBreaker(tracked, today, nowMs = Date.now()) {
   const state = loadBreakerState();
-  const closedToday = tracked.filter(t => t.closed && t.closeAt && t.closeAt.slice(0, 10) === today);
+  // Cooldown: if previously tripped, stay blocked until untilMs
+  if (state.untilMs && Number(state.untilMs) > nowMs) {
+    const reason = state.lastReason || 'circuit-cooldown';
+    const already = state.lastDate === today && state.lastReason === reason;
+    return { tripped: true, reason, alreadyNotified: already, untilMs: state.untilMs };
+  }
+
+  const closedToday = tracked.filter(t => t.closed && t.closeAt && String(t.closeAt).slice(0, 10) === today);
   const dailyPnl = closedToday.reduce((s, t) => s + (typeof t.closePct === 'number' ? t.closePct : 0), 0);
   if (CONFIG.maxDailyLossPct > 0 && dailyPnl <= -Math.abs(CONFIG.maxDailyLossPct)) {
     const reason = `خسارة يومية ${dailyPnl.toFixed(2)}% تجاوزت الحد ${CONFIG.maxDailyLossPct}%`;
+    // Block rest of UTC day
+    const endOfDay = Date.parse(`${today}T23:59:59.999Z`);
     const already = state.lastReason === reason && state.lastDate === today;
-    if (!already) saveBreakerState({ lastReason: reason, lastDate: today });
-    return { tripped: true, reason, alreadyNotified: already };
+    if (!already) saveBreakerState({ lastReason: reason, lastDate: today, untilMs: endOfDay, type: 'daily-loss' });
+    return { tripped: true, reason, alreadyNotified: already, untilMs: endOfDay };
   }
+
   if (CONFIG.maxLossStreak > 0) {
-    const closedSorted = tracked.filter(t => t.closed && t.closeAt).sort((a, b) => b.closeAt.localeCompare(a.closeAt));
+    const windowMs = Number(process.env.LOSS_STREAK_WINDOW_HOURS || 48) * 3600 * 1000;
+    const cutoff = nowMs - windowMs;
+    const closedSorted = tracked
+      .filter(t => t.closed && t.closeAt && typeof t.closePct === 'number')
+      .filter(t => {
+        const ts = Date.parse(t.closeAt);
+        return Number.isFinite(ts) && ts >= cutoff;
+      })
+      .sort((a, b) => String(b.closeAt).localeCompare(String(a.closeAt)));
     let streak = 0;
-    for (const t of closedSorted) { if (typeof t.closePct === 'number' && t.closePct < 0) streak++; else break; }
+    for (const t of closedSorted) {
+      if (t.closePct < 0) streak++;
+      else break;
+    }
     if (streak >= CONFIG.maxLossStreak) {
-      const reason = `سلسلة ${streak} خسائر متتالية بلغت الحد ${CONFIG.maxLossStreak}`;
+      const cooldownH = Number(process.env.LOSS_STREAK_COOLDOWN_HOURS || 12);
+      const untilMs = nowMs + cooldownH * 3600 * 1000;
+      const reason = `سلسلة ${streak} خسائر متتالية خلال ${windowMs / 3600000}h (حد ${CONFIG.maxLossStreak}) — تبريد ${cooldownH}h`;
       const already = state.lastReason === reason && state.lastDate === today;
-      if (!already) saveBreakerState({ lastReason: reason, lastDate: today });
-      return { tripped: true, reason, alreadyNotified: already };
+      if (!already) saveBreakerState({ lastReason: reason, lastDate: today, untilMs, type: 'loss-streak', streak });
+      return { tripped: true, reason, alreadyNotified: already, untilMs };
     }
   }
-  if (state.lastReason) saveBreakerState({}); // تعافى القاطع — امسح الحالة
+
+  if (state.lastReason || state.untilMs) saveBreakerState({});
   return { tripped: false };
 }
 function buildBreakerMessage(breaker) {
@@ -761,13 +785,14 @@ async function scan() {
     try { return { symbol, ...(await evaluate(symbol, volumeMap.get(symbol).quoteVolume, sentiment)) }; }
     catch (e) { console.log(`فشل تقييم ${symbol}: ${e.message}`); return { symbol, ok: false, reason: 'evaluation-error' }; }
   }));
+  // Hour block: only if explicitly set. Empty default = disabled (small samples are unsafe).
   const blockHours = String(process.env.BLOCK_UTC_HOURS || '')
-    .split(',').map(s => s.trim()).filter(Boolean).map(Number).filter(n => Number.isFinite(n));
+    .split(',').map(s => s.trim()).filter(Boolean).map(Number).filter(n => Number.isFinite(n) && n >= 0 && n <= 23);
   const hourNow = new Date().getUTCHours();
   let candidates = results.filter(r => r.ok && r.signal).map(r => r.signal)
     .filter(s => !tracked.some(t => t.date === today && t.symbol === s.symbol));
-  if (blockHours.includes(hourNow)) {
-    console.log(`حظر ساعات UTC ${blockHours.join(',')}: الساعة الحالية ${hourNow} — تخطي بث جديد`);
+  if (blockHours.length && blockHours.includes(hourNow)) {
+    console.log(`حظر ساعات UTC [${blockHours.join(',')}]: الساعة ${hourNow} — تخطي بث جديد`);
     candidates = [];
   }
   // Shadow ML: log always; filter only if ML_SHADOW_MODE=filter

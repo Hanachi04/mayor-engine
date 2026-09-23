@@ -1,11 +1,11 @@
 {
   "name": "mayor-cloud-pro-mtf",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "MaYor Cloud Pro MTF research-only signal engine",
+  "description": "Research-oriented MaYor Cloud Pro MTF signal engine (core strategy, adaptation, shadow ML, scalper)",
   "type": "commonjs",
   "scripts": {
-    "test": "node test/unit.test.js && node test/scalper/unit.test.js && node test/adaptation.test.js",
+    "test": "node test/unit.test.js && node test/scalper/unit.test.js && node test/adaptation.test.js && node test/circuit_breaker.test.js && node test/auto_status.test.js",
     "backtest": "node engine/backtest.js",
     "verify": "node engine/backtest.js",
     "report:daily": "node engine/performance_report.js daily",
@@ -18,7 +18,9 @@
     "report:status": "node engine/auto_status.js",
     "test:adapt": "node test/adaptation.test.js",
     "ml:train": "node engine/ml/train_shadow.js",
-    "test:ml": "node engine/ml/train_shadow.js"
+    "test:ml": "node engine/ml/train_shadow.js",
+    "test:circuit": "node test/circuit_breaker.test.js",
+    "test:status": "node test/auto_status.test.js"
   },
   "engines": {
     "node": ">=20"

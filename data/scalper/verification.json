@@ -2,7 +2,14 @@
   "gateVersion": "scalper-statistical-gate-1",
   "status": "BLOCKED",
   "passed": false,
-  "reason": "awaiting-first-local-backtest",
-  "generatedAt": "2026-08-30T00:00:00.000Z",
-  "engineVersion": "futures-scalper-v1.0"
+  "reason": "awaiting-reproducible-local-backtest-with-historical-1m-data",
+  "generatedAt": "2026-09-23T14:07:54.294865Z",
+  "engineVersion": "futures-scalper-v1.1",
+  "dataset": null,
+  "notes": [
+    "Code version is futures-scalper-v1.1 (minAtrPct, requireRecentCross, RSI extremes).",
+    "No packaged historical 1m dataset in repo; local backtest requires data/scalper/historical/*_1m.json.",
+    "REST endpoint corrected to fapi.binance.com only (fstream removed \u2014 was causing HTTP 404).",
+    "Gate stays BLOCKED until backtest artifacts are produced and reviewed."
+  ]
 }

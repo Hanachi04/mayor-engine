@@ -6,11 +6,7 @@ on:
     # كل يوم 21:15 UTC ≈ 00:15 الرياض (بعد التقرير اليومي)
     - cron: '15 21 * * *'
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MaYor Daily Performance Report"
-      - "Futures Scalper v1.1"
-    types: [completed]
+  # Reduced noise: no longer runs after every Scalper (~15m). Daily + manual + after daily report only via schedule.
 
 permissions:
   contents: write

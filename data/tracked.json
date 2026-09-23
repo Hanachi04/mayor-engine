@@ -29,7 +29,8 @@
     "closePrice": 81.52,
     "closeResult": "TP3",
     "closePct": 0.606,
-    "closeAt": "2026-08-19T18:06:18.747Z"
+    "closeAt": "2026-08-19T18:06:18.747Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "ADAUSDT",
@@ -73,7 +74,8 @@
     "closePrice": 0.1854,
     "closeResult": "TP1",
     "closePct": 1.601,
-    "closeAt": "2026-08-19T20:58:53.406Z"
+    "closeAt": "2026-08-19T20:58:53.406Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "XRPUSDT",
@@ -121,7 +123,8 @@
     "closePrice": 1.0895,
     "closeResult": "SL",
     "closePct": -0.969,
-    "closeAt": "2026-08-20T03:13:22.475Z"
+    "closeAt": "2026-08-20T03:13:22.475Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "BTCUSDT",
@@ -167,7 +170,8 @@
     "closePrice": 69553.54,
     "closeResult": "SL",
     "closePct": -0.54,
-    "closeAt": "2026-08-20T05:07:38.985Z"
+    "closeAt": "2026-08-20T05:07:38.985Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "BNBUSDT",
@@ -211,7 +215,8 @@
     "closePrice": 643.37,
     "closeResult": "TP3",
     "closePct": 1.285,
-    "closeAt": "2026-08-20T09:53:07.154Z"
+    "closeAt": "2026-08-20T09:53:07.154Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "SOLUSDT",
@@ -261,7 +266,8 @@
     "slippagePct": 0.04,
     "closePct": 2.3478,
     "netPnlUsd": null,
-    "closeAt": "2026-08-21T03:31:39.465Z"
+    "closeAt": "2026-08-21T03:31:39.465Z",
+    "strategyMode": "legacy"
   },
   {
     "symbol": "LTCUSDT",
@@ -1639,8 +1645,8 @@
   {
     "symbol": "PEPEUSDT",
     "dir": "LONG",
-    "price": 0.00000419,
-    "atr": 6.153161748811994e-8,
+    "price": 4.19e-06,
+    "atr": 6.153161748811994e-08,
     "atrPct": 0.014685350235828148,
     "adx": 65.33875000007909,
     "pdi": 37.341826463855746,
@@ -1675,10 +1681,10 @@
     "rsi4h": 70.83803551931675,
     "adx4h": 33.05365700821712,
     "sentiment": 71,
-    "sl": 0.00000409770257376782,
-    "tp1": 0.00000428229742623218,
-    "tp2": 0.0000043745948524643595,
-    "tp3": 0.0000044668922786965394,
+    "sl": 4.09770257376782e-06,
+    "tp1": 4.28229742623218e-06,
+    "tp2": 4.3745948524643595e-06,
+    "tp3": 4.4668922786965394e-06,
     "rr": 3,
     "position": {
       "capital": 1000,
@@ -1701,10 +1707,10 @@
     "ts": 1789841704601,
     "slot": 6,
     "closed": true,
-    "entryFillPrice": 0.0000041908379999999995,
-    "closePrice": 0.00000394,
+    "entryFillPrice": 4.1908379999999995e-06,
+    "closePrice": 3.94e-06,
     "closeResult": "SL",
-    "exitFillPrice": 0.000003939212000000001,
+    "exitFillPrice": 3.939212000000001e-06,
     "grossPnlPct": -6.0042,
     "feesPct": 0.1,
     "slippagePct": 0.04,
@@ -2472,8 +2478,8 @@
   {
     "symbol": "PEPEUSDT",
     "dir": "LONG",
-    "price": 0.00000481,
-    "atr": 8.25826323587954e-8,
+    "price": 4.81e-06,
+    "atr": 8.25826323587954e-08,
     "atrPct": 0.01716894643634,
     "adx": 46.83617202536963,
     "pdi": 54.02603977502414,
@@ -2511,10 +2517,10 @@
     "rsi4h": 72.39586496181438,
     "adx4h": 40.14767308789509,
     "sentiment": 70,
-    "sl": 0.000004686126051461806,
-    "tp1": 0.000004933873948538193,
-    "tp2": 0.000005057747897076386,
-    "tp3": 0.000005181621845614579,
+    "sl": 4.686126051461806e-06,
+    "tp1": 4.933873948538193e-06,
+    "tp2": 5.057747897076386e-06,
+    "tp3": 5.181621845614579e-06,
     "rr": 3,
     "position": {
       "capital": 1000,
@@ -2537,10 +2543,10 @@
     "ts": 1790003597398,
     "slot": 5,
     "closed": true,
-    "entryFillPrice": 0.0000048109619999999996,
-    "closePrice": 0.00000503,
+    "entryFillPrice": 4.8109619999999996e-06,
+    "closePrice": 5.03e-06,
     "closeResult": "TP1",
-    "exitFillPrice": 0.000005028994,
+    "exitFillPrice": 5.028994e-06,
     "grossPnlPct": 4.532,
     "feesPct": 0.1,
     "slippagePct": 0.04,

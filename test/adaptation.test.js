@@ -9,14 +9,19 @@ process.env.ADAPT_BAN_HOURS = '24';
 process.env.ADAPT_MAX_NEW_BANS = '5';
 
 const assert = require('assert');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
-// Isolate state files under tmp by monkeypatching - use real data dir but restore
-const adaptPath = path.join(__dirname, '..', 'engine', 'adaptation.js');
-// clear module cache and use dedicated env - adaptation reads DATA_DIR fixed
+const productionState = path.join(__dirname, '..', 'data', 'adaptation_state.json');
+const prodBefore = fs.existsSync(productionState) ? fs.readFileSync(productionState, 'utf8') : null;
 
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'adapt-test-'));
+process.env.ADAPTATION_DATA_DIR = tmp;
+
+// Load after env set
 const adaptation = require('../engine/adaptation');
+adaptation.setDataDir(tmp);
 
 function makeTrade(symbol, net, i) {
   return {
@@ -45,7 +50,7 @@ function makeTrade(symbol, net, i) {
   );
   assert.ok(activeBans.includes('AAAUSDT') || skipped.some(s => s.symbol === 'AAAUSDT'), 'weak AAA should skip');
   assert.ok(allowed.includes('BBBUSDT'), 'strong BBB allowed');
-  assert.ok(allowed.includes('CCCUSDT'), 'unknown CCC allowed (no sample)');
+  assert.ok(allowed.includes('CCCUSDT'), 'unknown CCC allowed');
   console.log('✓ weak symbol banned / strong allowed');
 })();
 
@@ -54,13 +59,21 @@ function makeTrade(symbol, net, i) {
     makeTrade('DDDUSDT', -5, 1),
     makeTrade('DDDUSDT', -5, 2)
   ];
-  // only 2 trades < minTrades 4
-  const stateBefore = adaptation.loadState();
-  delete stateBefore.blacklist.DDDUSDT;
-  adaptation.saveState(stateBefore);
+  const state = adaptation.loadState();
+  delete state.blacklist.DDDUSDT;
+  adaptation.saveState(state);
   const { allowed } = adaptation.filterEligible(['DDDUSDT'], tracked);
   assert.ok(allowed.includes('DDDUSDT'), 'insufficient sample must not ban');
   console.log('✓ insufficient sample not banned');
 })();
+
+(function testProductionUntouched() {
+  const after = fs.existsSync(productionState) ? fs.readFileSync(productionState, 'utf8') : null;
+  assert.strictEqual(after, prodBefore, 'production adaptation_state.json must not change');
+  console.log('✓ production adaptation_state untouched');
+})();
+
+// cleanup
+try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {}
 
 console.log('✓ test/adaptation: Layer A tests passed');
