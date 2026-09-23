@@ -242,7 +242,7 @@ function monteCarlo(returns, runs = MC_RUNS) {
   return {
     runs, method: 'permutation_paths', observedNetPct: round(observedStats.finalNetPct, 5),
     observedMaxDrawdownPct: round(observedStats.maxDrawdownPct, 5), observedScore: round(observedStats.score, 5),
-    p05: round(quantile(scores, 0.05), 5), p50: round(quantile(scores, 0.5), 5), p95: round(quantile(scores, 0.95), 5),
+    p05: round(quantile(scores, 0.05), 5), p25: round(quantile(scores, 0.25), 5), p50: round(quantile(scores, 0.5), 5), p75: round(quantile(scores, 0.75), 5), p95: round(quantile(scores, 0.95), 5),
     maxDrawdownP05: round(quantile(drawdowns, 0.05), 5), maxDrawdownP50: round(quantile(drawdowns, 0.5), 5), maxDrawdownP95: round(quantile(drawdowns, 0.95), 5),
     mean: round(m, 5), stddev: round(sd, 5), zScore: round(z, 4),
     observedAtOrAbovePct: scores.length ? scores.filter(x => x <= observedStats.score).length / scores.length * 100 : 0
@@ -278,16 +278,67 @@ async function main() {
   const symbolReports = [];
   for (const dataset of datasets) {
     const all = dataset.data[CONFIG.baseInterval] || [], start = all[0]?.openTime || 0, end = all.at(-1)?.closeTime || 0, split = start + (end - start) * 0.7;
-    if (!all.length) { symbolReports.push({ symbol: dataset.symbol, warning: 'No historical data' }); continue; }
+    if (!all.length) {
+      console.error(`No historical dataset available for ${dataset.symbol}.`);
+      console.error(`Expected files under data/historical/: ${INTERVALS.map(i => dataset.symbol + '_' + i + '.json').join(', ')}`);
+      console.error('Or set BACKTEST_FETCH=1 when public klines are reachable.');
+      console.error('Backtest not executed for this symbol. Verification remains BLOCKED.');
+      symbolReports.push({ symbol: dataset.symbol, warning: 'No historical dataset available', gate: { gateVersion: 'cloud-pro-statistical-gate-1', status: 'BLOCKED', passed: false, warnings: ['no-historical-data'] } });
+      continue;
+    }
     const isRun = runWindow(dataset, start, split), oosRun = runWindow(dataset, split, end);
     const is = metrics(isRun.trades), oos = metrics(oosRun.trades), mc = monteCarlo(oos.returns), correlation = correlationMatrix([...isRun.features, ...oosRun.features]);
     const gate = buildGate(is, oos, mc);
     symbolReports.push({ symbol: dataset.symbol, period: { start, split, end }, inSample: is, outOfSample: oos, monteCarlo: mc, correlation, gate, warnings: [...gate.warnings] });
   }
   const valid = symbolReports.filter(r => r.gate), passed = valid.length > 0 && valid.every(r => r.gate.passed);
-  const report = { generatedAt: new Date().toISOString(), strategy: 'MaYor Cloud Pro MTF', engineVersion: 'cloud-pro-mtf-2.0', assumptions: { entry: 'next base candle open', ambiguousCandle: 'SL first (conservative)', takerFeeRate: CONFIG.takerFeeRate, slippageRate: CONFIG.slippageRate, monteCarloRuns: MC_RUNS, sampleWarning: true }, symbols: symbolReports, gate: { gateVersion: 'cloud-pro-statistical-gate-1', status: passed ? 'PASS' : 'BLOCKED', passed, reason: passed ? 'all symbol gates passed' : 'one or more symbol gates blocked' } };
+  const strategyMode = process.env.STRATEGY_MODE || 'balanced';
+  const noData = symbolReports.every(r => (r.warning || '').includes('No historical') || (r.gate && (r.gate.warnings || []).includes('no-historical-data')));
+  const report = {
+    generatedAt: new Date().toISOString(),
+    strategy: 'MaYor Cloud Pro MTF',
+    engineVersion: 'cloud-pro-mtf-2.1',
+    strategyMode,
+    dataset: {
+      source: process.env.BACKTEST_FETCH ? 'fetch' : 'local-files',
+      historicalDir: HIST_DIR,
+      symbols: SYMBOLS,
+      intervals: INTERVALS,
+      schema: 'Array of {openTime,open,high,low,close,volume,closeTime} or Binance kline arrays'
+    },
+    assumptions: {
+      entry: 'next base candle open',
+      ambiguousCandle: 'SL first (conservative)',
+      takerFeeRate: CONFIG.takerFeeRate,
+      slippageRate: CONFIG.slippageRate,
+      monteCarloRuns: MC_RUNS,
+      monteCarloSeedBase: 17,
+      monteCarloMethod: 'deterministic permutation of OOS returns',
+      sampleWarning: true
+    },
+    symbols: symbolReports,
+    gate: {
+      gateVersion: 'cloud-pro-statistical-gate-1',
+      status: passed ? 'PASS' : 'BLOCKED',
+      passed,
+      reason: noData
+        ? 'No historical dataset available. Backtest not executed. Verification remains BLOCKED.'
+        : (passed ? 'all symbol gates passed' : 'one or more symbol gates blocked')
+    }
+  };
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
-  const verification = { ...report.gate, generatedAt: report.generatedAt, engineVersion: report.engineVersion, monteCarlo: symbolReports.map(r => ({ symbol: r.symbol, ...(r.monteCarlo || {}) })), oos: symbolReports.map(r => ({ symbol: r.symbol, ...(r.outOfSample || {}) })), warnings: symbolReports.flatMap(r => r.warnings || []) };
+  const verification = {
+    ...report.gate,
+    generatedAt: report.generatedAt,
+    engineVersion: report.engineVersion,
+    strategyMode: report.strategyMode,
+    dataset: report.dataset,
+    assumptions: report.assumptions,
+    monteCarlo: symbolReports.map(r => ({ symbol: r.symbol, ...(r.monteCarlo || {}) })),
+    oos: symbolReports.map(r => ({ symbol: r.symbol, ...(r.outOfSample || {}) })),
+    symbols: SYMBOLS,
+    warnings: symbolReports.flatMap(r => r.warnings || [])
+  };
   fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));
   console.log(JSON.stringify({ report: REPORT_FILE, verification: VERIFICATION_FILE, gate: report.gate, symbols: symbolReports.map(r => ({ symbol: r.symbol, isTrades: r.inSample?.trades || 0, oosTrades: r.outOfSample?.trades || 0, oosNetPct: r.outOfSample?.netPct || 0, zScore: r.monteCarlo?.zScore || 0 })) }, null, 2));
   return report;

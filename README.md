@@ -116,3 +116,25 @@ Secrets: `TELEGRAM_TOKEN`, `TELEGRAM_CHAT` (optional per workflow).
 ## License
 
 MIT — see `LICENSE`.
+
+
+## Historical data & verification
+
+See [docs/HISTORICAL_DATA.md](docs/HISTORICAL_DATA.md).
+
+Without local datasets (or reachable public klines), backtests print **BLOCKED** and do **not** invent PASS metrics.
+
+## Coverage
+
+```bash
+npm run coverage
+```
+
+Uses `c8` via npx (no required dependency install).
+
+## Limitations
+
+- Research / notification engine only.
+- Statistical gates may remain BLOCKED until reproducible datasets are provided.
+- Shadow ML stays in **log** mode until out-of-sample evidence justifies filtering.
+- Past tracked PnL is not a guarantee of future results.

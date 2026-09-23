@@ -1,25 +1,50 @@
 {
-  "generatedAt": "2026-09-23T14:07:21.393Z",
+  "generatedAt": "2026-09-23T14:32:42.741Z",
   "strategy": "MaYor Cloud Pro MTF",
-  "engineVersion": "cloud-pro-mtf-2.0",
+  "engineVersion": "cloud-pro-mtf-2.1",
+  "strategyMode": "core",
+  "dataset": {
+    "source": "local-files",
+    "historicalDir": "/tmp/mayor-engine/data/historical",
+    "symbols": [
+      "BTCUSDT"
+    ],
+    "intervals": [
+      "5m",
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "schema": "Array of {openTime,open,high,low,close,volume,closeTime} or Binance kline arrays"
+  },
   "assumptions": {
     "entry": "next base candle open",
     "ambiguousCandle": "SL first (conservative)",
     "takerFeeRate": 0.0005,
     "slippageRate": 0.0002,
     "monteCarloRuns": 1000,
+    "monteCarloSeedBase": 17,
+    "monteCarloMethod": "deterministic permutation of OOS returns",
     "sampleWarning": true
   },
   "symbols": [
     {
       "symbol": "BTCUSDT",
-      "warning": "No historical data"
+      "warning": "No historical dataset available",
+      "gate": {
+        "gateVersion": "cloud-pro-statistical-gate-1",
+        "status": "BLOCKED",
+        "passed": false,
+        "warnings": [
+          "no-historical-data"
+        ]
+      }
     }
   ],
   "gate": {
     "gateVersion": "cloud-pro-statistical-gate-1",
     "status": "BLOCKED",
     "passed": false,
-    "reason": "one or more symbol gates blocked"
+    "reason": "No historical dataset available. Backtest not executed. Verification remains BLOCKED."
   }
 }

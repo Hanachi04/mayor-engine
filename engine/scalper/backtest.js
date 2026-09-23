@@ -18,6 +18,24 @@ function finite(v, fb = NaN) {
 }
 function round(v, d = 4) { return Number(Number(v).toFixed(d)); }
 
+/** Validate local OHLCV series used by scalper backtest */
+function validateOhlcvSeries(rows, label = 'series') {
+  const errors = [];
+  if (!Array.isArray(rows) || !rows.length) return { ok: false, errors: [`${label}: empty`] };
+  let prev = -Infinity;
+  for (let i = 0; i < rows.length; i++) {
+    const k = rows[i];
+    const o = finite(k.open), h = finite(k.high), l = finite(k.low), c = finite(k.close);
+    const ot = finite(k.openTime), ct = finite(k.closeTime);
+    if (![o, h, l, c, ot, ct].every(Number.isFinite)) errors.push(`${label}[${i}]: non-finite ohlcv/time`);
+    if (h < Math.max(o, c) || l > Math.min(o, c)) errors.push(`${label}[${i}]: OHLC inconsistency`);
+    if (ct <= prev) errors.push(`${label}[${i}]: timestamps not strictly increasing`);
+    prev = ct;
+  }
+  return { ok: errors.length === 0, errors: errors.slice(0, 20), bars: rows.length };
+}
+
+
 function simulateSymbol(symbol, frames) {
   const k1 = frames['1m'] || [];
   if (k1.length < 80) return { symbol, trades: [], reason: 'short-history' };
@@ -248,7 +266,12 @@ async function runBacktest(framesBySymbol) {
 async function main() {
   const histDir = path.join(DATA_DIR, 'historical');
   if (!fs.existsSync(histDir)) {
-    console.log('No data/scalper/historical/ — place SYMBOL_1m.json then re-run.');
+    console.log([
+      'No historical dataset available under data/scalper/historical/.',
+      'Expected files: SYMBOL_1m.json (and optional _3m/_5m/_15m).',
+      'Schema: JSON array of {openTime,open,high,low,close,volume,closeTime} or Binance kline arrays.',
+      'Backtest not executed. Verification remains BLOCKED.'
+    ].join('\n'));
     const verification = {
       gateVersion: GATE_VERSION, status: 'BLOCKED', passed: false,
       reason: 'no-historical-data', generatedAt: new Date().toISOString(),
@@ -284,7 +307,7 @@ async function main() {
 }
 
 if (process.env.SCALPER_TEST === '1' || require.main !== module) {
-  module.exports = {
+  module.exports = { validateOhlcvSeries, 
     simulateSymbol, summarize, monteCarloSequence, concentrationCheck,
     splitIsoos, runBacktest
   };
