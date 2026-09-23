@@ -20,3 +20,7 @@ data/ml/shadow_log.jsonl
 # OS / tooling
 npm-debug.log*
 yarn-error.log*
+
+# Local recovered historical datasets (do not commit large OHLCV)
+data/historical/
+
