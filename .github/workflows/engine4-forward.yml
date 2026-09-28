@@ -1,10 +1,9 @@
 name: Engine #4 Turtle Forward Paper
 
 # Daily after UTC day candle is closed. Also manual.
+# FROZEN with rest of mayor-engine — Actions disabled at repo level.
+# Manual only if Actions are re-enabled later.
 on:
-  schedule:
-    # 00:20 UTC — first minutes after daily close on most crypto venues
-    - cron: '20 0 * * *'
   workflow_dispatch:
 
 permissions:
