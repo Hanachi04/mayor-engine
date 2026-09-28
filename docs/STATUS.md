@@ -1,3 +1,11 @@
+# STATUS — MaYor product line FROZEN
+
+> **2026-09-28:** Core + Scalper + MaYor reports **STOPPED** (no schedule).  
+> Only **Engine #4 Turtle forward paper** remains scheduled.  
+> Details: [`MAYOR_ENGINE_FROZEN.md`](./MAYOR_ENGINE_FROZEN.md)
+
+---
+
 # حالة الأنظمة — توثيق تلقائي
 
 **آخر تحديث:** 2026-09-23T14:06:55.426Z

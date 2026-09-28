@@ -1,12 +1,9 @@
+# FROZEN / STOPPED with MaYor product line — manual only
 name: Auto Status Documentation
 
-# يوثّق حالة MaYor + Scalper + Aegis تلقائياً في docs/STATUS.md
+# يوثّق حالة MaYor + Scalper + Aegis عند التشغيل اليدوي فقط
 on:
-  schedule:
-    # كل يوم 21:15 UTC ≈ 00:15 الرياض (بعد التقرير اليومي)
-    - cron: '15 21 * * *'
   workflow_dispatch:
-  # Reduced noise: no longer runs after every Scalper (~15m). Daily + manual + after daily report only via schedule.
 
 permissions:
   contents: write

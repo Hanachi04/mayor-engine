@@ -1,9 +1,7 @@
+# FROZEN / STOPPED with MaYor product line — manual only
 name: MaYor Weekly Performance Report
 
 on:
-  schedule:
-    # كل يوم جمعة الساعة 15:00 UTC (18:00 بتوقيت الرياض)
-    - cron: '0 15 * * 5'
   workflow_dispatch:
 
 permissions:

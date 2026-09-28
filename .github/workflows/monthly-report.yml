@@ -1,9 +1,7 @@
+# FROZEN / STOPPED with MaYor product line — manual only
 name: MaYor Monthly Performance Report
 
 on:
-  schedule:
-    # أول يوم من كل شهر عند 05:00 بتوقيت الرياض؛ التقرير يغطي آخر 30 يومًا.
-    - cron: '0 2 1 * *'
   workflow_dispatch:
 
 permissions:
