@@ -1,0 +1,79 @@
+name: Engine #4 Turtle Forward Paper
+
+# Daily after UTC day candle is closed. Also manual.
+on:
+  schedule:
+    # 00:20 UTC — first minutes after daily close on most crypto venues
+    - cron: '20 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: engine4-forward
+  cancel-in-progress: false
+
+jobs:
+  forward:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Engine #4 forward paper
+        env:
+          ENGINE4_MODE: FORWARD_PAPER
+          # Map existing MaYor Telegram secrets + optional dedicated names
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || secrets.TELEGRAM_CHAT }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
+        run: |
+          set -euo pipefail
+          node engine/engine4/forward.js
+          node engine/engine4/status_report.js
+
+      - name: Upload forward-test artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine4-forward-${{ github.run_id }}
+          path: |
+            forward-test/
+            data/reports/engine4_forward_status.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Commit forward journals + status
+        env:
+          GH_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -u
+          git config user.name "mayor-bot"
+          git config user.email "mayor-bot@users.noreply.github.com"
+          git add forward-test/signals forward-test/trades forward-test/equity forward-test/state forward-test/audit \
+                  data/reports/engine4_forward_status.json || true
+          if git diff --cached --quiet; then
+            echo "No forward-test changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(engine4): forward paper snapshot ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+          branch="${GH_BRANCH:-main}"
+          for attempt in 1 2 3; do
+            if git fetch origin "$branch" && git pull --rebase origin "$branch" && git push origin "HEAD:$branch"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "Push failed after retries (check Actions permissions / billing)"
+          exit 1

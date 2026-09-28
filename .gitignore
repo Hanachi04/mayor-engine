@@ -25,11 +25,6 @@ yarn-error.log*
 data/historical/
 
 
-# Engine #4 forward-test runtime journals (keep directory via .gitkeep)
-forward-test/signals/*.jsonl
-forward-test/trades/*.jsonl
-forward-test/equity/*.jsonl
-forward-test/state/*.json
-forward-test/audit/*.jsonl
+# Engine #4: track journals/state for Actions continuity; candles are rebuildable
 forward-test/candles/*.jsonl
 !forward-test/**/.gitkeep

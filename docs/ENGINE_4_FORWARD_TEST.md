@@ -163,3 +163,34 @@ Stop the scheduler / process. State remains on disk for resume.
 - Claim that Turtle is profitable
 
 Forward-test data accumulates; **validation is a separate later stage**.
+
+
+## Automated schedule (GitHub Actions)
+
+Workflow: `.github/workflows/engine4-forward.yml`
+
+| Trigger | When |
+|---------|------|
+| `schedule` | `20 0 * * *` (00:20 UTC daily) |
+| `workflow_dispatch` | Manual from Actions tab |
+
+### Required for live paper
+
+1. **GitHub Actions enabled** (Billing + Actions permissions).
+2. Secrets (reuse existing MaYor names or dedicated):
+   - `TELEGRAM_TOKEN` / `TELEGRAM_CHAT` **or**
+   - `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`
+3. After each run, journals under `forward-test/` and `data/reports/engine4_forward_status.json` are committed.
+
+### Manual one-shot
+
+```bash
+ENGINE4_MODE=FORWARD_PAPER npm run engine4:forward
+npm run engine4:status
+```
+
+### If Actions stopped (billing)
+
+GitHub → Settings → Billing → Actions minutes / spending limit.  
+Until Actions run, no new forward rows will appear.
+

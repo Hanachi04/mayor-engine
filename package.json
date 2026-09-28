@@ -9,6 +9,7 @@
     "test:engine4": "node test/engine4/unit.test.js",
     "engine4:replay": "node engine/engine4/replay.js",
     "engine4:forward": "node engine/engine4/forward.js",
+    "engine4:status": "node engine/engine4/status_report.js",
     "backtest": "node engine/backtest.js",
     "verify": "node engine/backtest.js",
     "report:daily": "node engine/performance_report.js daily",
