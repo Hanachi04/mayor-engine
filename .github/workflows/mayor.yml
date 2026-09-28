@@ -1,8 +1,10 @@
 name: MaYor Cloud Pro MTF
 
+# BUDGET: was every 3 hours (~8/day + CI cascade on each commit).
+# Now once daily 12:00 UTC + manual.
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:
     inputs:
       run_verification:

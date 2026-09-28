@@ -1,8 +1,14 @@
 name: CI
 
+# BUDGET: ignore routine data/docs bot commits so scanner/report pushes do not re-run full CI.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'data/**'
+      - 'forward-test/**'
+      - 'docs/STATUS.md'
+      - '**.md'
   pull_request:
   workflow_dispatch:
 
