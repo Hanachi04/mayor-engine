@@ -54,7 +54,7 @@ jobs:
           SIGNAL_SLOT_HOURS: '3'
           SIGNAL_COOLDOWN_MINUTES: '60'
           MIN_QUOTE_VOLUME_24H: '5000000'
-          VERIFICATION_GATE_MODE: 'warn'
+          VERIFICATION_GATE_MODE: 'enforce'
           TAKER_FEE_RATE: '0.0005'
           SLIPPAGE_RATE: '0.0002'
           ACCOUNT_CAPITAL: '1000'

@@ -7,6 +7,7 @@ const {
   analyze1m, emaDirection, softTrend15m, levelsFromSignal,
   entryFillPrice, exitFillPrice, prepareKlines, Indicators
 } = require('./scan');
+const { bootstrapEdge, drawdownRisk } = require('../edge_stats');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
 const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');
@@ -146,38 +147,22 @@ function summarize(trades) {
   };
 }
 
-function monteCarloSequence(returns, runs = 500) {
-  if (returns.length < 3) {
-    return { runs: 0, method: 'permutation_paths', zScore: 0, p05: 0, p50: 0, p95: 0, observed: 0 };
-  }
-  const observed = returns.reduce((a, b) => a + b, 0);
-  const scores = [];
-  for (let r = 0; r < runs; r++) {
-    const arr = returns.slice();
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    let eq = 0, peak = 0, dd = 0;
-    for (const x of arr) {
-      eq += x;
-      peak = Math.max(peak, eq);
-      dd = Math.max(dd, peak - eq);
-    }
-    scores.push(eq - dd);
-  }
-  scores.sort((a, b) => a - b);
-  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-  const variance = scores.reduce((a, b) => a + (b - mean) ** 2, 0) / scores.length;
-  const std = Math.sqrt(variance) || 1e-9;
-  const z = (observed - mean) / std;
+// Monte Carlo (مصحّح): المقارنة السابقة (مجموع العوائد مقابل eq - dd) كانت موجبة لأي استراتيجية
+// وتعتمد على Math.random. الآن: bootstrap للعوائد مع الإرجاع (seeded) → p-value لـ"المتوسط <= 0"،
+// وتوزيع التراجع من الخلط كمقياس مخاطرة منفصل.
+const EDGE_P_VALUE_MAX = Number(process.env.SCALPER_EDGE_P_VALUE_MAX || process.env.EDGE_P_VALUE_MAX || 0.05);
+function monteCarloSequence(returns, runs = 2000, seed = 17) {
+  const bootstrap = bootstrapEdge(returns, { iterations: runs, seed });
+  const dd = drawdownRisk(returns, { runs, seed: seed + 1 });
   return {
-    runs, method: 'permutation_paths',
-    observed: round(observed, 4),
-    p05: round(scores[Math.floor(runs * 0.05)], 4),
-    p50: round(scores[Math.floor(runs * 0.5)], 4),
-    p95: round(scores[Math.floor(runs * 0.95)], 4),
-    mean: round(mean, 4), stddev: round(std, 4), zScore: round(z, 4)
+    runs, method: 'bootstrap_mean_returns', seed, n: bootstrap.n,
+    observed: bootstrap.observedTotalPct,
+    observedMeanPct: bootstrap.observedMeanPct,
+    pValue: bootstrap.pValueMeanLeZero,
+    p05: bootstrap.totalP05, p50: bootstrap.totalP50, p95: bootstrap.totalP95,
+    zScore: bootstrap.zScore,
+    observedMaxDrawdownPct: dd.observedMaxDrawdownPct,
+    maxDrawdownP50: dd.maxDrawdownP50, maxDrawdownP95: dd.maxDrawdownP95
   };
 }
 
@@ -218,7 +203,7 @@ async function runBacktest(framesBySymbol) {
   const oosSum = summarize(oos);
   const allSum = summarize(allTrades);
   const returns = allTrades.map(t => t.netPct);
-  const mc = monteCarloSequence(returns, Number(process.env.MONTE_CARLO_RUNS || 500));
+  const mc = monteCarloSequence(returns, Number(process.env.MONTE_CARLO_RUNS || 2000));
   const conc = concentrationCheck(allTrades);
 
   const passed =
@@ -226,6 +211,7 @@ async function runBacktest(framesBySymbol) {
     oosSum.trades >= 5 &&
     oosSum.netPct > 0 &&
     allSum.profitFactor > 1 &&
+    Number.isFinite(mc.pValue) && mc.pValue <= EDGE_P_VALUE_MAX &&
     conc.ok;
 
   const report = {
@@ -235,7 +221,7 @@ async function runBacktest(framesBySymbol) {
     overall: allSum, is: isSum, oos: oosSum,
     monteCarlo: mc, concentration: conc, perSymbol,
     passed, status: passed ? 'PASS' : 'BLOCKED',
-    note: 'Monte Carlo here measures sequence risk only, not edge vs random entries.'
+    note: 'Edge gate = bootstrap P(mean per-trade return <= 0) <= ' + EDGE_P_VALUE_MAX + '; permutation drawdown is a risk metric only.'
   };
 
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });

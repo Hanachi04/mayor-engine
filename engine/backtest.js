@@ -23,6 +23,7 @@ const {
   CONFIG, Indicators, normalizeKlines, analyzeLatest, levelsFromSignal,
   netPnl
 } = require('./scan.js');
+const { bootstrapEdge, drawdownRisk } = require('./edge_stats');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
@@ -32,7 +33,9 @@ const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
 const ENDPOINTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
 const INTERVALS = ['5m', '15m', '1h', '4h'];
 const FRAME_WEIGHTS = CONFIG.frameWeights;
-const MC_RUNS = Math.max(200, Number(process.env.MONTE_CARLO_RUNS || 1000));
+const MC_RUNS = Math.max(200, Number(process.env.MONTE_CARLO_RUNS || 2000));
+const MC_ALPHA = Number(process.env.EDGE_P_VALUE_MAX || 0.05);
+const MC_SEED = 17;
 const MIN_SAMPLE = Number(process.env.MIN_BACKTEST_TRADES || CONFIG.minBacktestTrades || 30);
 const MIN_OOS = Number(process.env.MIN_OOS_TRADES || CONFIG.minOosTrades || 10);
 const SYMBOLS = (process.env.BACKTEST_SYMBOLS || 'BTCUSDT').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -215,37 +218,24 @@ function metrics(trades) {
     maxDrawdownPct: maxDrawdown, medianNetPct: quantile(returns, 0.5), returns };
 }
 
-function deterministicShuffle(input, seed) {
-  const a = [...input]; let x = seed >>> 0;
-  for (let i = a.length - 1; i > 0; i--) { x = (1664525 * x + 1013904223) >>> 0; const j = x % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
-  return a;
-}
-
-function pathStats(returns) {
-  let equity = 0, peak = 0, maxDrawdown = 0;
-  for (const r of returns) {
-    equity += r;
-    peak = Math.max(peak, equity);
-    maxDrawdown = Math.max(maxDrawdown, peak - equity);
-  }
-  return { finalNetPct: equity, maxDrawdownPct: maxDrawdown, score: equity - maxDrawdown };
-}
-
-function monteCarlo(returns, runs = MC_RUNS) {
-  if (!returns.length) return { runs, method: 'permutation_paths', observedNetPct: 0, observedMaxDrawdownPct: 0, observedScore: 0, p05: 0, p50: 0, p95: 0, mean: 0, stddev: 0, zScore: 0, observedAtOrAbovePct: 0 };
-  const observedStats = pathStats(returns), scores = [], drawdowns = [];
-  for (let i = 0; i < runs; i++) {
-    const stats = pathStats(deterministicShuffle(returns, i + 17));
-    scores.push(stats.score); drawdowns.push(stats.maxDrawdownPct);
-  }
-  const m = mean(scores), sd = stddev(scores), z = sd ? (observedStats.score - m) / sd : 0;
+// Monte Carlo (مصحّح): خلط الترتيب لا يغيّر مجموع العوائد، فلا يقيس الربحية.
+// الاختبار الآن bootstrap للعوائد لكل صفقة مع الإرجاع (seeded) → p-value لفرضية "المتوسط <= 0".
+// توزيع التراجع من خلط الترتيب يبقى كمقياس مخاطرة منفصل فقط ولا يدخل في البوابة.
+function monteCarlo(returns, runs = MC_RUNS, seed = MC_SEED) {
+  const bootstrap = bootstrapEdge(returns, { iterations: runs, seed });
+  const dd = drawdownRisk(returns, { runs, seed: seed + 1 });
   return {
-    runs, method: 'permutation_paths', observedNetPct: round(observedStats.finalNetPct, 5),
-    observedMaxDrawdownPct: round(observedStats.maxDrawdownPct, 5), observedScore: round(observedStats.score, 5),
-    p05: round(quantile(scores, 0.05), 5), p25: round(quantile(scores, 0.25), 5), p50: round(quantile(scores, 0.5), 5), p75: round(quantile(scores, 0.75), 5), p95: round(quantile(scores, 0.95), 5),
-    maxDrawdownP05: round(quantile(drawdowns, 0.05), 5), maxDrawdownP50: round(quantile(drawdowns, 0.5), 5), maxDrawdownP95: round(quantile(drawdowns, 0.95), 5),
-    mean: round(m, 5), stddev: round(sd, 5), zScore: round(z, 4),
-    observedAtOrAbovePct: scores.length ? scores.filter(x => x <= observedStats.score).length / scores.length * 100 : 0
+    runs, method: 'bootstrap_mean_returns', seed,
+    n: bootstrap.n,
+    observedNetPct: bootstrap.observedTotalPct,
+    observedMeanPct: bootstrap.observedMeanPct,
+    pValue: bootstrap.pValueMeanLeZero,
+    p05: bootstrap.totalP05, p50: bootstrap.totalP50, p95: bootstrap.totalP95,
+    meanP05: bootstrap.meanP05, meanP95: bootstrap.meanP95,
+    zScore: bootstrap.zScore,
+    observedMaxDrawdownPct: dd.observedMaxDrawdownPct,
+    maxDrawdownP05: dd.maxDrawdownP05, maxDrawdownP50: dd.maxDrawdownP50, maxDrawdownP95: dd.maxDrawdownP95,
+    drawdownMethod: dd.method
   };
 }
 
@@ -267,7 +257,8 @@ function buildGate(is, oos, mc) {
   const warnings = [];
   if (is.trades < MIN_SAMPLE) warnings.push(`IS sample small: ${is.trades}/${MIN_SAMPLE}`);
   if (oos.trades < MIN_OOS) warnings.push(`OOS sample small: ${oos.trades}/${MIN_OOS}`);
-  const pass = is.trades >= MIN_SAMPLE && oos.trades >= MIN_OOS && oos.netPct > 0 && oos.profitFactor > 1 && mc.zScore >= 1 && mc.observedAtOrAbovePct >= 95;
+  const pass = is.trades >= MIN_SAMPLE && oos.trades >= MIN_OOS && oos.netPct > 0 && oos.profitFactor > 1 && Number.isFinite(mc.pValue) && mc.pValue <= MC_ALPHA;
+  if (!(Number.isFinite(mc.pValue) && mc.pValue <= MC_ALPHA)) warnings.push(`Bootstrap edge test failed: p=${mc.pValue} > ${MC_ALPHA}`);
   if (!pass) warnings.push('Statistical gate not passed; live broadcast remains blocked');
   return { gateVersion: 'cloud-pro-statistical-gate-1', status: pass ? 'PASS' : 'BLOCKED', passed: pass, warnings };
 }
@@ -312,8 +303,9 @@ async function main() {
       takerFeeRate: CONFIG.takerFeeRate,
       slippageRate: CONFIG.slippageRate,
       monteCarloRuns: MC_RUNS,
-      monteCarloSeedBase: 17,
-      monteCarloMethod: 'deterministic permutation of OOS returns',
+      monteCarloSeedBase: MC_SEED,
+      monteCarloMethod: 'bootstrap resampling (with replacement) of OOS per-trade returns; gate: P(mean<=0) <= alpha; permutation used only for drawdown risk',
+      edgePValueMax: MC_ALPHA,
       sampleWarning: true
     },
     symbols: symbolReports,
@@ -340,10 +332,10 @@ async function main() {
     warnings: symbolReports.flatMap(r => r.warnings || [])
   };
   fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));
-  console.log(JSON.stringify({ report: REPORT_FILE, verification: VERIFICATION_FILE, gate: report.gate, symbols: symbolReports.map(r => ({ symbol: r.symbol, isTrades: r.inSample?.trades || 0, oosTrades: r.outOfSample?.trades || 0, oosNetPct: r.outOfSample?.netPct || 0, zScore: r.monteCarlo?.zScore || 0 })) }, null, 2));
+  console.log(JSON.stringify({ report: REPORT_FILE, verification: VERIFICATION_FILE, gate: report.gate, symbols: symbolReports.map(r => ({ symbol: r.symbol, isTrades: r.inSample?.trades || 0, oosTrades: r.outOfSample?.trades || 0, oosNetPct: r.outOfSample?.netPct || 0, zScore: r.monteCarlo?.zScore || 0, edgePValue: r.monteCarlo?.pValue ?? null })) }, null, 2));
   return report;
 }
 
 if (require.main === module) main().catch(e => { console.error(`Backtest failed: ${e.stack || e.message}`); process.exitCode = 1; });
 
-if (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate };
+if (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate, chooseExit };

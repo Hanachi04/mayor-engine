@@ -61,7 +61,7 @@ const CONFIG = {
   requestTimeoutMs: Number(process.env.SCALPER_REQUEST_TIMEOUT_MS || 10000),
   retries: Number(process.env.SCALPER_REQUEST_RETRIES || 2),
   minRequestGapMs: 80,
-  verificationGateMode: (process.env.SCALPER_VERIFICATION_GATE_MODE || 'warn').toLowerCase(),
+  verificationGateMode: (process.env.SCALPER_VERIFICATION_GATE_MODE || 'enforce').toLowerCase(),
   heartbeatMaxAgeMs: Number(process.env.SCALPER_HEARTBEAT_MAX_AGE_MINUTES || 20) * 60 * 1000,
   telegramToken: process.env.SCALPER_TELEGRAM_TOKEN || process.env.TELEGRAM_TOKEN || '',
   telegramChat: process.env.SCALPER_TELEGRAM_CHAT || process.env.TELEGRAM_CHAT || '',

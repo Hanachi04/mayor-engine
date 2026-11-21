@@ -22,6 +22,7 @@
 const fs = require('fs');
 const adaptation = require('./adaptation');
 const shadowGate = require('./ml/shadow_gate');
+const { walkExit, tradeEntryTime } = require('./exit_walker');
 const path = require('path');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
@@ -600,41 +601,67 @@ async function send(message) {
   } catch (e) { console.log(`Telegram error: ${e.message}`); return false; }
 }
 
-async function checkOpenTrades() {
-  const tracked = loadTracked(), open = tracked.filter(t => !t.closed);
-  if (!open.length) { console.log('لا صفقات مفتوحة للمتابعة'); return; }
-  const prices = new Map();
-  for (const trade of open) { try { prices.set(trade.symbol, await getTicker(trade.symbol)); } catch (e) { console.log(`تعذر سعر ${trade.symbol}: ${e.message}`); } }
+const EXIT_CANDLE_INTERVAL = '5m';
+const EXIT_CANDLE_LIMIT = 1000; // 1000×5m ≈ 83h > maxTradeAgeMs (48h)
+
+// شموع مغلقة منذ دخول الصفقة لمسار الخروج (بدل سعر التيكر اللحظي)
+async function getExitCandles(symbol, startTime) {
+  const raw = await requestJson('/api/v3/klines', { symbol, interval: EXIT_CANDLE_INTERVAL, startTime, limit: EXIT_CANDLE_LIMIT });
+  return prepareKlines(raw, 0).klines;
+}
+
+// يحدد خروج صفقة مفتوحة بالمشي على الشموع منذ الدخول (SL أولًا عند الالتباس، الإغلاق بسعر المستوى)
+function resolveTradeExit(trade, candles, cfg = CONFIG) {
+  return walkExit(trade, candles, {
+    entryTime: tradeEntryTime(trade), maxAgeMs: cfg.maxTradeAgeMs,
+    targets: ['tp1', 'tp2', 'tp3'], expiredLabel: 'انتهت المدة'
+  });
+}
+
+function applyTradeExit(trade, exit, cfg = CONFIG) {
+  const calc = netPnl(trade.price, exit.rawExit, trade.dir, cfg);
+  trade.closed = true; trade.closePrice = exit.rawExit; trade.closeResult = exit.result;
+  trade.exitMethod = `candle-walk-${EXIT_CANDLE_INTERVAL}`;
+  trade.entryFillPrice = trade.entryFillPrice || calc.entryFill; trade.exitFillPrice = calc.exitFill;
+  trade.grossPnlPct = round(calc.grossPct, 4); trade.feesPct = round(calc.feesPct, 4); trade.slippagePct = round(cfg.slippageRate * 2 * 100, 4);
+  trade.closePct = round(calc.netPct, 4); trade.netPnlUsd = trade.position?.notional ? round(trade.position.notional * calc.netPct / 100, 4) : null;
+  trade.closeAt = new Date(Number.isFinite(exit.exitTime) ? exit.exitTime : Date.now()).toISOString();
+  return trade;
+}
+
+async function checkOpenTrades(deps = {}) {
+  const fetchCandles = deps.fetchCandles || getExitCandles;
+  const notify = deps.notify || send;
+  const load = deps.loadTracked || loadTracked;
+  const save = deps.saveTracked || saveTracked;
+  const tracked = load(), open = tracked.filter(t => !t.closed);
+  if (!open.length) { console.log('لا صفقات مفتوحة للمتابعة'); return { closed: 0, open: 0 }; }
   let closedCount = 0;
   for (const trade of open) {
-    const price = prices.get(trade.symbol); if (!Number.isFinite(price)) continue;
-    const sign = trade.dir === 'LONG' ? 1 : -1;
-    const slHit = sign === 1 ? price <= trade.sl : price >= trade.sl;
-    const tp1Hit = sign === 1 ? price >= trade.tp1 : price <= trade.tp1;
-    const tp2Hit = sign === 1 ? price >= trade.tp2 : price <= trade.tp2;
-    const tp3Hit = sign === 1 ? price >= trade.tp3 : price <= trade.tp3;
-    const expired = Date.now() - Number(trade.ts || 0) > CONFIG.maxTradeAgeMs;
-    let result = null;
-    if (slHit) result = 'SL'; else if (tp3Hit) result = 'TP3'; else if (tp2Hit) result = 'TP2'; else if (tp1Hit) result = 'TP1'; else if (expired) result = 'انتهت المدة';
-    if (!result) continue;
-    const calc = netPnl(trade.price, price, trade.dir);
-    trade.closed = true; trade.closePrice = price; trade.closeResult = result;
-    trade.entryFillPrice = trade.entryFillPrice || calc.entryFill; trade.exitFillPrice = calc.exitFill;
-    trade.grossPnlPct = round(calc.grossPct, 4); trade.feesPct = round(calc.feesPct, 4); trade.slippagePct = round(CONFIG.slippageRate * 2 * 100, 4);
-    trade.closePct = round(calc.netPct, 4); trade.netPnlUsd = trade.position?.notional ? round(trade.position.notional * calc.netPct / 100, 4) : null;
-    trade.closeAt = new Date().toISOString(); closedCount++;
+    const entryTime = tradeEntryTime(trade);
+    if (!Number.isFinite(entryTime)) { console.log(`صفقة ${trade.symbol} بلا وقت دخول — تُترك مفتوحة`); continue; }
+    let candles;
+    try { candles = await fetchCandles(trade.symbol, entryTime); }
+    catch (e) { console.log(`تعذر شموع الخروج ${trade.symbol}: ${e.message}`); continue; }
+    const exit = resolveTradeExit(trade, candles);
+    if (!exit) continue;
+    applyTradeExit(trade, exit);
+    const result = exit.result;
+    closedCount++;
     const outcome = result === 'SL' ? '⛔ ضرب وقف الخسارة' : result.startsWith('TP') ? `✅ أصابت ${result}` : '⏱️ انتهت مدة الإشارة (48 ساعة)';
     const msg = `🚨 <b>إغلاق صفقة — ${esc(trade.symbol)}</b> 🚨\n\n` +
       `📈 الاتجاه: ${trade.dir === 'LONG' ? 'شراء 🟢' : 'بيع 🔴'}\n${outcome}\n\n` +
       `💰 سعر الدخول: <code>${formatPrice(trade.price, trade.symbol)}</code>\n` +
-      `🏁 سعر الإغلاق: <code>${formatPrice(price, trade.symbol)}</code>\n\n` +
+      `🏁 سعر الإغلاق: <code>${formatPrice(trade.closePrice, trade.symbol)}</code>\n\n` +
       `📊 الإجمالي: <b>${trade.grossPnlPct >= 0 ? '+' : ''}${trade.grossPnlPct}%</b>\n` +
       `💳 الرسوم والانزلاق: <b>-${trade.feesPct + trade.slippagePct}%</b>\n` +
       `✅ الصافي: <b>${trade.closePct >= 0 ? '+' : ''}${trade.closePct}%</b>\n⏰ ${fmtTime()}`;
-    await send(msg); console.log(`إغلاق ${trade.symbol}: ${result} net=${trade.closePct}%`);
+    await notify(msg); console.log(`إغلاق ${trade.symbol}: ${result} net=${trade.closePct}%`);
   }
-  if (closedCount) saveTracked(tracked);
-  console.log(`متابعة الصفقات: أُغلق ${closedCount} | مفتوحة ${tracked.filter(t => !t.closed).length}`);
+  if (closedCount) save(tracked);
+  const stillOpen = tracked.filter(t => !t.closed).length;
+  console.log(`متابعة الصفقات: أُغلق ${closedCount} | مفتوحة ${stillOpen}`);
+  return { closed: closedCount, open: stillOpen };
 }
 
 const BREAKER_FILE = path.join(DATA_DIR, 'circuit_breaker.json');
@@ -831,7 +858,8 @@ if (process.env.CLOUD_PRO_TEST === '1' || require.main !== module) {
     getKlines, get24hVolumeMap, getOrderBookImbalance, getMarketSentiment, analyzeLatest, levelsFromSignal, calculatePositionSize,
     applyExchangeLotSizing, roundDownToStep, checkCircuitBreaker, entryFillPrice, exitFillPrice, netPnl,
     adaptation,
-    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed
+    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed,
+    resolveTradeExit, applyTradeExit, checkOpenTrades
   };
 } else {
   scan().catch(e => { console.error(`خطأ فادح: ${e.stack || e.message}`); process.exitCode = 1; });

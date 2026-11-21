@@ -48,7 +48,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           SCALPER_DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
-          SCALPER_VERIFICATION_GATE_MODE: 'warn'
+          SCALPER_VERIFICATION_GATE_MODE: 'enforce'
           SCALPER_MAX_SIGNALS_PER_DAY: '30'
           SCALPER_COOLDOWN_MINUTES: '3'
           SCALPER_MAX_OPEN: '4'
