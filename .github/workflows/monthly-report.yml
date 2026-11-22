@@ -46,9 +46,14 @@ jobs:
           fi
           git commit -m "save monthly performance report ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           branch="${GH_BRANCH:-main}"
+          pushed=0
           for attempt in 1 2 3; do
-            if git fetch origin "$branch" && git pull --rebase origin "$branch" && git push origin "HEAD:$branch"; then exit 0; fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 5))
+            echo "Push attempt $attempt/3"
+            git pull --rebase --autostash origin "$branch" || { echo 'rebase conflict'; git rebase --abort; exit 1; }
+            if git push origin "HEAD:$branch"; then pushed=1; break; fi
+            sleep 5
           done
-          exit 1
+          if [ "$pushed" != 1 ]; then
+            echo "push failed after 3 attempts"
+            exit 1
+          fi

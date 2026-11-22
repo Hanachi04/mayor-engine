@@ -11,6 +11,8 @@ const path = require('path');
 const { CONFIG, ENGINE_VERSION, GATE_VERSION } = require('./config');
 
 const parent = require('../scan.js');
+const { walkExit, tradeEntryTime } = require('../exit_walker');
+const { requestJsonWithRetry, BinanceGeoBlockedError } = require('../binance_http');
 const {
   Indicators,
   prepareKlines,
@@ -20,7 +22,8 @@ const {
 } = parent;
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
-const TRACKED_FILE = path.join(DATA_DIR, 'tracked.json');
+const { stateDir } = require('../state_dir');
+const TRACKED_FILE = path.join(stateDir(), 'scalper', 'tracked.json');
 const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
 const HEARTBEAT_FILE = path.join(DATA_DIR, 'heartbeat.json');
 
@@ -55,6 +58,7 @@ function loadTracked() {
   }
 }
 function saveTracked(arr) {
+  fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true });
   fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2));
 }
 
@@ -88,40 +92,24 @@ function writeHeartbeat(ok = true, extra = {}) {
 }
 
 async function requestJson(pathname, params = {}) {
+  // fapi.binance.com has no alternate host; a 403/451 surfaces as BinanceGeoBlockedError.
   let lastError = null;
   for (const base of CONFIG.futuresEndpoints) {
-    for (let attempt = 0; attempt <= CONFIG.retries; attempt++) {
-      let timer;
-      try {
-        const now = Date.now();
-        if (now < nextRequestAt) await sleep(nextRequestAt - now);
-        nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
-        const url = new URL(`${base}${pathname}`);
-        for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
-        const controller = new AbortController();
-        timer = setTimeout(() => controller.abort(), CONFIG.requestTimeoutMs);
-        const res = await fetch(url, {
-          signal: controller.signal,
-          headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' }
-        });
-        if (!res.ok) {
-          const body = await res.text().catch(() => '');
-          const err = new Error(`HTTP ${res.status} ${base} ${body.slice(0, 100)}`);
-          err.status = res.status;
-          throw err;
+    const url = new URL(`${base}${pathname}`);
+    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
+    try {
+      return await requestJsonWithRetry(url, {
+        timeoutMs: CONFIG.requestTimeoutMs,
+        headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' },
+        sleep,
+        beforeAttempt: async () => {
+          const now = Date.now();
+          if (now < nextRequestAt) await sleep(nextRequestAt - now);
+          nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
         }
-        return await res.json();
-      } catch (e) {
-        lastError = e;
-        const retryable = e.name === 'AbortError' || [418, 429, 500, 502, 503, 504].includes(e.status);
-        // 404 on REST path is not transient (wrong host/path)
-        if (retryable && attempt < CONFIG.retries) {
-          const delay = Math.min(15000, 400 * (2 ** attempt) + Math.floor(Math.random() * 200));
-          await sleep(delay);
-        }
-      } finally {
-        if (timer) clearTimeout(timer);
-      }
+      });
+    } catch (e) {
+      lastError = e;
     }
   }
   throw lastError || new Error('Futures request failed');
@@ -439,55 +427,76 @@ function buildCloseMessage(trade, result) {
     `⏰ ${fmtTime()}`;
 }
 
-async function checkOpenTrades() {
-  const tracked = loadTracked();
+const EXIT_CANDLE_INTERVAL = '1m';
+
+// شموع 1m مغلقة منذ دخول الصفقة (25 دقيقة كحد أقصى → طلب واحد يكفي)
+async function getExitCandles(symbol, startTime) {
+  const raw = await requestJson('/fapi/v1/klines', { symbol, interval: EXIT_CANDLE_INTERVAL, startTime, limit: 1000 });
+  return prepareKlines(raw, 0).klines;
+}
+
+function resolveTradeExit(trade, candles) {
+  return walkExit(trade, candles, {
+    entryTime: tradeEntryTime(trade), maxAgeMs: CONFIG.maxTradeAgeMs,
+    targets: ['tp1'], expiredLabel: 'TIMEOUT'
+  });
+}
+
+function applyTradeExit(trade, exit) {
+  const sign = trade.dir === 'LONG' ? 1 : -1;
+  const entryF = trade.entryFillPrice || entryFillPrice(trade.price, trade.dir);
+  const exitF = exitFillPrice(exit.rawExit, trade.dir);
+  const grossPct = sign * (exitF - entryF) / entryF * 100;
+  const feesPct = CONFIG.takerFeeRate * 2 * 100;
+  const slipPct = CONFIG.slippageRate * 2 * 100;
+  trade.closed = true;
+  trade.closePrice = exit.rawExit;
+  trade.closeResult = exit.result;
+  trade.exitMethod = `candle-walk-${EXIT_CANDLE_INTERVAL}`;
+  trade.entryFillPrice = entryF;
+  trade.exitFillPrice = exitF;
+  trade.grossPnlPct = round(grossPct, 4);
+  trade.feesPct = round(feesPct, 4);
+  trade.slippagePct = round(slipPct, 4);
+  trade.closePct = round(grossPct - feesPct, 4);
+  trade.netPnlUsd = trade.position?.notional
+    ? round(trade.position.notional * trade.closePct / 100, 4) : null;
+  trade.closeAt = new Date(Number.isFinite(exit.exitTime) ? exit.exitTime : Date.now()).toISOString();
+  return trade;
+}
+
+async function checkOpenTrades(deps = {}) {
+  const fetchCandles = deps.fetchCandles || getExitCandles;
+  const notify = deps.notify || send;
+  const load = deps.loadTracked || loadTracked;
+  const save = deps.saveTracked || saveTracked;
+  const tracked = load();
   const open = tracked.filter(t => !t.closed);
   if (!open.length) {
     console.log('Scalper: no open trades');
-    return;
+    return { closed: 0, open: 0 };
   }
-  const prices = new Map();
-  for (const t of open) {
-    try { prices.set(t.symbol, await getTicker(t.symbol)); }
-    catch (e) { console.log(`price ${t.symbol}: ${e.message}`); }
-  }
-  let closedCount = 0;
+  let closedCount = 0, geoError = null;
   for (const trade of open) {
-    const price = prices.get(trade.symbol);
-    if (!Number.isFinite(price)) continue;
-    const sign = trade.dir === 'LONG' ? 1 : -1;
-    const slHit = sign === 1 ? price <= trade.sl : price >= trade.sl;
-    const tpHit = sign === 1 ? price >= trade.tp1 : price <= trade.tp1;
-    const expired = Date.now() - Number(trade.ts || 0) > CONFIG.maxTradeAgeMs;
-    let result = null;
-    if (slHit) result = 'SL';
-    else if (tpHit) result = 'TP1';
-    else if (expired) result = 'TIMEOUT';
-    if (!result) continue;
-
-    const entryF = trade.entryFillPrice || entryFillPrice(trade.price, trade.dir);
-    const exitF = exitFillPrice(price, trade.dir);
-    const grossPct = sign * (exitF - entryF) / entryF * 100;
-    const feesPct = CONFIG.takerFeeRate * 2 * 100;
-    const slipPct = CONFIG.slippageRate * 2 * 100;
-    trade.closed = true;
-    trade.closePrice = price;
-    trade.closeResult = result;
-    trade.entryFillPrice = entryF;
-    trade.exitFillPrice = exitF;
-    trade.grossPnlPct = round(grossPct, 4);
-    trade.feesPct = round(feesPct, 4);
-    trade.slippagePct = round(slipPct, 4);
-    trade.closePct = round(grossPct - feesPct, 4);
-    trade.netPnlUsd = trade.position?.notional
-      ? round(trade.position.notional * trade.closePct / 100, 4) : null;
-    trade.closeAt = new Date().toISOString();
+    const entryTime = tradeEntryTime(trade);
+    if (!Number.isFinite(entryTime)) { console.log(`Scalper ${trade.symbol}: no entry time, left open`); continue; }
+    let candles;
+    try { candles = await fetchCandles(trade.symbol, entryTime); }
+    catch (e) {
+      if (e instanceof BinanceGeoBlockedError) { geoError = e; break; }
+      console.log(`exit candles ${trade.symbol}: ${e.message}`); continue;
+    }
+    const exit = resolveTradeExit(trade, candles);
+    if (!exit) continue;
+    applyTradeExit(trade, exit);
     closedCount++;
-    await send(buildCloseMessage(trade, result));
-    console.log(`Scalper close ${trade.symbol}: ${result} net=${trade.closePct}%`);
+    await notify(buildCloseMessage(trade, exit.result));
+    console.log(`Scalper close ${trade.symbol}: ${exit.result} net=${trade.closePct}%`);
   }
-  if (closedCount) saveTracked(tracked);
+  if (closedCount) save(tracked);
   console.log(`Scalper open follow-up: closed ${closedCount}`);
+  if (geoError) throw geoError;
+  return { closed: closedCount, open: tracked.filter(t => !t.closed).length };
 }
 
 async function scan() {
@@ -519,6 +528,7 @@ async function scan() {
   try {
     volumeMap = await get24hVolumeMap(CONFIG.symbols);
   } catch (e) {
+    if (e instanceof BinanceGeoBlockedError) throw e;
     console.log(`Scalper volume map failed: ${e.message}`);
     writeHeartbeat(false, { error: e.message, dataFetchOk: false, signalsAvailable: false, phase: 'data-fetch-failed' });
     return;
@@ -591,11 +601,16 @@ if (process.env.SCALPER_TEST === '1' || require.main !== module) {
     analyze1m, emaDirection, softTrend15m, levelsFromSignal,
     calculatePositionSize, canEmit, entryFillPrice, exitFillPrice,
     prepareKlines, Indicators, loadTracked, saveTracked,
-    loadVerification, verificationPassed, getMTFScalper, netPnl
+    loadVerification, verificationPassed, getMTFScalper, netPnl,
+    resolveTradeExit, applyTradeExit, checkOpenTrades
   };
 } else {
   scan().catch(e => {
-    console.error(`Scalper fatal: ${e.stack || e.message}`);
+    if (e instanceof BinanceGeoBlockedError) {
+      console.error(`BINANCE GEO-BLOCKED: HTTP ${e.status} at ${e.host} (tried ${e.triedHosts.join(', ')}) — no market data, scalper aborted`);
+    } else {
+      console.error(`Scalper fatal: ${e.stack || e.message}`);
+    }
     writeHeartbeat(false, { error: String(e.message || e) });
     process.exitCode = 1;
   });

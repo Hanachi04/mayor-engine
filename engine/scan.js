@@ -22,7 +22,9 @@
 const fs = require('fs');
 const adaptation = require('./adaptation');
 const shadowGate = require('./ml/shadow_gate');
+const { walkExit, tradeEntryTime } = require('./exit_walker');
 const path = require('path');
+const { requestJsonWithRetry, BinanceGeoBlockedError } = require('./binance_http');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
 const TOKEN = process.env.TELEGRAM_TOKEN || '';
@@ -30,7 +32,8 @@ const CHAT = process.env.TELEGRAM_CHAT || '';
 const SHEET_CSV_URL = process.env.SHEET_CSV_URL || '';
 const DRY_RUN = /^(1|true|yes)$/i.test(process.env.DRY_RUN || '');
 const VERIFICATION_GATE_MODE = (process.env.VERIFICATION_GATE_MODE || 'enforce').toLowerCase();
-const BINANCE_ENDPOINTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
+// Alternates (api1-3, data-api.binance.vision) are handled by engine/binance_http.js on 403/451.
+const BINANCE_SPOT_BASE = 'https://api.binance.com';
 // الكون الافتراضي موسّع لمطابقة تغطية v13 (37 زوجًا)؛ يظل قابلاً للتضييق عبر SYMBOLS
 const DEFAULT_SYMBOLS = 'BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT,ADAUSDT,AVAXUSDT,LINKUSDT,TONUSDT,' +
   'TRXUSDT,DOTUSDT,LTCUSDT,BCHUSDT,NEARUSDT,APTUSDT,ARBUSDT,OPUSDT,SUIUSDT,INJUSDT,' +
@@ -102,7 +105,8 @@ const WEIGHTS = WEIGHT_PROFILES[STRATEGY_MODE] || WEIGHT_PROFILES.balanced;
 const TOTAL_VOTE_WEIGHT = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const TRACKED_FILE = path.join(DATA_DIR, 'tracked.json');
+const { stateDir } = require('./state_dir');
+const TRACKED_FILE = path.join(stateDir(), 'tracked.json');
 const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
 const pricePrecisionCache = new Map();
 const lotSizeCache = new Map(); // symbol -> { stepSize, minQty, minNotional }
@@ -133,7 +137,7 @@ function loadTracked() {
     return [];
   }
 }
-function saveTracked(arr) { fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2)); }
+function saveTracked(arr) { fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true }); fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2)); }
 
 function loadVerification() {
   try {
@@ -148,44 +152,18 @@ function verificationPassed(v = loadVerification()) {
 }
 
 async function requestJson(pathname, params = {}) {
-  let lastError = null;
-  for (const base of BINANCE_ENDPOINTS) {
-    for (let attempt = 0; attempt <= CONFIG.retries; attempt++) {
-      let timer;
-      try {
-        const now = Date.now();
-        if (now < nextRequestAt) await sleep(nextRequestAt - now);
-        nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
-        const url = new URL(`${base}${pathname}`);
-        for (const [key, value] of Object.entries(params)) url.searchParams.set(key, String(value));
-        const controller = new AbortController();
-        timer = setTimeout(() => controller.abort(), CONFIG.requestTimeoutMs);
-        const res = await fetch(url, { signal: controller.signal, headers: { 'user-agent': 'MaYor-Cloud-Pro/2.0' } });
-        if (!res.ok) {
-          const body = await res.text().catch(() => '');
-          const error = new Error(`HTTP ${res.status} ${base} ${body.slice(0, 120)}`);
-          error.status = res.status;
-          throw error;
-        }
-        return await res.json();
-      } catch (e) {
-        lastError = e;
-        const retryable = e.name === 'AbortError' || [418, 429, 500, 502, 503, 504].includes(e.status);
-        if (retryable && attempt < CONFIG.retries) {
-          const baseDelay = [418, 429].includes(e.status) ? 1200 : 500;
-          const delay = Math.min(30000, baseDelay * (2 ** attempt) + Math.floor(Math.random() * 250));
-          console.log(`طلب Binance فشل (${e.status || e.name || e.message})؛ إعادة بعد ${delay}ms`);
-          await sleep(delay);
-        } else if (attempt < CONFIG.retries) {
-          await sleep(400 * (attempt + 1));
-        }
-      } finally {
-        if (timer) clearTimeout(timer);
-      }
+  const url = new URL(`${BINANCE_SPOT_BASE}${pathname}`);
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, String(value));
+  return requestJsonWithRetry(url, {
+    timeoutMs: CONFIG.requestTimeoutMs,
+    headers: { 'user-agent': 'MaYor-Cloud-Pro/2.0' },
+    sleep,
+    beforeAttempt: async () => {
+      const now = Date.now();
+      if (now < nextRequestAt) await sleep(nextRequestAt - now);
+      nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
     }
-    console.log(`الانتقال إلى Binance endpoint البديل بعد فشل ${base}`);
-  }
-  throw lastError || new Error('Binance request failed');
+  });
 }
 
 function normalizeKlines(raw) {
@@ -600,41 +578,71 @@ async function send(message) {
   } catch (e) { console.log(`Telegram error: ${e.message}`); return false; }
 }
 
-async function checkOpenTrades() {
-  const tracked = loadTracked(), open = tracked.filter(t => !t.closed);
-  if (!open.length) { console.log('لا صفقات مفتوحة للمتابعة'); return; }
-  const prices = new Map();
-  for (const trade of open) { try { prices.set(trade.symbol, await getTicker(trade.symbol)); } catch (e) { console.log(`تعذر سعر ${trade.symbol}: ${e.message}`); } }
-  let closedCount = 0;
+const EXIT_CANDLE_INTERVAL = '5m';
+const EXIT_CANDLE_LIMIT = 1000; // 1000×5m ≈ 83h > maxTradeAgeMs (48h)
+
+// شموع مغلقة منذ دخول الصفقة لمسار الخروج (بدل سعر التيكر اللحظي)
+async function getExitCandles(symbol, startTime) {
+  const raw = await requestJson('/api/v3/klines', { symbol, interval: EXIT_CANDLE_INTERVAL, startTime, limit: EXIT_CANDLE_LIMIT });
+  return prepareKlines(raw, 0).klines;
+}
+
+// يحدد خروج صفقة مفتوحة بالمشي على الشموع منذ الدخول (SL أولًا عند الالتباس، الإغلاق بسعر المستوى)
+function resolveTradeExit(trade, candles, cfg = CONFIG) {
+  return walkExit(trade, candles, {
+    entryTime: tradeEntryTime(trade), maxAgeMs: cfg.maxTradeAgeMs,
+    targets: ['tp1', 'tp2', 'tp3'], expiredLabel: 'انتهت المدة'
+  });
+}
+
+function applyTradeExit(trade, exit, cfg = CONFIG) {
+  const calc = netPnl(trade.price, exit.rawExit, trade.dir, cfg);
+  trade.closed = true; trade.closePrice = exit.rawExit; trade.closeResult = exit.result;
+  trade.exitMethod = `candle-walk-${EXIT_CANDLE_INTERVAL}`;
+  trade.entryFillPrice = trade.entryFillPrice || calc.entryFill; trade.exitFillPrice = calc.exitFill;
+  trade.grossPnlPct = round(calc.grossPct, 4); trade.feesPct = round(calc.feesPct, 4); trade.slippagePct = round(cfg.slippageRate * 2 * 100, 4);
+  trade.closePct = round(calc.netPct, 4); trade.netPnlUsd = trade.position?.notional ? round(trade.position.notional * calc.netPct / 100, 4) : null;
+  trade.closeAt = new Date(Number.isFinite(exit.exitTime) ? exit.exitTime : Date.now()).toISOString();
+  return trade;
+}
+
+async function checkOpenTrades(deps = {}) {
+  const fetchCandles = deps.fetchCandles || getExitCandles;
+  const notify = deps.notify || send;
+  const load = deps.loadTracked || loadTracked;
+  const save = deps.saveTracked || saveTracked;
+  const tracked = load(), open = tracked.filter(t => !t.closed);
+  if (!open.length) { console.log('لا صفقات مفتوحة للمتابعة'); return { closed: 0, open: 0 }; }
+  let closedCount = 0, geoError = null;
   for (const trade of open) {
-    const price = prices.get(trade.symbol); if (!Number.isFinite(price)) continue;
-    const sign = trade.dir === 'LONG' ? 1 : -1;
-    const slHit = sign === 1 ? price <= trade.sl : price >= trade.sl;
-    const tp1Hit = sign === 1 ? price >= trade.tp1 : price <= trade.tp1;
-    const tp2Hit = sign === 1 ? price >= trade.tp2 : price <= trade.tp2;
-    const tp3Hit = sign === 1 ? price >= trade.tp3 : price <= trade.tp3;
-    const expired = Date.now() - Number(trade.ts || 0) > CONFIG.maxTradeAgeMs;
-    let result = null;
-    if (slHit) result = 'SL'; else if (tp3Hit) result = 'TP3'; else if (tp2Hit) result = 'TP2'; else if (tp1Hit) result = 'TP1'; else if (expired) result = 'انتهت المدة';
-    if (!result) continue;
-    const calc = netPnl(trade.price, price, trade.dir);
-    trade.closed = true; trade.closePrice = price; trade.closeResult = result;
-    trade.entryFillPrice = trade.entryFillPrice || calc.entryFill; trade.exitFillPrice = calc.exitFill;
-    trade.grossPnlPct = round(calc.grossPct, 4); trade.feesPct = round(calc.feesPct, 4); trade.slippagePct = round(CONFIG.slippageRate * 2 * 100, 4);
-    trade.closePct = round(calc.netPct, 4); trade.netPnlUsd = trade.position?.notional ? round(trade.position.notional * calc.netPct / 100, 4) : null;
-    trade.closeAt = new Date().toISOString(); closedCount++;
+    const entryTime = tradeEntryTime(trade);
+    if (!Number.isFinite(entryTime)) { console.log(`صفقة ${trade.symbol} بلا وقت دخول — تُترك مفتوحة`); continue; }
+    let candles;
+    try { candles = await fetchCandles(trade.symbol, entryTime); }
+    catch (e) {
+      if (e instanceof BinanceGeoBlockedError) { geoError = e; break; }
+      console.log(`تعذر شموع الخروج ${trade.symbol}: ${e.message}`); continue;
+    }
+    const exit = resolveTradeExit(trade, candles);
+    if (!exit) continue;
+    applyTradeExit(trade, exit);
+    const result = exit.result;
+    closedCount++;
     const outcome = result === 'SL' ? '⛔ ضرب وقف الخسارة' : result.startsWith('TP') ? `✅ أصابت ${result}` : '⏱️ انتهت مدة الإشارة (48 ساعة)';
     const msg = `🚨 <b>إغلاق صفقة — ${esc(trade.symbol)}</b> 🚨\n\n` +
       `📈 الاتجاه: ${trade.dir === 'LONG' ? 'شراء 🟢' : 'بيع 🔴'}\n${outcome}\n\n` +
       `💰 سعر الدخول: <code>${formatPrice(trade.price, trade.symbol)}</code>\n` +
-      `🏁 سعر الإغلاق: <code>${formatPrice(price, trade.symbol)}</code>\n\n` +
+      `🏁 سعر الإغلاق: <code>${formatPrice(trade.closePrice, trade.symbol)}</code>\n\n` +
       `📊 الإجمالي: <b>${trade.grossPnlPct >= 0 ? '+' : ''}${trade.grossPnlPct}%</b>\n` +
       `💳 الرسوم والانزلاق: <b>-${trade.feesPct + trade.slippagePct}%</b>\n` +
       `✅ الصافي: <b>${trade.closePct >= 0 ? '+' : ''}${trade.closePct}%</b>\n⏰ ${fmtTime()}`;
-    await send(msg); console.log(`إغلاق ${trade.symbol}: ${result} net=${trade.closePct}%`);
+    await notify(msg); console.log(`إغلاق ${trade.symbol}: ${result} net=${trade.closePct}%`);
   }
-  if (closedCount) saveTracked(tracked);
-  console.log(`متابعة الصفقات: أُغلق ${closedCount} | مفتوحة ${tracked.filter(t => !t.closed).length}`);
+  if (closedCount) save(tracked);
+  const stillOpen = tracked.filter(t => !t.closed).length;
+  console.log(`متابعة الصفقات: أُغلق ${closedCount} | مفتوحة ${stillOpen}`);
+  if (geoError) throw geoError;
+  return { closed: closedCount, open: stillOpen };
 }
 
 const BREAKER_FILE = path.join(DATA_DIR, 'circuit_breaker.json');
@@ -773,7 +781,10 @@ async function scan() {
   if (todayCount >= CONFIG.maxSignalsPerDay) { console.log('تم بلوغ حد الإشارات اليومية'); return; }
   console.log(`بدء ${ENGINE_VERSION} [${STRATEGY_MODE}] — ${SYMS.length} أزواج — ${new Date().toISOString()}`);
   let volumeMap;
-  try { volumeMap = await get24hVolumeMap(SYMS); } catch (e) { console.log(`فشل حارس السيولة: ${e.message}`); return; }
+  try { volumeMap = await get24hVolumeMap(SYMS); } catch (e) {
+    if (e instanceof BinanceGeoBlockedError) throw e;
+    console.log(`فشل حارس السيولة: ${e.message}`); return;
+  }
   const liquid = SYMS.filter(symbol => finite(volumeMap.get(symbol)?.quoteVolume, 0) >= CONFIG.minQuoteVolume24h);
   const adaptResult = adaptation.filterEligible(liquid, tracked);
   const eligible = adaptResult.allowed;
@@ -831,8 +842,16 @@ if (process.env.CLOUD_PRO_TEST === '1' || require.main !== module) {
     getKlines, get24hVolumeMap, getOrderBookImbalance, getMarketSentiment, analyzeLatest, levelsFromSignal, calculatePositionSize,
     applyExchangeLotSizing, roundDownToStep, checkCircuitBreaker, entryFillPrice, exitFillPrice, netPnl,
     adaptation,
-    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed
+    getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed,
+    resolveTradeExit, applyTradeExit, checkOpenTrades
   };
 } else {
-  scan().catch(e => { console.error(`خطأ فادح: ${e.stack || e.message}`); process.exitCode = 1; });
+  scan().catch(e => {
+    if (e instanceof BinanceGeoBlockedError) {
+      console.error(`BINANCE GEO-BLOCKED: HTTP ${e.status} at ${e.host} (tried ${e.triedHosts.join(', ')}) — no market data, scan aborted`);
+    } else {
+      console.error(`خطأ فادح: ${e.stack || e.message}`);
+    }
+    process.exitCode = 1;
+  });
 }

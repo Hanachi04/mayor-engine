@@ -79,11 +79,14 @@ jobs:
             exit 0
           fi
           git commit -m "docs: auto status $(date -u +%Y-%m-%dT%H:%MZ)"
+          pushed=0
           for attempt in 1 2 3; do
-            if git fetch origin main && git pull --rebase origin main && git push origin HEAD:main; then
-              exit 0
-            fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 4))
+            echo "Push attempt $attempt/3"
+            git pull --rebase --autostash origin main || { echo 'rebase conflict'; git rebase --abort; exit 1; }
+            if git push origin HEAD:main; then pushed=1; break; fi
+            sleep 5
           done
-          exit 1
+          if [ "$pushed" != 1 ]; then
+            echo "push failed after 3 attempts"
+            exit 1
+          fi

@@ -76,7 +76,8 @@ function approx(actual, expected, tolerance = 1e-8, label = '') {
   const returns = [1.2, -0.6, 0.8, -0.4, 1.1, -0.3, 0.5, -0.2, 0.7, -0.1];
   const mc = monteCarlo(returns, 200);
   assert.strictEqual(mc.runs, 200, 'Monte Carlo must run at least 200 paths');
-  assert.strictEqual(mc.method, 'permutation_paths');
+  assert.strictEqual(mc.method, 'bootstrap_mean_returns');
+  assert.ok(mc.pValue >= 0 && mc.pValue <= 1, 'bootstrap p-value must be a probability');
   assert.ok(Number.isFinite(mc.zScore), 'Monte Carlo Z-score must be finite');
   assert.ok(mc.p05 <= mc.p50 && mc.p50 <= mc.p95, 'Monte Carlo percentiles must be ordered');
   const corr = correlationMatrix(returns.map((value, i) => ({ a: value, b: value * 2, c: i })));

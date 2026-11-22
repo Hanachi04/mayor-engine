@@ -48,7 +48,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
           SCALPER_DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
-          SCALPER_VERIFICATION_GATE_MODE: 'warn'
+          SCALPER_VERIFICATION_GATE_MODE: 'enforce'
           SCALPER_MAX_SIGNALS_PER_DAY: '30'
           SCALPER_COOLDOWN_MINUTES: '3'
           SCALPER_MAX_OPEN: '4'
@@ -78,14 +78,14 @@ jobs:
           fi
           git commit -m "scalper: update tracked/heartbeat ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           branch="${GH_BRANCH:-main}"
+          pushed=0
           for attempt in 1 2 3; do
             echo "Push attempt $attempt/3"
-            if git fetch origin "$branch" && git pull --rebase origin "$branch" && git push origin "HEAD:$branch"; then
-              echo "✓ scalper data pushed"
-              exit 0
-            fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 4))
+            git pull --rebase --autostash origin "$branch" || { echo 'rebase conflict'; git rebase --abort; exit 1; }
+            if git push origin "HEAD:$branch"; then pushed=1; break; fi
+            sleep 5
           done
-          echo "✗ push failed after 3 attempts"
-          exit 1
+          if [ "$pushed" != 1 ]; then
+            echo "✗ push failed after 3 attempts"
+            exit 1
+          fi
