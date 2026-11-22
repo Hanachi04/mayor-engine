@@ -103,7 +103,8 @@ const WEIGHTS = WEIGHT_PROFILES[STRATEGY_MODE] || WEIGHT_PROFILES.balanced;
 const TOTAL_VOTE_WEIGHT = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const TRACKED_FILE = path.join(DATA_DIR, 'tracked.json');
+const { stateDir } = require('./state_dir');
+const TRACKED_FILE = path.join(stateDir(), 'tracked.json');
 const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
 const pricePrecisionCache = new Map();
 const lotSizeCache = new Map(); // symbol -> { stepSize, minQty, minNotional }
@@ -134,7 +135,7 @@ function loadTracked() {
     return [];
   }
 }
-function saveTracked(arr) { fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2)); }
+function saveTracked(arr) { fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true }); fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2)); }
 
 function loadVerification() {
   try {

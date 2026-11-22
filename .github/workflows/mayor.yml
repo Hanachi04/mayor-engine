@@ -101,15 +101,14 @@ jobs:
           fi
           git commit -m "update tracked signals ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           branch="${GH_BRANCH:-main}"
+          pushed=0
           for attempt in 1 2 3; do
-            echo "محاولة الدفع $attempt/3"
-            if git fetch origin "$branch" && git pull --rebase origin "$branch" && git push origin "HEAD:$branch"; then
-              echo "✓ تم دفع tracked.json"
-              exit 0
-            fi
-            echo "تعذر الدفع؛ إلغاء rebase قبل إعادة المحاولة"
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 5))
+            echo "Push attempt $attempt/3"
+            git pull --rebase --autostash origin "$branch" || { echo 'rebase conflict'; git rebase --abort; exit 1; }
+            if git push origin "HEAD:$branch"; then pushed=1; break; fi
+            sleep 5
           done
-          echo "✗ تعذر دفع tracked.json بعد 3 محاولات"
-          exit 1
+          if [ "$pushed" != 1 ]; then
+            echo "✗ تعذر دفع tracked.json بعد 3 محاولات"
+            exit 1
+          fi

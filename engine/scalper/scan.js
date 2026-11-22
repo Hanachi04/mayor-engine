@@ -21,7 +21,8 @@ const {
 } = parent;
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
-const TRACKED_FILE = path.join(DATA_DIR, 'tracked.json');
+const { stateDir } = require('../state_dir');
+const TRACKED_FILE = path.join(stateDir(), 'scalper', 'tracked.json');
 const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
 const HEARTBEAT_FILE = path.join(DATA_DIR, 'heartbeat.json');
 
@@ -56,6 +57,7 @@ function loadTracked() {
   }
 }
 function saveTracked(arr) {
+  fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true });
   fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2));
 }
 

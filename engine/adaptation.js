@@ -13,7 +13,7 @@ const path = require('path');
 function resolveDataDir() {
   if (process.env.ADAPTATION_DATA_DIR) return process.env.ADAPTATION_DATA_DIR;
   if (process.env.DATA_DIR) return path.join(process.env.DATA_DIR);
-  return path.join(__dirname, '..', 'data');
+  return require('./state_dir').stateDir();
 }
 let DATA_DIR = resolveDataDir();
 let STATE_FILE = path.join(DATA_DIR, 'adaptation_state.json');

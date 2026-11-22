@@ -5,7 +5,7 @@
   "description": "Research-oriented MaYor Cloud Pro MTF signal engine (core strategy, adaptation, shadow ML, scalper)",
   "type": "commonjs",
   "scripts": {
-    "test": "node test/unit.test.js && node test/scalper/unit.test.js && node test/adaptation.test.js && node test/circuit_breaker.test.js && node test/auto_status.test.js && node test/integration_pipeline.test.js && node test/heartbeat.test.js && node test/engine4/unit.test.js && node test/exit_and_edge.test.js",
+    "test": "node test/run_all.js",
     "test:engine4": "node test/engine4/unit.test.js",
     "engine4:replay": "node engine/engine4/replay.js",
     "engine4:forward": "node engine/engine4/forward.js",

@@ -12,7 +12,8 @@ const path = require('path');
 const { FEATURE_KEYS, signalToFeatures } = require('./features');
 
 const MODEL_PATH = path.join(__dirname, '..', '..', 'data', 'ml', 'shadow_model.json');
-const LOG_PATH = path.join(__dirname, '..', '..', 'data', 'ml', 'shadow_log.jsonl');
+const { stateDir } = require('../state_dir');
+const LOG_PATH = path.join(stateDir(), 'ml', 'shadow_log.jsonl');
 
 function mode() {
   return String(process.env.ML_SHADOW_MODE || 'log').toLowerCase();
