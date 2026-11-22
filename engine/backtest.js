@@ -30,7 +30,9 @@ const DATA_DIR = path.join(ROOT, 'data');
 const HIST_DIR = path.join(DATA_DIR, 'historical');
 const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');
 const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
-const ENDPOINTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
+// Alternates on 403/451 are handled by engine/binance_http.js.
+const BINANCE_SPOT_BASE = 'https://api.binance.com';
+const { requestJsonWithRetry } = require('./binance_http');
 const INTERVALS = ['5m', '15m', '1h', '4h'];
 const FRAME_WEIGHTS = CONFIG.frameWeights;
 const MC_RUNS = Math.max(200, Number(process.env.MONTE_CARLO_RUNS || 2000));
@@ -63,23 +65,9 @@ function loadSeriesFromFile(file) {
 }
 
 async function fetchJson(url, params) {
-  let last;
-  for (const base of ENDPOINTS) {
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      try {
-        const u = new URL(`${base}${url}`); Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
-        const res = await fetch(u, { signal: controller.signal, headers: { 'user-agent': 'MaYor-Backtest/1.0' } });
-        if (!res.ok) { const e = new Error(`HTTP ${res.status}`); e.status = res.status; throw e; }
-        return await res.json();
-      } catch (e) {
-        last = e; const delay = [418, 429].includes(e.status) ? 1500 * 2 ** attempt : 500 * 2 ** attempt;
-        if (attempt < 3) await sleep(Math.min(30000, delay));
-      } finally { clearTimeout(timer); }
-    }
-  }
-  throw last || new Error('historical-data-fetch-failed');
+  const u = new URL(`${BINANCE_SPOT_BASE}${url}`);
+  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
+  return requestJsonWithRetry(u, { timeoutMs: 15000, headers: { 'user-agent': 'MaYor-Backtest/1.0' }, sleep });
 }
 
 async function fetchHistorical(symbol, interval) {

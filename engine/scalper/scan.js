@@ -12,6 +12,7 @@ const { CONFIG, ENGINE_VERSION, GATE_VERSION } = require('./config');
 
 const parent = require('../scan.js');
 const { walkExit, tradeEntryTime } = require('../exit_walker');
+const { requestJsonWithRetry, BinanceGeoBlockedError } = require('../binance_http');
 const {
   Indicators,
   prepareKlines,
@@ -91,40 +92,24 @@ function writeHeartbeat(ok = true, extra = {}) {
 }
 
 async function requestJson(pathname, params = {}) {
+  // fapi.binance.com has no alternate host; a 403/451 surfaces as BinanceGeoBlockedError.
   let lastError = null;
   for (const base of CONFIG.futuresEndpoints) {
-    for (let attempt = 0; attempt <= CONFIG.retries; attempt++) {
-      let timer;
-      try {
-        const now = Date.now();
-        if (now < nextRequestAt) await sleep(nextRequestAt - now);
-        nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
-        const url = new URL(`${base}${pathname}`);
-        for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
-        const controller = new AbortController();
-        timer = setTimeout(() => controller.abort(), CONFIG.requestTimeoutMs);
-        const res = await fetch(url, {
-          signal: controller.signal,
-          headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' }
-        });
-        if (!res.ok) {
-          const body = await res.text().catch(() => '');
-          const err = new Error(`HTTP ${res.status} ${base} ${body.slice(0, 100)}`);
-          err.status = res.status;
-          throw err;
+    const url = new URL(`${base}${pathname}`);
+    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
+    try {
+      return await requestJsonWithRetry(url, {
+        timeoutMs: CONFIG.requestTimeoutMs,
+        headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' },
+        sleep,
+        beforeAttempt: async () => {
+          const now = Date.now();
+          if (now < nextRequestAt) await sleep(nextRequestAt - now);
+          nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
         }
-        return await res.json();
-      } catch (e) {
-        lastError = e;
-        const retryable = e.name === 'AbortError' || [418, 429, 500, 502, 503, 504].includes(e.status);
-        // 404 on REST path is not transient (wrong host/path)
-        if (retryable && attempt < CONFIG.retries) {
-          const delay = Math.min(15000, 400 * (2 ** attempt) + Math.floor(Math.random() * 200));
-          await sleep(delay);
-        }
-      } finally {
-        if (timer) clearTimeout(timer);
-      }
+      });
+    } catch (e) {
+      lastError = e;
     }
   }
   throw lastError || new Error('Futures request failed');
@@ -491,13 +476,16 @@ async function checkOpenTrades(deps = {}) {
     console.log('Scalper: no open trades');
     return { closed: 0, open: 0 };
   }
-  let closedCount = 0;
+  let closedCount = 0, geoError = null;
   for (const trade of open) {
     const entryTime = tradeEntryTime(trade);
     if (!Number.isFinite(entryTime)) { console.log(`Scalper ${trade.symbol}: no entry time, left open`); continue; }
     let candles;
     try { candles = await fetchCandles(trade.symbol, entryTime); }
-    catch (e) { console.log(`exit candles ${trade.symbol}: ${e.message}`); continue; }
+    catch (e) {
+      if (e instanceof BinanceGeoBlockedError) { geoError = e; break; }
+      console.log(`exit candles ${trade.symbol}: ${e.message}`); continue;
+    }
     const exit = resolveTradeExit(trade, candles);
     if (!exit) continue;
     applyTradeExit(trade, exit);
@@ -507,6 +495,7 @@ async function checkOpenTrades(deps = {}) {
   }
   if (closedCount) save(tracked);
   console.log(`Scalper open follow-up: closed ${closedCount}`);
+  if (geoError) throw geoError;
   return { closed: closedCount, open: tracked.filter(t => !t.closed).length };
 }
 
@@ -539,6 +528,7 @@ async function scan() {
   try {
     volumeMap = await get24hVolumeMap(CONFIG.symbols);
   } catch (e) {
+    if (e instanceof BinanceGeoBlockedError) throw e;
     console.log(`Scalper volume map failed: ${e.message}`);
     writeHeartbeat(false, { error: e.message, dataFetchOk: false, signalsAvailable: false, phase: 'data-fetch-failed' });
     return;
@@ -616,7 +606,11 @@ if (process.env.SCALPER_TEST === '1' || require.main !== module) {
   };
 } else {
   scan().catch(e => {
-    console.error(`Scalper fatal: ${e.stack || e.message}`);
+    if (e instanceof BinanceGeoBlockedError) {
+      console.error(`BINANCE GEO-BLOCKED: HTTP ${e.status} at ${e.host} (tried ${e.triedHosts.join(', ')}) — no market data, scalper aborted`);
+    } else {
+      console.error(`Scalper fatal: ${e.stack || e.message}`);
+    }
     writeHeartbeat(false, { error: String(e.message || e) });
     process.exitCode = 1;
   });

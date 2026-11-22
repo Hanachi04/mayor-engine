@@ -16,7 +16,8 @@ const FILES = [
   'test/integration_pipeline.test.js',
   'test/heartbeat.test.js',
   'test/engine4/unit.test.js',
-  'test/exit_and_edge.test.js'
+  'test/exit_and_edge.test.js',
+  'test/binance_http.test.js'
 ];
 
 const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mayor-state-'));
