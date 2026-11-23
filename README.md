@@ -101,7 +101,7 @@ Balanced/momentum/breakout remain available for research comparison.
 
 - `mayor.yml` — main signal scan
 - `scalper.yml` — futures scalper
-- `auto-status.yml` — STATUS docs (daily; reduced frequency)
+- `auto-status.yml` — STATUS docs (manual `workflow_dispatch`)
 - `daily/weekly/monthly-report.yml` — performance JSON
 - `ci.yml` — `npm test` on push/PR
 

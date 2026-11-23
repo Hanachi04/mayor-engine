@@ -151,27 +151,33 @@ function getMtfAt(dataset, evaluationTime, sentiment = null) {
   return levels ? { ok: true, signal: levels, frames, valid, mtfPct, features: extractFeatures(base) } : { ok: false, reason: 'invalid-levels', frames, valid, mtfPct };
 }
 
-function chooseExit(trade, candle) {
-  // Use the same candle walker as live tracking: SL wins an ambiguous candle,
-  // otherwise the furthest touched TP is recorded at its exact level.
-  const exit = walkExit(trade, [candle], { entryTime: Number(candle.openTime ?? trade.entryTime ?? trade.ts), targets: ['tp1', 'tp2', 'tp3'] });
-  return exit ? { result: exit.result, rawExit: exit.rawExit } : null;
+function exitCandlesForBase(baseCandle, fiveMinuteCandles, entryTime) {
+  // Only closed 5m candles fully contained in this 15m candle and after entry.
+  return (fiveMinuteCandles || []).filter(c => c.openTime >= entryTime && c.closeTime <= baseCandle.closeTime);
+}
+
+function chooseExit(trade, candles) {
+  // Match live tracking: chronological 5m candles, SL first on ambiguity.
+  const exit = walkExit(trade, candles, { entryTime: Number(trade.entryTime ?? trade.ts),
+    maxAgeMs: CONFIG.maxTradeAgeMs, targets: ['tp1', 'tp2', 'tp3'], expiredLabel: 'انتهت المدة' });
+  return exit ? { result: exit.result, rawExit: exit.rawExit, exitTime: exit.exitTime } : null;
 }
 
 function runWindow(dataset, startTime, endTime) {
-  const base = dataset.data[CONFIG.baseInterval] || [], trades = [], features = [], open = [];
+  const base = dataset.data[CONFIG.baseInterval] || [], exits5m = dataset.data['5m'] || [], trades = [], features = [], open = [];
   let lastSignalAt = 0;
   for (let i = 0; i < base.length - 1; i++) {
     const signalClose = base[i].closeTime;
     if (signalClose < startTime || signalClose >= endTime) continue;
     for (let oi = open.length - 1; oi >= 0; oi--) {
       const trade = open[oi], age = base[i].closeTime - trade.entryTime;
-      const exit = chooseExit(trade, base[i]);
+      const intrabars = exitCandlesForBase(base[i], exits5m, trade.entryTime);
+      const exit = chooseExit(trade, intrabars);
       if (exit || age >= CONFIG.maxTradeAgeMs) {
         const rawExit = exit ? exit.rawExit : base[i].close;
         const result = exit ? exit.result : 'انتهت المدة';
         const pnl = netPnl(trade.entryRaw, rawExit, trade.dir);
-        trades.push({ ...trade, result, exitTime: base[i].closeTime, exitRaw: rawExit, ...pnl, netPct: round(pnl.netPct, 5) });
+        trades.push({ ...trade, result, exitTime: exit ? exit.exitTime : base[i].closeTime, exitRaw: rawExit, ...pnl, netPct: round(pnl.netPct, 5) });
         open.splice(oi, 1);
       }
     }
@@ -323,4 +329,4 @@ async function main() {
 
 if (require.main === module) main().catch(e => { console.error(`Backtest failed: ${e.stack || e.message}`); process.exitCode = 1; });
 
-if (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate, chooseExit };
+if (process.env.CLOUD_PRO_TEST === '1') module.exports = { loadDataset, getMtfAt, runWindow, metrics, monteCarlo, correlationMatrix, buildGate, chooseExit, exitCandlesForBase };

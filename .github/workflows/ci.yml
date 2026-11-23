@@ -24,11 +24,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install dependencies
+        run: npm ci
       - name: Unit & integration tests
         run: npm test
-      - name: Coverage (informational)
+      - name: Lint
+        run: npm run lint
+      - name: Required coverage (minimum 60% lines/statements/functions, 55% branches)
         run: npm run coverage
-        continue-on-error: true
       - name: Shadow ML smoke (log mode)
         run: node engine/ml/train_shadow.js
       - name: Backtest no-data path must remain BLOCKED

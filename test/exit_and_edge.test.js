@@ -11,7 +11,7 @@ const { walkExit } = require('../engine/exit_walker');
 const { bootstrapEdge, drawdownRisk, edgeGate, mulberry32 } = require('../engine/edge_stats');
 const scan = require('../engine/scan.js');
 const scalper = require('../engine/scalper/scan.js');
-const { monteCarlo, buildGate } = require('../engine/backtest.js');
+const { monteCarlo, buildGate, chooseExit, exitCandlesForBase } = require('../engine/backtest.js');
 const { monteCarloSequence } = require('../engine/scalper/backtest.js');
 
 const T0 = 1_700_000_000_000;
@@ -72,6 +72,25 @@ const SHORT = { dir: 'SHORT', price: 100, sl: 102, tp1: 98, tp2: 96, tp3: 94, ts
   assert.strictEqual(expired.result, 'TIMEOUT');
   assert.strictEqual(expired.rawExit, 100.4, 'expiry closes at that candle close');
   console.log('✓ exit: pre-entry candles ignored, open/expiry handled');
+})();
+
+(function backtestExitUsesEntryAlignedFiveMinuteIntrabars() {
+  const m15 = 3 * M5, entryTime = T0 + m15;
+  const baseCandle = candle(1, 100, 106, 97, 104, m15);
+  const intrabars = [
+    candle(0, 100, 107, 97, 100, M5), // before entry: must not be considered
+    candle(3, 100, 101, 99, 100.5, M5),
+    candle(4, 100.5, 102.2, 100, 102, M5), // TP1 is first reached here
+    candle(6, 102, 107, 101, 106, M5) // after this 15m candle: must not be considered
+  ];
+  const aligned = exitCandlesForBase(baseCandle, intrabars, entryTime);
+  assert.deepStrictEqual(aligned.map(c => c.openTime), [entryTime, entryTime + M5]);
+  const backtest = chooseExit({ ...LONG, entryTime }, aligned);
+  const live = walkExit({ ...LONG, entryTime }, aligned, { entryTime, targets: ['tp1', 'tp2', 'tp3'] });
+  assert.strictEqual(backtest.result, live.result);
+  assert.strictEqual(backtest.rawExit, live.rawExit);
+  assert.strictEqual(backtest.exitTime, aligned[1].closeTime);
+  console.log('✓ backtest: 5m exits align to entry and 15m parent candle');
 })();
 
 (function getMtfAtIgnoresFutureCandles() {

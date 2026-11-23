@@ -22,13 +22,11 @@ const {
   calculatePositionSize: parentCalculatePositionSize
 } = parent;
 
-const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
 const { stateDir } = require('../state_dir');
+const { createSignalNotification, attemptSignalNotification, retryPendingSignalNotifications } = require('../telegram_outbox');
 const TRACKED_FILE = path.join(stateDir(), 'scalper', 'tracked.json');
 const VERIFICATION_FILE = path.join(stateDir(), 'scalper', 'verification.json');
 const HEARTBEAT_FILE = path.join(stateDir(), 'scalper', 'heartbeat.json');
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function finite(v, fb = NaN) {
@@ -496,6 +494,8 @@ async function checkOpenTrades(deps = {}) {
 async function scan() {
   writeHeartbeat(true, { phase: 'start', dataFetchOk: false, signalsAvailable: false });
   const today = fmtDate();
+  const pendingNotifications = loadTracked();
+  await retryPendingSignalNotifications(pendingNotifications, { save: saveTracked, send });
   await checkOpenTrades();
 
   const verification = loadVerification();
@@ -580,9 +580,10 @@ async function scan() {
       continue;
     }
 
+    record.signalNotification = createSignalNotification(record, buildSignalMessage(record));
     tracked.push(record);
-    saveTracked(tracked);
-    await send(buildSignalMessage(record));
+    saveTracked(tracked); // Persist signal and pending outbox entry before network delivery.
+    await attemptSignalNotification(record, tracked, { save: saveTracked, send });
     console.log(`✓ SCALPER ${record.dir} ${record.symbol} | RR 1:${record.rr}`);
   }
 
@@ -596,7 +597,8 @@ if (process.env.SCALPER_TEST === '1' || require.main !== module) {
     calculatePositionSize, canEmit, entryFillPrice, exitFillPrice,
     prepareKlines, Indicators, loadTracked, saveTracked,
     loadVerification, verificationPassed, getMTFScalper, netPnl,
-    resolveTradeExit, applyTradeExit, checkOpenTrades
+    resolveTradeExit, applyTradeExit, checkOpenTrades,
+    createSignalNotification, attemptSignalNotification, retryPendingSignalNotifications
   };
 } else {
   scan().catch(e => {
