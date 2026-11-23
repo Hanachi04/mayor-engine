@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { FEATURE_KEYS, datasetFromTracked } = require('./features');
-const { atomicWriteJson } = require('../atomic_json');
+const { atomicWriteJson, readJsonWithBackup } = require('../atomic_json');
 const { stateDir } = require('../state_dir');
 
 const TRACKED = path.join(stateDir(), 'tracked.json');
@@ -48,7 +48,7 @@ function selectThreshold(examples, weights) {
   return Number.isFinite(best.net) ? best : { threshold: 0.5, net: null, n: 0, reason: 'validation-sample-too-small' };
 }
 function main() {
-  const tracked = JSON.parse(fs.readFileSync(TRACKED, 'utf8'));
+  const tracked = readJsonWithBackup(TRACKED, [], { validate: Array.isArray });
   let data = datasetFromTracked(tracked, { mode: 'core' });
   if (data.length < 12) data = datasetFromTracked(tracked);
   data.sort((a, b) => Number(a.ts || 0) - Number(b.ts || 0));
