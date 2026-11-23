@@ -93,5 +93,24 @@ const FAPI = 'https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m
     assert.strictEqual(f.calls.length, 2);
     console.log('✓ binance_http: network error is retried');
   }
+  {
+    const starts = [];
+    let active = 0, maxActive = 0;
+    const f = async () => {
+      starts.push(Date.now());
+      active++;
+      maxActive = Math.max(maxActive, active);
+      await new Promise(resolve => setTimeout(resolve, 2));
+      active--;
+      return res(200, { ok: true });
+    };
+    const jobs = Array.from({ length: 12 }, (_, i) => requestJsonWithRetry(`https://fapi.binance.com/test?n=${i}`, {
+      fetch: f, minRequestGapMs: 3, maxRetries: 0, log: () => {}
+    }));
+    await Promise.all(jobs);
+    assert.strictEqual(starts.length, 12);
+    assert.strictEqual(maxActive, 1, 'Promise.all callers must still share one outbound request lane');
+    console.log('✓ binance_http: concurrent Promise.all requests share the rate-limited queue');
+  }
   console.log('✓ test/binance_http: passed');
 })().catch(e => { console.error(e); process.exit(1); });

@@ -29,3 +29,19 @@ data/historical/
 # Engine #4: track journals/state for Actions continuity; candles are rebuildable
 forward-test/candles/*.jsonl
 !forward-test/**/.gitkeep
+
+# Runtime state and generated snapshots
+**/*.json.bak
+**/*.tmp-*
+*.sqlite
+*.sqlite3
+*.db
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.parquet
+*.bin
+*.pkl
+*.onnx
+*local-snapshot*

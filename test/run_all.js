@@ -17,14 +17,17 @@ const FILES = [
   'test/heartbeat.test.js',
   'test/engine4/unit.test.js',
   'test/exit_and_edge.test.js',
-  'test/binance_http.test.js'
+  'test/binance_http.test.js',
+  'test/atomic_json.test.js',
+  'test/ml_shadow.test.js'
 ];
 
 const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mayor-state-'));
-const env = { ...process.env, MAYOR_STATE_DIR: stateDir };
-
 let failed = 0;
 for (const file of FILES) {
+  const testStateDir = path.join(stateDir, path.basename(file, '.js'));
+  fs.mkdirSync(testStateDir, { recursive: true });
+  const env = { ...process.env, MAYOR_STATE_DIR: testStateDir };
   console.log(`\n=== ${file} ===`);
   const r = spawnSync(process.execPath, [path.join(ROOT, file)], { stdio: 'inherit', env, cwd: ROOT });
   if (r.status !== 0) {

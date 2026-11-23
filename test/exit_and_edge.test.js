@@ -74,6 +74,30 @@ const SHORT = { dir: 'SHORT', price: 100, sl: 102, tp1: 98, tp2: 96, tp3: 94, ts
   console.log('✓ exit: pre-entry candles ignored, open/expiry handled');
 })();
 
+(function getMtfAtIgnoresFutureCandles() {
+  const { getMtfAt } = require('../engine/backtest.js');
+  const { CONFIG } = require('../engine/scan.js');
+  const data = {};
+  const frameMs = { '5m': 300_000, '15m': 900_000, '1h': 3_600_000, '4h': 14_400_000 };
+  for (const tf of Object.keys(frameMs)) {
+    const step = frameMs[tf];
+    data[tf] = Array.from({ length: 240 }, (_, i) => {
+      const close = 100 + i * 0.05;
+      return { openTime: T0 + i * step, closeTime: T0 + (i + 1) * step - 1,
+        open: close - 0.02, high: close + 0.2, low: close - 0.2, close, volume: 1000 };
+    });
+  }
+  const at = data[CONFIG.baseInterval][199].closeTime + 1;
+  const before = getMtfAt({ symbol: 'BTCUSDT', data }, at);
+  const withFuture = Object.fromEntries(Object.entries(data).map(([tf, rows]) => [tf, [...rows,
+    { openTime: rows.at(-1).openTime + frameMs[tf], closeTime: rows.at(-1).closeTime + frameMs[tf], open: 900, high: 1000, low: 800, close: 950, volume: 1e9 }
+  ]]));
+  const after = getMtfAt({ symbol: 'BTCUSDT', data: withFuture }, at);
+  assert.strictEqual(before.frames[CONFIG.baseInterval].indicators.price, after.frames[CONFIG.baseInterval].indicators.price);
+  assert.strictEqual(before.frames[CONFIG.baseInterval].indicators.price, data[CONFIG.baseInterval][199].close);
+  console.log('✓ backtest getMtfAt ignores candles after evaluation timestamp');
+})();
+
 (async function checkOpenTradesUsesCandles() {
   // Cloud Pro: SL touched between runs; injected deps → no network/no file writes
   const tracked = [{ ...LONG, symbol: 'BTCUSDT', closed: false, position: { notional: 1000 } }];

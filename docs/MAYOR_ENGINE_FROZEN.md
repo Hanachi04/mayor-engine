@@ -1,9 +1,3 @@
-# MaYor Engine — FULLY FROZEN
+# MaYor Engine — workflow policy
 
-**Effective:** 2026-09-28
-
-- **GitHub Actions: DISABLED** at repository level (account policy: only MR-BET stays active).
-- Core / Scalper / reports / Engine #4: no schedules; not for live trading.
-- Code retained for research audit only.
-
-See also: `docs/ALL_REPOS_ACTIONS_FREEZE.md`
+The repository Actions switch is enabled. Research and signal workflows remain manual-only (`workflow_dispatch`); no trading schedule is active. Run a workflow manually only for an intentional verification or research task.

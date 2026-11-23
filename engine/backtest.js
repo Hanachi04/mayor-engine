@@ -24,12 +24,15 @@ const {
   netPnl
 } = require('./scan.js');
 const { bootstrapEdge, drawdownRisk } = require('./edge_stats');
+const { walkExit } = require('./exit_walker');
+const { atomicWriteJson } = require('./atomic_json');
+const { stateDir } = require('./state_dir');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
 const HIST_DIR = path.join(DATA_DIR, 'historical');
 const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');
-const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
+const VERIFICATION_FILE = path.join(stateDir(), 'verification.json');
 // Alternates on 403/451 are handled by engine/binance_http.js.
 const BINANCE_SPOT_BASE = 'https://api.binance.com';
 const { requestJsonWithRetry } = require('./binance_http');
@@ -149,16 +152,10 @@ function getMtfAt(dataset, evaluationTime, sentiment = null) {
 }
 
 function chooseExit(trade, candle) {
-  const long = trade.dir === 'LONG';
-  const sl = long ? candle.low <= trade.sl : candle.high >= trade.sl;
-  const tp3 = long ? candle.high >= trade.tp3 : candle.low <= trade.tp3;
-  const tp2 = long ? candle.high >= trade.tp2 : candle.low <= trade.tp2;
-  const tp1 = long ? candle.high >= trade.tp1 : candle.low <= trade.tp1;
-  if (sl) return { result: 'SL', rawExit: trade.sl };
-  if (tp3) return { result: 'TP3', rawExit: trade.tp3 };
-  if (tp2) return { result: 'TP2', rawExit: trade.tp2 };
-  if (tp1) return { result: 'TP1', rawExit: trade.tp1 };
-  return null;
+  // Use the same candle walker as live tracking: SL wins an ambiguous candle,
+  // otherwise the furthest touched TP is recorded at its exact level.
+  const exit = walkExit(trade, [candle], { entryTime: Number(candle.openTime ?? trade.entryTime ?? trade.ts), targets: ['tp1', 'tp2', 'tp3'] });
+  return exit ? { result: exit.result, rawExit: exit.rawExit } : null;
 }
 
 function runWindow(dataset, startTime, endTime) {
@@ -279,7 +276,7 @@ async function main() {
     engineVersion: 'cloud-pro-mtf-2.1',
     strategyMode,
     dataset: {
-      source: process.env.BACKTEST_FETCH ? 'fetch' : 'local-files',
+      source: /^(1|true|yes)$/i.test(process.env.BACKTEST_FETCH || '') ? 'fetch' : 'local-files',
       historicalDir: HIST_DIR,
       symbols: SYMBOLS,
       intervals: INTERVALS,
@@ -306,7 +303,7 @@ async function main() {
         : (passed ? 'all symbol gates passed' : 'one or more symbol gates blocked')
     }
   };
-  fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
+  atomicWriteJson(REPORT_FILE, report, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
   const verification = {
     ...report.gate,
     generatedAt: report.generatedAt,
@@ -319,7 +316,7 @@ async function main() {
     symbols: SYMBOLS,
     warnings: symbolReports.flatMap(r => r.warnings || [])
   };
-  fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));
+  atomicWriteJson(VERIFICATION_FILE, verification, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
   console.log(JSON.stringify({ report: REPORT_FILE, verification: VERIFICATION_FILE, gate: report.gate, symbols: symbolReports.map(r => ({ symbol: r.symbol, isTrades: r.inSample?.trades || 0, oosTrades: r.outOfSample?.trades || 0, oosNetPct: r.outOfSample?.netPct || 0, zScore: r.monteCarlo?.zScore || 0, edgePValue: r.monteCarlo?.pValue ?? null })) }, null, 2));
   return report;
 }

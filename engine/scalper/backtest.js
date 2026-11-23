@@ -8,10 +8,12 @@ const {
   entryFillPrice, exitFillPrice, prepareKlines, Indicators
 } = require('./scan');
 const { bootstrapEdge, drawdownRisk } = require('../edge_stats');
+const { atomicWriteJson } = require('../atomic_json');
+const { stateDir } = require('../state_dir');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
 const REPORT_FILE = path.join(DATA_DIR, 'backtest_report.json');
-const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
+const VERIFICATION_FILE = path.join(stateDir(), 'scalper', 'verification.json');
 
 function finite(v, fb = NaN) {
   const n = Number(v);
@@ -225,7 +227,7 @@ async function runBacktest(framesBySymbol) {
   };
 
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
+  atomicWriteJson(REPORT_FILE, report, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
 
   const verification = {
     gateVersion: GATE_VERSION,
@@ -237,7 +239,7 @@ async function runBacktest(framesBySymbol) {
     overall: allSum, is: isSum, oos: oosSum,
     concentration: conc, monteCarlo: mc
   };
-  fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));
+  atomicWriteJson(VERIFICATION_FILE, verification, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
 
   console.log(JSON.stringify({
     netPct: allSum.netPct,
@@ -264,7 +266,7 @@ async function main() {
       engineVersion: ENGINE_VERSION
     };
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(VERIFICATION_FILE, JSON.stringify(verification, null, 2));
+    atomicWriteJson(VERIFICATION_FILE, verification, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
     console.log(JSON.stringify({ netPct: 0, profitFactor: 0, trades: 0, concentration: 'no-data' }));
     return;
   }
