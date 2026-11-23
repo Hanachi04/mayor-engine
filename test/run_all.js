@@ -19,6 +19,7 @@ const FILES = [
   'test/exit_and_edge.test.js',
   'test/binance_http.test.js',
   'test/atomic_json.test.js',
+  'test/telegram_outbox.test.js',
   'test/ml_shadow.test.js'
 ];
 

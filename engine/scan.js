@@ -107,6 +107,7 @@ const TOTAL_VOTE_WEIGHT = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const { stateDir } = require('./state_dir');
+const { createSignalNotification, attemptSignalNotification, retryPendingSignalNotifications } = require('./telegram_outbox');
 const TRACKED_FILE = path.join(stateDir(), 'tracked.json');
 const VERIFICATION_FILE = path.join(stateDir(), 'verification.json');
 const pricePrecisionCache = new Map();
@@ -751,6 +752,8 @@ async function evaluate(symbol, liquidity24h, sentiment) {
 
 async function scan() {
   const today = fmtDate();
+  const pendingNotifications = loadTracked();
+  await retryPendingSignalNotifications(pendingNotifications, { save: saveTracked, send });
   await checkOpenTrades();
   const verification = loadVerification();
   if (!verificationPassed(verification)) {
@@ -825,7 +828,10 @@ async function scan() {
     feeRate: CONFIG.takerFeeRate, slippageRate: CONFIG.slippageRate,
     date: today, ts: Date.now(), slot: currentSlot(), closed: false, entryFillPrice: entryFillPrice(chosen.price, chosen.dir) };
   if (DRY_RUN) { console.log(`DRY_RUN: مرشح ${record.dir} ${record.symbol} | MTF ${record.mtfPct}% | Core ${record.corePct}% | RR 1:${record.rr}`); console.log(buildSignalMessage(record)); return; }
-  tracked.push(record); saveTracked(tracked); await send(buildSignalMessage(record));
+  record.signalNotification = createSignalNotification(record, buildSignalMessage(record));
+  tracked.push(record);
+  saveTracked(tracked); // Persist signal and pending outbox entry before network delivery.
+  await attemptSignalNotification(record, tracked, { save: saveTracked, send });
   await appendToSheet([tracked.filter(t => t.date === today).length, today, fmtTime(), record.symbol, record.dir, record.price, record.sl, record.tp1, record.tp2, record.tp3, '', 'مفتوحة', '', 'مفتوحة', record.position?.quantity || '', record.position?.notional || '', record.engineVersion]);
   console.log(`✓ إشارة ${record.dir} ${record.symbol} | MTF ${record.mtfPct}% | Core ${record.corePct}% | RR 1:${record.rr}`);
 }
@@ -837,7 +843,8 @@ if (process.env.CLOUD_PRO_TEST === '1' || require.main !== module) {
     applyExchangeLotSizing, roundDownToStep, checkCircuitBreaker, entryFillPrice, exitFillPrice, netPnl,
     adaptation,
     getMTFAnalysis, canEmit, buildSignalMessage, loadVerification, verificationPassed,
-    resolveTradeExit, applyTradeExit, checkOpenTrades
+    resolveTradeExit, applyTradeExit, checkOpenTrades,
+    createSignalNotification, attemptSignalNotification, retryPendingSignalNotifications
   };
 } else {
   scan().catch(e => {
