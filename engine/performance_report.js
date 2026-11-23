@@ -6,12 +6,14 @@
 const fs = require('fs');
 const path = require('path');
 const { CONFIG, netPnl } = require('./scan.js');
+const { stateDir } = require('./state_dir');
+const { readJsonWithBackup } = require('./atomic_json');
 
 const TOKEN = process.env.TELEGRAM_TOKEN || '';
 const CHAT = process.env.TELEGRAM_CHAT || '';
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 12000);
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const TRACKED_FILE = path.join(DATA_DIR, 'tracked.json');
+const TRACKED_FILE = path.join(stateDir(), 'tracked.json');
 const REPORTS_DIR = path.join(DATA_DIR, 'reports');
 
 const PERIODS = {
@@ -27,8 +29,7 @@ const riyadhTime = () => new Date().toLocaleTimeString('en-GB', { hour12: false,
 
 function loadTracked() {
   try {
-    const raw = fs.existsSync(TRACKED_FILE) ? fs.readFileSync(TRACKED_FILE, 'utf8') : '[]';
-    const parsed = JSON.parse(raw);
+    const parsed = readJsonWithBackup(TRACKED_FILE, [], { validate: Array.isArray });
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
     console.log(`تعذر قراءة tracked.json: ${error.message}`);

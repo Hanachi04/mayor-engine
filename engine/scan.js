@@ -24,7 +24,8 @@ const adaptation = require('./adaptation');
 const shadowGate = require('./ml/shadow_gate');
 const { walkExit, tradeEntryTime } = require('./exit_walker');
 const path = require('path');
-const { requestJsonWithRetry, BinanceGeoBlockedError } = require('./binance_http');
+const { requestJsonWithRetry, BinanceGeoBlockedError, mapLimit } = require('./binance_http');
+const { atomicWriteJson, readJsonWithBackup } = require('./atomic_json');
 
 const ENGINE_VERSION = 'cloud-pro-mtf-2.1';
 const TOKEN = process.env.TELEGRAM_TOKEN || '';
@@ -107,10 +108,9 @@ const TOTAL_VOTE_WEIGHT = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const { stateDir } = require('./state_dir');
 const TRACKED_FILE = path.join(stateDir(), 'tracked.json');
-const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
+const VERIFICATION_FILE = path.join(stateDir(), 'verification.json');
 const pricePrecisionCache = new Map();
 const lotSizeCache = new Map(); // symbol -> { stepSize, minQty, minNotional }
-let nextRequestAt = 0;
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -129,20 +129,19 @@ function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function loadTracked() {
   try {
-    if (!fs.existsSync(TRACKED_FILE)) return [];
-    const value = JSON.parse(fs.readFileSync(TRACKED_FILE, 'utf8'));
+    const value = readJsonWithBackup(TRACKED_FILE, [], { validate: Array.isArray });
     return Array.isArray(value) ? value : [];
   } catch (e) {
     console.log(`تعذر قراءة tracked.json: ${e.message}`);
     return [];
   }
 }
-function saveTracked(arr) { fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true }); fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2)); }
+function saveTracked(arr) { atomicWriteJson(TRACKED_FILE, arr, { validate: Array.isArray }); }
 
 function loadVerification() {
   try {
     if (!fs.existsSync(VERIFICATION_FILE)) return { passed: false, status: 'BLOCKED', reason: 'verification-file-missing' };
-    return JSON.parse(fs.readFileSync(VERIFICATION_FILE, 'utf8'));
+    return readJsonWithBackup(VERIFICATION_FILE, { passed: false, status: 'BLOCKED', reason: 'verification-file-corrupt' }, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
   } catch (e) {
     return { passed: false, status: 'BLOCKED', reason: `verification-read-error:${e.message}` };
   }
@@ -158,11 +157,7 @@ async function requestJson(pathname, params = {}) {
     timeoutMs: CONFIG.requestTimeoutMs,
     headers: { 'user-agent': 'MaYor-Cloud-Pro/2.0' },
     sleep,
-    beforeAttempt: async () => {
-      const now = Date.now();
-      if (now < nextRequestAt) await sleep(nextRequestAt - now);
-      nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
-    }
+    minRequestGapMs: CONFIG.minRequestGapMs
   });
 }
 
@@ -474,7 +469,7 @@ function calculatePositionSize(signal, cfg = CONFIG) {
 
 async function getMTFAnalysis(symbol, liquidity24h, sentiment = null) {
   const frames = {};
-  const fetched = await Promise.all(CONFIG.intervals.map(async interval => {
+  const fetched = await mapLimit(CONFIG.intervals, 2, async interval => {
     try {
       const klines = await getKlines(symbol, interval, CONFIG.limits[interval]);
       const depth = interval === CONFIG.baseInterval ? await getOrderBookImbalance(symbol) : null;
@@ -482,7 +477,7 @@ async function getMTFAnalysis(symbol, liquidity24h, sentiment = null) {
     } catch (e) {
       console.log(`${symbol} ${interval}: ${e.message}`); return [interval, null];
     }
-  }));
+  });
   for (const [interval, result] of fetched) if (result) frames[interval] = result;
   const valid = CONFIG.intervals.filter(tf => frames[tf]?.signal);
   if (valid.length < CONFIG.minFrames) return { ok: false, reason: `mtf-frames:${valid.length}/${CONFIG.minFrames}`, frames };
@@ -645,12 +640,11 @@ async function checkOpenTrades(deps = {}) {
   return { closed: closedCount, open: stillOpen };
 }
 
-const BREAKER_FILE = path.join(DATA_DIR, 'circuit_breaker.json');
+const BREAKER_FILE = path.join(stateDir(), 'circuit_breaker.json');
 function loadBreakerState() {
-  try { return fs.existsSync(BREAKER_FILE) ? JSON.parse(fs.readFileSync(BREAKER_FILE, 'utf8')) : {}; }
-  catch { return {}; }
+  return readJsonWithBackup(BREAKER_FILE, {}, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
 }
-function saveBreakerState(state) { fs.writeFileSync(BREAKER_FILE, JSON.stringify(state, null, 2)); }
+function saveBreakerState(state) { atomicWriteJson(BREAKER_FILE, state, { validate: v => v && typeof v === 'object' && !Array.isArray(v) }); }
 
 // قاطع أمان: خسارة يومية و/أو سلسلة خسائر ضمن نافذة زمنية + تبريد (cooldown).
 // لا يسبب قفلاً دائماً من خسائر تاريخية قديمة خارج النافذة.
@@ -797,10 +791,10 @@ async function scan() {
   console.log(`السيولة+التكيف: ${eligible.length}/${SYMS.length} أزواج مؤهلة بحد $${CONFIG.minQuoteVolume24h.toLocaleString('en-US')}`);
   const sentiment = await getMarketSentiment();
   if (sentiment !== null) console.log(`مؤشر الخوف والجشع: ${sentiment}`);
-  const results = await Promise.all(eligible.map(async symbol => {
+  const results = await mapLimit(eligible, 3, async symbol => {
     try { return { symbol, ...(await evaluate(symbol, volumeMap.get(symbol).quoteVolume, sentiment)) }; }
     catch (e) { console.log(`فشل تقييم ${symbol}: ${e.message}`); return { symbol, ok: false, reason: 'evaluation-error' }; }
-  }));
+  });
   // Hour block: only if explicitly set. Empty default = disabled (small samples are unsafe).
   const blockHours = String(process.env.BLOCK_UTC_HOURS || '')
     .split(',').map(s => s.trim()).filter(Boolean).map(Number).filter(n => Number.isFinite(n) && n >= 0 && n <= 23);

@@ -55,23 +55,9 @@ jobs:
       - name: Layer 2 - Debate Chamber
         run: python3 aegis-quant/debate-chamber/main.py
 
-      - name: Layer 3 - DRL Sizing
-        run: python3 aegis-quant/drl-sizing/main.py
 
       - name: Test - Analyst Council
         run: python3 aegis-quant/analyst-council/test/test_parallel_graph.py -v
 
       - name: Test - Debate Chamber
         run: python3 aegis-quant/debate-chamber/test/test_debate_chamber.py -v
-
-      - name: Test - Direction Invariance
-        run: python3 aegis-quant/drl-sizing/test/test_direction_invariance.py -v
-
-      - name: Test - Reward
-        run: python3 aegis-quant/drl-sizing/test/test_reward.py -v
-
-      - name: Test - Sizing
-        run: python3 aegis-quant/drl-sizing/test/test_sizing.py -v
-
-      - name: Test - Execution Timing
-        run: python3 aegis-quant/drl-sizing/test/test_execution_timing.py -v

@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { atomicWriteJson, readJsonWithBackup } = require('./atomic_json');
 
 function resolveDataDir() {
   if (process.env.ADAPTATION_DATA_DIR) return process.env.ADAPTATION_DATA_DIR;
@@ -64,9 +65,10 @@ function ensureDataDir() {
 
 function loadState() {
   try {
-    if (!fs.existsSync(STATE_FILE)) return { version: 1, blacklist: {}, updatedAt: null };
-    const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-    if (!s.blacklist || typeof s.blacklist !== 'object') s.blacklist = {};
+    const s = readJsonWithBackup(STATE_FILE, { version: 1, blacklist: {}, updatedAt: null }, {
+      validate: value => value && typeof value === 'object' && !Array.isArray(value)
+    });
+    if (!s.blacklist || typeof s.blacklist !== 'object' || Array.isArray(s.blacklist)) s.blacklist = {};
     return s;
   } catch {
     return { version: 1, blacklist: {}, updatedAt: null };
@@ -76,7 +78,7 @@ function loadState() {
 function saveState(state) {
   ensureDataDir();
   state.updatedAt = new Date().toISOString();
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  atomicWriteJson(STATE_FILE, state, { validate: value => value && typeof value === 'object' && !Array.isArray(value) });
 }
 
 function appendLog(entry) {

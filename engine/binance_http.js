@@ -34,6 +34,38 @@ class BinanceGeoBlockedError extends Error {
 
 function defaultSleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
+// A module-wide FIFO queue applies across all callers (including Promise.all) and
+// reserves each attempt, retry and fallback-host request through one shared lane.
+let queueTail = Promise.resolve();
+let nextQueuedRequestAt = 0;
+async function enterRequestQueue(minGapMs = 0) {
+  let release;
+  const turn = new Promise(resolve => { release = resolve; });
+  const previous = queueTail;
+  queueTail = previous.then(() => turn, () => turn);
+  await previous;
+  const gap = Math.max(0, Number(minGapMs) || 0);
+  const waitMs = Math.max(0, nextQueuedRequestAt - Date.now());
+  if (waitMs) await defaultSleep(waitMs);
+  nextQueuedRequestAt = Date.now() + gap;
+  return release;
+}
+
+async function mapLimit(items, limit, mapper) {
+  const input = Array.from(items || []);
+  const results = new Array(input.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.max(1, Math.min(input.length || 1, Math.floor(limit) || 1)) }, async () => {
+    while (true) {
+      const index = next++;
+      if (index >= input.length) return;
+      results[index] = await mapper(input[index], index);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 function isRetryableStatus(status) {
   return status === 429 || status === 418 || (status >= 500 && status <= 599);
 }
@@ -67,13 +99,15 @@ function hostCandidates(url, publicMarketData) {
 // Retries one host. Returns parsed JSON, or throws (geo errors are tagged).
 async function requestOneHost(url, o) {
   for (let attempt = 0; ; attempt++) {
-    if (o.beforeAttempt) await o.beforeAttempt();
+    const release = await enterRequestQueue(o.minRequestGapMs);
+    try { if (o.beforeAttempt) await o.beforeAttempt(); } catch (error) { release(); throw error; }
     let res, timer;
     try {
       const controller = typeof AbortController === 'function' ? new AbortController() : null;
       if (controller && o.timeoutMs > 0) timer = setTimeout(() => controller.abort(), o.timeoutMs);
       res = await o.fetch(url, { headers: o.headers, signal: controller ? controller.signal : undefined });
     } catch (e) {
+      release();
       if (timer) clearTimeout(timer);
       // Network error / timeout: retryable.
       if (attempt >= o.maxRetries) {
@@ -86,6 +120,7 @@ async function requestOneHost(url, o) {
       continue;
     }
     if (timer) clearTimeout(timer);
+    release();
 
     if (res.ok) return await res.json();
 
@@ -151,5 +186,6 @@ module.exports = {
   SPOT_HOST_CHAIN,
   parseRetryAfterMs,
   backoffDelayMs,
-  isRetryableStatus
+  isRetryableStatus,
+  mapLimit
 };

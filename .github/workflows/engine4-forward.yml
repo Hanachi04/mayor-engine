@@ -1,8 +1,6 @@
 name: Engine #4 Turtle Forward Paper
 
-# Daily after UTC day candle is closed. Also manual.
-# FROZEN with rest of mayor-engine — Actions disabled at repo level.
-# Manual only if Actions are re-enabled later.
+# Manual dispatch only; no scheduled forward-trading runs. Actions remain enabled at repository level.
 on:
   workflow_dispatch:
 
@@ -26,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Run Engine #4 forward paper
         env:

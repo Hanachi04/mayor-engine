@@ -1,115 +1,77 @@
 'use strict';
-/**
- * Train a simple logistic regression on tracked.json (win=1).
- * Walk-forward: train on first 70%, test on last 30% by time.
- * Writes data/ml/shadow_model.json — used only if ML_SHADOW_MODE allows.
- */
-
+/** Time-ordered shadow model. Threshold selection uses validation only; test is report-only. */
 const fs = require('fs');
 const path = require('path');
 const { FEATURE_KEYS, datasetFromTracked } = require('./features');
+const { atomicWriteJson } = require('../atomic_json');
+const { stateDir } = require('../state_dir');
 
-const ROOT = path.join(__dirname, '..', '..');
-const TRACKED = path.join(ROOT, 'data', 'tracked.json');
-const OUT = path.join(ROOT, 'data', 'ml', 'shadow_model.json');
-
-function sigmoid(z) {
-  if (z > 20) return 1;
-  if (z < -20) return 0;
-  return 1 / (1 + Math.exp(-z));
-}
-
+const TRACKED = path.join(stateDir(), 'tracked.json');
+const OUT = path.join(stateDir(), 'ml', 'shadow_model.json');
+const MIN_ML_SAMPLES = Math.max(100, Number(process.env.ML_MIN_TRAIN_SAMPLES || 100));
+const THRESHOLDS = [0.45, 0.5, 0.55, 0.6, 0.65];
+function sigmoid(z) { if (z > 20) return 1; if (z < -20) return 0; return 1 / (1 + Math.exp(-z)); }
 function trainLogistic(examples, { lr = 0.15, epochs = 800, l2 = 0.02 } = {}) {
-  const dim = FEATURE_KEYS.length;
-  const w = new Array(dim).fill(0);
+  const w = new Array(FEATURE_KEYS.length).fill(0);
   for (let e = 0; e < epochs; e++) {
-    const grad = new Array(dim).fill(0);
+    const grad = new Array(w.length).fill(0);
     for (const ex of examples) {
-      const z = ex.x.reduce((s, xi, i) => s + w[i] * xi, 0);
-      const p = sigmoid(z);
-      const err = p - ex.y;
-      for (let i = 0; i < dim; i++) grad[i] += err * ex.x[i];
+      const p = sigmoid(ex.x.reduce((sum, value, i) => sum + w[i] * value, 0));
+      for (let i = 0; i < w.length; i++) grad[i] += (p - ex.y) * ex.x[i];
     }
     const n = examples.length || 1;
-    for (let i = 0; i < dim; i++) {
-      grad[i] = grad[i] / n + l2 * w[i];
-      w[i] -= lr * grad[i];
-    }
+    for (let i = 0; i < w.length; i++) w[i] -= lr * (grad[i] / n + l2 * w[i]);
   }
   return w;
 }
-
-function predict(w, x) {
-  const z = x.reduce((s, xi, i) => s + w[i] * xi, 0);
-  return sigmoid(z);
-}
-
-function metrics(examples, w) {
-  if (!examples.length) return { n: 0, accuracy: 0, logloss: 0, baseline: 0 };
-  let correct = 0, ll = 0;
+function predict(weights, x) { return sigmoid(x.reduce((sum, value, i) => sum + (weights[i] || 0) * value, 0)); }
+function metrics(examples, weights) {
+  if (!examples.length) return { n: 0, accuracy: 0, logloss: 0, baseline: 0, winRate: 0 };
+  let correct = 0, loss = 0;
   const wins = examples.filter(e => e.y === 1).length;
   for (const ex of examples) {
-    const p = predict(w, ex.x);
-    const pred = p >= 0.5 ? 1 : 0;
-    if (pred === ex.y) correct++;
-    const pp = Math.min(1 - 1e-7, Math.max(1e-7, p));
-    ll += -(ex.y * Math.log(pp) + (1 - ex.y) * Math.log(1 - pp));
+    const p = predict(weights, ex.x);
+    if ((p >= 0.5 ? 1 : 0) === ex.y) correct++;
+    const bounded = Math.min(1 - 1e-7, Math.max(1e-7, p));
+    loss -= ex.y * Math.log(bounded) + (1 - ex.y) * Math.log(1 - bounded);
   }
-  return {
-    n: examples.length,
-    accuracy: correct / examples.length,
-    logloss: ll / examples.length,
-    baseline: Math.max(wins, examples.length - wins) / examples.length,
-    winRate: wins / examples.length
-  };
+  return { n: examples.length, accuracy: correct / examples.length, logloss: loss / examples.length, baseline: Math.max(wins, examples.length - wins) / examples.length, winRate: wins / examples.length };
 }
-
+function selectThreshold(examples, weights) {
+  let best = { threshold: 0.5, net: -Infinity, n: 0 };
+  for (const threshold of THRESHOLDS) {
+    const kept = examples.filter(ex => predict(weights, ex.x) >= threshold);
+    if (kept.length < 10) continue;
+    const net = kept.reduce((sum, ex) => sum + ex.net, 0);
+    if (net > best.net) best = { threshold, net, n: kept.length, winRate: kept.filter(ex => ex.y).length / kept.length };
+  }
+  return Number.isFinite(best.net) ? best : { threshold: 0.5, net: null, n: 0, reason: 'validation-sample-too-small' };
+}
 function main() {
   const tracked = JSON.parse(fs.readFileSync(TRACKED, 'utf8'));
   let data = datasetFromTracked(tracked, { mode: 'core' });
-  if (data.length < 12) data = datasetFromTracked(tracked); // fallback all
+  if (data.length < 12) data = datasetFromTracked(tracked);
   data.sort((a, b) => Number(a.ts || 0) - Number(b.ts || 0));
-  const cut = Math.max(8, Math.floor(data.length * 0.7));
-  const train = data.slice(0, cut);
-  const test = data.slice(cut);
-  const w = trainLogistic(train);
-  const trainM = metrics(train, w);
-  const testM = metrics(test, w);
-
-  // Shadow filter utility: P(win) threshold suggestion
-  const scores = test.map(ex => ({ p: predict(w, ex.x), y: ex.y, net: ex.net }));
-  let best = { thr: 0.5, net: -999, n: 0 };
-  for (const thr of [0.45, 0.5, 0.55, 0.6, 0.65]) {
-    const kept = scores.filter(s => s.p >= thr);
-    if (kept.length < 3) continue;
-    const net = kept.reduce((a, s) => a + s.net, 0);
-    if (net > best.net) best = { thr, net, n: kept.length, wr: kept.filter(s => s.y).length / kept.length };
-  }
-
+  const n = data.length;
+  const enough = n >= MIN_ML_SAMPLES;
+  const trainEnd = Math.floor(n * 0.6), validationEnd = Math.floor(n * 0.8);
+  const train = data.slice(0, trainEnd), validation = data.slice(trainEnd, validationEnd), test = data.slice(validationEnd);
+  const weights = enough ? trainLogistic(train) : new Array(FEATURE_KEYS.length).fill(0);
+  const trainMetrics = enough ? metrics(train, weights) : null;
+  const validationMetrics = enough ? metrics(validation, weights) : null;
+  const testMetrics = enough ? metrics(test, weights) : null;
+  const selected = enough ? selectThreshold(validation, weights) : { threshold: 0.5, net: null, n: 0, reason: 'insufficient-sample; use non-ML strategy' };
   const model = {
-    version: 1,
-    type: 'logistic_win_prob',
-    featureKeys: FEATURE_KEYS,
-    weights: w.map(x => Number(x.toFixed(6))),
-    trainedAt: new Date().toISOString(),
-    trainSize: train.length,
-    testSize: test.length,
-    trainMetrics: trainM,
-    testMetrics: testM,
-    suggestedMinPWin: best.thr,
-    suggestedFilterStats: best,
-    note: 'Shadow model only. Does not guarantee live edge. Prefer skip when P(win) low.'
+    version: 2, type: enough ? 'logistic_win_prob' : 'disabled_insufficient_sample', featureKeys: FEATURE_KEYS,
+    weights: enough ? weights.map(x => Number(x.toFixed(6))) : [], trainedAt: new Date().toISOString(),
+    sampleSize: n, minMlSamples: MIN_ML_SAMPLES, enabledForFiltering: enough,
+    split: { train: train.length, validation: validation.length, test: test.length, method: 'chronological 60/20/20' },
+    trainMetrics, validationMetrics, testMetrics,
+    suggestedMinPWin: selected.threshold, validationThresholdStats: selected,
+    note: enough ? 'Threshold selected on validation only; test is report-only.' : `Only ${n} closed trades; ML filtering disabled until ${MIN_ML_SAMPLES} samples. Use the non-ML strategy.`
   };
-
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(model, null, 2));
-  console.log(JSON.stringify({
-    out: OUT,
-    train: trainM,
-    test: testM,
-    suggested: best
-  }, null, 2));
+  atomicWriteJson(OUT, model, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
+  console.log(JSON.stringify({ out: OUT, sampleSize: n, enabledForFiltering: enough, split: model.split, validationThreshold: selected, test: testMetrics }, null, 2));
 }
-
 if (require.main === module) main();
-module.exports = { trainLogistic, predict, metrics, main };
+module.exports = { trainLogistic, predict, metrics, selectThreshold, main, MIN_ML_SAMPLES };

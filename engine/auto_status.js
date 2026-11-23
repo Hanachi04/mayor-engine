@@ -1,4 +1,6 @@
 'use strict';
+const { stateDir } = require('./state_dir');
+const { readJsonWithBackup } = require('./atomic_json');
 /**
  * Unified auto documentation — MaYor + Scalper + Aegis
  * Writes: docs/STATUS.md | data/reports/status.json | appends history.jsonl
@@ -15,8 +17,9 @@ const DOCS = path.join(ROOT, 'docs');
 
 function readJson(fp, fallback) {
   try {
-    if (!fs.existsSync(fp)) return fallback;
-    return JSON.parse(fs.readFileSync(fp, 'utf8'));
+    const validate = Array.isArray(fallback) ? Array.isArray : fallback && typeof fallback === 'object'
+      ? value => value && typeof value === 'object' && !Array.isArray(value) : null;
+    return readJsonWithBackup(fp, fallback, { validate });
   } catch {
     return fallback;
   }
@@ -104,15 +107,15 @@ function verdictFrom(netPct, closed, gatePassed) {
 }
 
 function build() {
-  const mayorTracked = readJson(path.join(DATA, 'tracked.json'), []);
-  const mayorVer = readJson(path.join(DATA, 'verification.json'), {});
-  const scalperTracked = readJson(path.join(DATA, 'scalper', 'tracked.json'), []);
-  const scalperVer = readJson(path.join(DATA, 'scalper', 'verification.json'), {});
-  const scalperHb = readJson(path.join(DATA, 'scalper', 'heartbeat.json'), {});
+  const mayorTracked = readJson(path.join(stateDir(), 'tracked.json'), []);
+  const mayorVer = readJson(path.join(stateDir(), 'verification.json'), {});
+  const scalperTracked = readJson(path.join(stateDir(), 'scalper', 'tracked.json'), []);
+  const scalperVer = readJson(path.join(stateDir(), 'scalper', 'verification.json'), {});
+  const scalperHb = readJson(path.join(stateDir(), 'scalper', 'heartbeat.json'), {});
   const aegisReport = readJson(path.join(ROOT, 'aegis-quant', 'data', 'pipeline_report.json'), {});
   const daily = readJson(path.join(REPORTS, 'daily.json'), null);
   const weekly = readJson(path.join(REPORTS, 'weekly.json'), null);
-  const adaptState = readJson(path.join(DATA, 'adaptation_state.json'), { blacklist: {} });
+  const adaptState = readJson(path.join(stateDir(), 'adaptation_state.json'), { blacklist: {} });
   const adaptBans = Object.entries(adaptState.blacklist || {}).map(([sym, info]) => ({
     symbol: sym, until: info.until, reason: info.reason, pf: info.pf, netSum: info.netSum
   }));

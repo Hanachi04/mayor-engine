@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Unit & integration tests
         run: npm test
       - name: Coverage (informational)
@@ -31,13 +31,16 @@ jobs:
         continue-on-error: true
       - name: Shadow ML smoke (log mode)
         run: node engine/ml/train_shadow.js
-      - name: Backtest no-data path (must stay BLOCKED without dataset)
+      - name: Backtest no-data path must remain BLOCKED
+        env:
+          BACKTEST_FETCH: '0'
+          BACKTEST_SYMBOLS: BTCUSDT
+          MAYOR_STATE_DIR: ${{ runner.temp }}/mayor-state
         run: |
-          set +e
+          set -euo pipefail
           out=$(STRATEGY_MODE=core node engine/backtest.js 2>&1)
           echo "$out" | tail -30
-          echo "$out" | grep -qi 'BLOCKED\|No historical\|no-historical\|not executed' || {
-            echo "Expected BLOCKED/no-data messaging when dataset missing"
-            # If fetch somehow works and produces report, do not fail CI
-            exit 0
+          echo "$out" | grep -q '"status": "BLOCKED"' || {
+            echo "Expected the backtest report to remain BLOCKED without historical data"
+            exit 1
           }

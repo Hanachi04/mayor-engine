@@ -10,11 +10,11 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// Isolate circuit_breaker.json by pointing DATA via cwd copy - scan uses fixed DATA_DIR
+// Isolate circuit_breaker.json under the runner's MAYOR_STATE_DIR
 // We'll test checkCircuitBreaker by requiring scan with CLOUD_PRO_TEST
 const { checkCircuitBreaker, CONFIG } = require('../engine/scan.js');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.MAYOR_STATE_DIR || path.join(__dirname, '..', 'data');
 const BREAKER_FILE = path.join(DATA_DIR, 'circuit_breaker.json');
 const backup = fs.existsSync(BREAKER_FILE) ? fs.readFileSync(BREAKER_FILE, 'utf8') : null;
 

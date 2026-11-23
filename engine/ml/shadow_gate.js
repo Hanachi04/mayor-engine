@@ -11,8 +11,9 @@ const fs = require('fs');
 const path = require('path');
 const { FEATURE_KEYS, signalToFeatures } = require('./features');
 
-const MODEL_PATH = path.join(__dirname, '..', '..', 'data', 'ml', 'shadow_model.json');
 const { stateDir } = require('../state_dir');
+const { readJsonWithBackup } = require('../atomic_json');
+const MODEL_PATH = path.join(stateDir(), 'ml', 'shadow_model.json');
 const LOG_PATH = path.join(stateDir(), 'ml', 'shadow_log.jsonl');
 
 function mode() {
@@ -22,7 +23,7 @@ function mode() {
 function loadModel() {
   try {
     if (!fs.existsSync(MODEL_PATH)) return null;
-    return JSON.parse(fs.readFileSync(MODEL_PATH, 'utf8'));
+    return readJsonWithBackup(MODEL_PATH, null, { validate: value => value && typeof value === 'object' && !Array.isArray(value) });
   } catch {
     return null;
   }
@@ -35,7 +36,7 @@ function sigmoid(z) {
 }
 
 function scoreSignal(signal, model) {
-  if (!model || !model.weights) return null;
+  if (!model || !model.enabledForFiltering || !Array.isArray(model.weights) || model.weights.length !== FEATURE_KEYS.length) return null;
   const feats = signalToFeatures(signal);
   const x = FEATURE_KEYS.map(k => feats[k]);
   const z = x.reduce((s, xi, i) => s + (model.weights[i] || 0) * xi, 0);
@@ -64,7 +65,7 @@ function evaluateCandidate(signal) {
   const model = loadModel();
   if (!model) return { allow: true, reason: 'no-model', score: null };
   const score = scoreSignal(signal, model);
-  if (!score) return { allow: true, reason: 'score-fail', score: null };
+  if (!score) return { allow: true, reason: m === 'filter' ? 'ml-disabled-or-insufficient-sample' : 'score-fail', score: null };
 
   const pass = score.pWin >= score.minP;
   appendShadowLog({

@@ -12,7 +12,8 @@ const { CONFIG, ENGINE_VERSION, GATE_VERSION } = require('./config');
 
 const parent = require('../scan.js');
 const { walkExit, tradeEntryTime } = require('../exit_walker');
-const { requestJsonWithRetry, BinanceGeoBlockedError } = require('../binance_http');
+const { requestJsonWithRetry, BinanceGeoBlockedError, mapLimit } = require('../binance_http');
+const { atomicWriteJson, readJsonWithBackup } = require('../atomic_json');
 const {
   Indicators,
   prepareKlines,
@@ -24,8 +25,8 @@ const {
 const DATA_DIR = path.join(__dirname, '..', '..', 'data', 'scalper');
 const { stateDir } = require('../state_dir');
 const TRACKED_FILE = path.join(stateDir(), 'scalper', 'tracked.json');
-const VERIFICATION_FILE = path.join(DATA_DIR, 'verification.json');
-const HEARTBEAT_FILE = path.join(DATA_DIR, 'heartbeat.json');
+const VERIFICATION_FILE = path.join(stateDir(), 'scalper', 'verification.json');
+const HEARTBEAT_FILE = path.join(stateDir(), 'scalper', 'heartbeat.json');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -45,12 +46,10 @@ function fmtTime(d = new Date()) {
 }
 function round(v, d = 4) { return Number(Number(v).toFixed(d)); }
 
-let nextRequestAt = 0;
 
 function loadTracked() {
   try {
-    if (!fs.existsSync(TRACKED_FILE)) return [];
-    const v = JSON.parse(fs.readFileSync(TRACKED_FILE, 'utf8'));
+    const v = readJsonWithBackup(TRACKED_FILE, [], { validate: Array.isArray });
     return Array.isArray(v) ? v : [];
   } catch (e) {
     console.log(`scalper tracked read error: ${e.message}`);
@@ -58,8 +57,7 @@ function loadTracked() {
   }
 }
 function saveTracked(arr) {
-  fs.mkdirSync(path.dirname(TRACKED_FILE), { recursive: true });
-  fs.writeFileSync(TRACKED_FILE, JSON.stringify(arr, null, 2));
+  atomicWriteJson(TRACKED_FILE, arr, { validate: Array.isArray });
 }
 
 function loadVerification() {
@@ -67,7 +65,7 @@ function loadVerification() {
     if (!fs.existsSync(VERIFICATION_FILE)) {
       return { passed: false, status: 'BLOCKED', reason: 'verification-file-missing', gateVersion: GATE_VERSION };
     }
-    return JSON.parse(fs.readFileSync(VERIFICATION_FILE, 'utf8'));
+    return readJsonWithBackup(VERIFICATION_FILE, { passed: false, status: 'BLOCKED', reason: 'verification-file-corrupt', gateVersion: GATE_VERSION }, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
   } catch (e) {
     return { passed: false, status: 'BLOCKED', reason: `read-error:${e.message}`, gateVersion: GATE_VERSION };
   }
@@ -88,7 +86,7 @@ function writeHeartbeat(ok = true, extra = {}) {
     signalsAvailable: extra.signalsAvailable !== undefined ? !!extra.signalsAvailable : false,
     ...extra
   };
-  fs.writeFileSync(HEARTBEAT_FILE, JSON.stringify(payload, null, 2));
+  atomicWriteJson(HEARTBEAT_FILE, payload, { validate: v => v && typeof v === 'object' && !Array.isArray(v) });
 }
 
 async function requestJson(pathname, params = {}) {
@@ -102,11 +100,7 @@ async function requestJson(pathname, params = {}) {
         timeoutMs: CONFIG.requestTimeoutMs,
         headers: { 'user-agent': 'Futures-Scalper-v1.1/1.1' },
         sleep,
-        beforeAttempt: async () => {
-          const now = Date.now();
-          if (now < nextRequestAt) await sleep(nextRequestAt - now);
-          nextRequestAt = Date.now() + CONFIG.minRequestGapMs;
-        }
+        minRequestGapMs: CONFIG.minRequestGapMs
       });
     } catch (e) {
       lastError = e;
@@ -295,7 +289,7 @@ function calculatePositionSize(signal) {
 async function getMTFScalper(symbol, liquidity24h) {
   const frames = {};
   const intervals = [CONFIG.baseInterval, ...CONFIG.confirmIntervals, CONFIG.trendInterval];
-  const results = await Promise.all(intervals.map(async interval => {
+  const results = await mapLimit(intervals, 2, async interval => {
     try {
       const klines = await getKlines(symbol, interval, CONFIG.limits[interval]);
       return [interval, klines];
@@ -303,7 +297,7 @@ async function getMTFScalper(symbol, liquidity24h) {
       console.log(`${symbol} ${interval}: ${e.message}`);
       return [interval, null];
     }
-  }));
+  });
   for (const [iv, ks] of results) if (ks) frames[iv] = ks;
 
   if (!frames['1m']) return { ok: false, reason: 'no-1m' };
@@ -539,14 +533,14 @@ async function scan() {
   );
   console.log(`Scalper liquidity: ${eligible.length}/${CONFIG.symbols.length}`);
 
-  const results = await Promise.all(eligible.map(async symbol => {
+  const results = await mapLimit(eligible, 2, async symbol => {
     try {
       return { symbol, ...(await getMTFScalper(symbol, volumeMap.get(symbol).quoteVolume)) };
     } catch (e) {
       console.log(`Scalper eval ${symbol}: ${e.message}`);
       return { symbol, ok: false, reason: 'eval-error' };
     }
-  }));
+  });
 
   const candidates = results
     .filter(r => r.ok && r.signal)
