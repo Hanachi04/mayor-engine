@@ -1,0 +1,1 @@
+{"signal_id":"sig_2ef01deaa58d","symbol":"ETHUSDT","side":"LONG","signal_time":"2026-09-20T16:00:00.000Z","strategy_version":"turtle-candidate-03","strategy_commit":"114bce4","entry_level":"NEXT_OPEN","stop_level":2530.2353956451702,"stopDistance":225.32460435482972,"N":112.66230217741486,"donchian_level":2668.99,"status":"PENDING_NEXT_OPEN"}

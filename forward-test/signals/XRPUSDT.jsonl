@@ -1,0 +1,1 @@
+{"signal_id":"sig_4a567d7bce4c","symbol":"XRPUSDT","side":"LONG","signal_time":"2026-09-20T16:00:00.000Z","strategy_version":"turtle-candidate-03","strategy_commit":"114bce4","entry_level":"NEXT_OPEN","stop_level":1.3054830330882394,"stopDistance":0.1897169669117607,"N":0.09485848345588035,"donchian_level":1.4921,"status":"PENDING_NEXT_OPEN"}
